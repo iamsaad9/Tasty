@@ -51,21 +51,7 @@ type VisibleTabType = MenuTabType & { items: MenuItemType[]};
 
 // --- Mock Data for Static Links ---
 const staticMenuTabsData: VisibleTabType[] = [
-  {
-    id: "home",
-    name: "Home",
-    // icon: "LayoutDashboard", 
-    order: 1,
-    items: [
-      {
-        id: "home",
-        name: "Home",
-        href: "/",
-        // icon: "LayoutDashboard",
-        order: 1,
-      },
-    ],
-  },
+
   {
     id: "menu",
     name: "Menu",
@@ -73,9 +59,9 @@ const staticMenuTabsData: VisibleTabType[] = [
     order: 2,
     items: [
       {
-        id: "settings-profile",
-        name: "Profile",
-        href: "/settings/profile",
+        id: "menu",
+        name: "Menu",
+        href: "/menu",
         // icon: "User",
         order: 1,
       }
@@ -278,7 +264,7 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
   }, [openDropdownId]);
 
   return (
-    <div className="hidden md:flex items-center space-x-1">
+    <div className="hidden md:flex items-center space-x-4">
       {visibleMenuTabs.map((tab) => {
         const active = isTabActive(tab);
         const hasMultipleItems = tab.items.length > 1;
@@ -317,11 +303,11 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
               <Link
                 href={singleItemHref}
                 title={tab.name}
-                className={`flex items-center px-3 py-2 rounded-lg transition-colors text-md
+                className={`flex items-center px-3 py-2 rounded-lg transition-colors text-base lg:text-lg 
                   ${
                     active
-                      ? "bg-primary/10 text-gray-400 dark:bg-primary/20 text-lg"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground "
+                      ? "bg-primary/10 text-gray-300 dark:bg-primary/20 text-base lg:text-lg"
+                      : "text-white hover:text-gray-300 "
                   }`}
               >
                 {/* {getIcon(tab.icon, "h-4 w-4 mr-1.5")} */}
@@ -512,8 +498,8 @@ export function Nav() {
   // }
 
   return (
-    <nav className=" bg-background py-5 top-0  shadow-sm w-full backdrop-blur-md z-50">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+    <nav className="fixed py-5 top-0  w-full z-50 lg:px-10 px-5 backdrop-blur-xs">
+      <div className="w-full">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             <Link
