@@ -25,22 +25,31 @@ function ReservationForm() {
             setAction(`submit ${JSON.stringify(data)}`);
           }}
         >
-          <Input
-          classNames={
-            {
-                base:'text-black',
-                label: '!text-black',
-                inputWrapper:'border-black !group-hover:border-black',
-                innerWrapper:'group',
-                input: "text-black "
-
-            }
-          }
-            isRequired
-            errorMessage="Please enter a valid Full Name"
+          <DatePicker
+            classNames={{
+              label: "text-black",
+              inputWrapper:
+                "border-2 border-black hover:border-black bg-transparent",
+              calendarContent: "bg-black",
+              selectorIcon: "text-black",
+              segment: "text-black",
+            }}
+            id="date"
             variant="bordered"
+            label="Reservation Date"
+            name="date"
+            radius="none"
+          />
+          <Input
+            classNames={{
+              label: "!text-black",
+              inputWrapper:
+                "border-2 border-black hover:border-black bg-transparent ",
+              input: "text-white",
+            }}
+            id="fullname"
+            errorMessage="Please enter a valid Full Name"
             label="Full Name"
-            // labelPlacement="outside"
             name="fullname"
             // placeholder="Enter your Full Name"
             type="text"
@@ -48,18 +57,13 @@ function ReservationForm() {
           />
 
           <NumberInput
-            classNames={
-            {
-                base:'text-black',
-                label: '!text-black',
-                inputWrapper:'border-black !group-hover:border-black',
-                innerWrapper:'group',
-                input: "text-black "
-
-            }
-        }
-          
-            variant="bordered"
+            classNames={{
+              label: "!text-black",
+              inputWrapper:
+                "border-2 border-black hover:border-black bg-transparent",
+              input: "text-black ",
+            }}
+            id="phone"
             hideStepper
             // isRequired
             label="Phone #"
@@ -68,66 +72,41 @@ function ReservationForm() {
             radius="none"
           />
 
-          <DatePicker
-          classNames={
-            {
-                base:'text-black',
-                label: '!text-black',
-                inputWrapper:'border-black !group-hover:border-black',
-                innerWrapper:'group',
-                input: "text-black "
-
-            }
-        }
+          <TimeInput
+            classNames={{
+              label: "!text-black",
+              inputWrapper:
+                "border-2 border-black hover:border-black bg-transparent",
+              input: "text-black ",
+              //  segment: "text-black",
+            }}
             variant="bordered"
-            label="Reservation Date"
-            name="date"
+            label="Event Time"
+            name="time"
             radius="none"
           />
 
-          <TimeInput 
-          classNames={
-            {
-                base:'text-black',
-                label: '!text-black',
-                inputWrapper:'border-black !group-hover:border-black',
-                innerWrapper:'group',
-                input: "text-black "
-
-            }
-        }
-          variant="bordered"
-          label="Event Time" 
-           name="time"
-          radius="none"
+          <NumberInput
+            classNames={{
+              label: "!text-black",
+              inputWrapper:
+                "border-2 border-black hover:border-black bg-transparent",
+              input: "text-black ",
+            }}
+            name="persons"
+            label="Persons"
+            radius="none"
           />
 
-           <NumberInput 
-           classNames={
-            {
-                base:'text-black',
-                label: '!text-black',
-                inputWrapper:'border-black !group-hover:border-black',
-                innerWrapper:'group',
-                input: "text-black "
-
-            }
-        }
-          variant="bordered"
-           name="persons"
-          label="Persons" 
-          radius="none"
-          />
-
-  <Button
-    //   className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
-      className="bg-white text-black hover:bg-transparent hover:text-white border-white"
-      variant="bordered"
-      radius="none"
-      size="lg"
-    >
-      Submit
-    </Button>
+          <Button
+            //   className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+            className="bg-white text-black hover:bg-transparent hover:text-white border-white"
+            variant="bordered"
+            radius="none"
+            size="lg"
+          >
+            Submit
+          </Button>
         </Form>
       </Card>
     </div>
