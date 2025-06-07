@@ -13,8 +13,8 @@ function ReservationForm() {
   const [action, setAction] = useState<string>("");
 
   return (
-    <div>
-      <Card className="bg-theme p-5 lg:p-10 rounded-none">
+    <div className="w-full bg-foreground">
+      <Card className="bg-theme mx-auto w-full lg:w-[90vw] xl:w-[80vw] p-5 2xl:p-10 rounded-none">
         <Form
           className="w-full flex-col justify-center items-center md:flex-row gap-5 lg:gap-10"
           onReset={() => setAction("reset")}
@@ -29,8 +29,7 @@ function ReservationForm() {
             classNames={{
               label: "text-black",
               inputWrapper:
-                "border-2 border-black hover:border-black bg-transparent",
-              calendarContent: "bg-black",
+                "border-1 border-black !text-black hover:border-black bg-transparent",
               selectorIcon: "text-black",
               segment: "text-black",
             }}
@@ -44,7 +43,7 @@ function ReservationForm() {
             classNames={{
               label: "!text-black",
               inputWrapper:
-                "border-2 border-black hover:border-black bg-transparent ",
+                "border-1 border-black hover:border-black bg-transparent",
               input: "text-white",
             }}
             id="fullname"
@@ -60,7 +59,7 @@ function ReservationForm() {
             classNames={{
               label: "!text-black",
               inputWrapper:
-                "border-2 border-black hover:border-black bg-transparent",
+                "border-1 border-black hover:border-black bg-transparent",
               input: "text-black ",
             }}
             id="phone"
@@ -76,7 +75,7 @@ function ReservationForm() {
             classNames={{
               label: "!text-black",
               inputWrapper:
-                "border-2 border-black hover:border-black bg-transparent",
+                "border-1 border-black hover:border-black bg-transparent",
               input: "text-black ",
               //  segment: "text-black",
             }}
@@ -90,7 +89,7 @@ function ReservationForm() {
             classNames={{
               label: "!text-black",
               inputWrapper:
-                "border-2 border-black hover:border-black bg-transparent",
+                "border-1 border-black hover:border-black bg-transparent",
               input: "text-black ",
             }}
             name="persons"

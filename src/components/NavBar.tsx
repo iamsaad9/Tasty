@@ -21,7 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Avatar } from "@heroui/react";
 // import { ThemeSwitcher } from "@/components/theme/theme-switcher"; // Uncommented this line
 // import { useFindManymenu_tab } from "@/lib/hooks/menu-tab"; // No longer needed
-import { getIcon } from "@/app/components/ui/utils/iconUtils";
+import { getIcon } from "@/components/utils/iconUtils";
 import type { User as NextAuthUser } from "next-auth";
 
 // --- Type Definitions (Re-added as inline types) ---
@@ -52,6 +52,21 @@ type VisibleTabType = MenuTabType & { items: MenuItemType[]};
 // --- Mock Data for Static Links ---
 const staticMenuTabsData: VisibleTabType[] = [
 
+   {
+    id: "dashboard",
+    name: "Dashboard",
+    // icon: "Settings",
+    order: 1,
+    items: [
+      {
+        id: "dashboard",
+        name: "Dashboard",
+        href: "/",
+        // icon: "User",
+        order: 1,
+      }
+    ],
+  },
   {
     id: "menu",
     name: "Menu",
@@ -278,42 +293,21 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
               dropdownRefs.current[tab.id] = el;
             }}
           >
-            {hasMultipleItems ? (
-              <button
-                onMouseEnter={() =>
-                  setOpenDropdownId(openDropdownId === tab.id ? null : tab.id)
-                }
-                title={tab.name}
-                className={` flex items-center cursor-pointer px-3 py-2 rounded-lg transition-colors text-sm font-medium 
-                  ${
-                    active
-                      ? "bg-primary/10 text-primary dark:bg-primary/20"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground "
-                  }`}
-              >
-                {/* {getIcon(tab.icon, "h-4 w-4 mr-1.5")} */}
-                {tab.name}
-                <ChevronDown
-                  className={`h-4 w-4 ml-1.5 transition-transform ${
-                    openDropdownId === tab.id ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-            ) : (
+           
               <Link
                 href={singleItemHref}
                 title={tab.name}
                 className={`flex items-center px-3 py-2 rounded-lg transition-colors text-base lg:text-lg 
                   ${
                     active
-                      ? "bg-primary/10 text-gray-300 dark:bg-primary/20 text-base lg:text-lg"
+                      ? " text-gray-300 text-base lg:text-lg"
                       : "text-white hover:text-gray-300 "
                   }`}
               >
                 {/* {getIcon(tab.icon, "h-4 w-4 mr-1.5")} */}
                 {tab.name}
               </Link>
-            )}
+          
             {hasMultipleItems && (
               <AnimatePresence>
                 {openDropdownId === tab.id && (
@@ -368,17 +362,17 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
 }) => {
   const pathname = usePathname();
   return (
-    <div className="px-2 pt-2 pb-4 space-y-1 ">
+    <div className="px-2 pt-2 pb-4 space-y-1 bg-transparent">
       {navLinks.map((link) => (
         <Link
           key={link.href}
           href={link.href}
-          className={`flex items-center px-3 py-3 rounded-lg mx-2
+          className={`flex items-center px-3 py-3 rounded-lg mx-2 text-white
             ${
               pathname === link.href ||
               (link.href !== "/" && pathname.startsWith(link.href))
-                ? "bg-primary/10 text-primary dark:bg-primary/20 text-gray-400 text-md"
-                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground text-sm"
+                ? "bg-background/50 text-primary dark:bg-primary/20  text-md"
+                : "text-muted-foreground hover:bg-background/30 hover:text-foreground text-sm"
             }`}
           onClick={onCloseMenu}
         >
@@ -405,10 +399,10 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
               </div>
             )}
             {user?.email && (
-              <div className="text-sm text-muted-foreground">{user.email}</div>
+              <div className="text-sm text-foreground/70">{user.email}</div>
             )}
             {user.role && (
-              <div className="text-xs text-muted-foreground capitalize">
+              <div className="text-xs text-foreground/70 capitalize">
                 {user.role.toLowerCase()}
               </div>
             )}
@@ -420,7 +414,7 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
             onCloseMenu();
             signOut({ callbackUrl: "/login" });
           }}
-          className="flex items-center w-full px-3 py-2 mt-1 text-sm text-destructive hover:bg-destructive/10 rounded-lg"
+          className="flex items-center w-full px-3 py-2 mt-1 text-sm  bg-destructive/30 hover:bg-destructive/50 rounded-lg cursor-pointer"
         >
           <LogOut className="h-4 w-4 mr-2 " /> Sign Out
         </button>
@@ -498,14 +492,14 @@ export function Nav() {
   // }
 
   return (
-    <nav className="fixed py-5 top-0  w-full z-50 lg:px-10 px-5 backdrop-blur-xs">
+    <nav className="bg-black/30 absolute py-2 top-0  w-full z-50 lg:px-10 px-5 backdrop-blur-xs">
       <div className="w-full">
-        <div className="flex justify-between h-16 items-center">
+        <div className="flex justify-between py-2 items-center">
           <div className="flex items-center">
             <Link
               // href={session ? "/dashboard" : "/login"}
               href={"/"}
-              className="text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
+              className="text-base md:text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
             >
               
                 Tasty
@@ -526,14 +520,14 @@ export function Nav() {
               <div className="flex items-center md:hidden ml-3">
                 <button
                   onClick={toggleMobileMenu}
-                  className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent focus:outline-none cursor-pointer"
+                  className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground  cursor-pointer"
                   aria-expanded={isMobileMenuOpen}
                   aria-label="Open main menu"
                 >
                   {isMobileMenuOpen ? (
-                    <X className="block h-6 w-6" />
+                    <X className="block h-6 w-6 text-white " />
                   ) : (
-                    <Menu className="block h-6 w-6" />
+                    <Menu className="block h-6 w-6 text-white" />
                   )}
                 </button>
               </div>
@@ -549,7 +543,7 @@ export function Nav() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className=" md:hidden overflow-hidden border-t border-border bg-background"
+              className=" md:hidden overflow-hidden border-t border-border bg-transparent "
               ref={mobileMenuRef}
             >
               <MobileNavMenu
