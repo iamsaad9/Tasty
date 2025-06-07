@@ -22,14 +22,14 @@ function About() {
         </div>
 
         <div className="flex flex-col gap-2 lg:gap-5 w-full xl:w-[90%]">
-          <p className="mt-2 text-gray-700 text-base sm:text-xs md:text-sm lg:text-medium  xl:text-lg 2xl:text-xl">
+          <p className="mt-2 text-accent/60 text-base sm:text-xs md:text-sm lg:text-medium  xl:text-lg ">
             Far far away, behind the word mountains, far from the countries
             Vokalia and Consonantia, there live the blind texts. Separated they
             live in Bookmarksgrove right at the coast of the Semantics, a large
             language ocean.
           </p>
 
-          <p className="mt-2 text-gray-700 text-base sm:text-xs md:text-sm lg:text-medium  xl:text-lg 2xl:text-xl">
+          <p className="mt-2 text-accent/60 text-base sm:text-xs md:text-sm lg:text-medium  xl:text-lg ">
             A small river named Duden flows by their place and supplies it with
             the necessary regelialia. It is a paradisematic country, in which
             roasted parts of sentences fly into your mouth.

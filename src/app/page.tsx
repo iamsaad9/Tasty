@@ -24,6 +24,10 @@ function Home() {
               <MenuItems/>
           </div>
 
+          <div className='h-[100vh] w-full flex items-center justify-center'>
+
+          </div>
+
        
     </div>
   )
