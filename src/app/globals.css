@@ -7,6 +7,7 @@
 
 :root {
   --theme:#ffb400;
+  --secondary-theme:#27272b;
   --radius:0.625rem;
   --background:black;
   --body-bg:#fafafa ;
@@ -17,7 +18,7 @@
   --popover-foreground:oklch(0.145 0 0);
   --primary:oklch(0.205 0 0);
   --primary-foreground:oklch(0.985 0 0);
-  --secondary:oklch(0.97 0 0);
+  --secondary:#8b8b92;
   --secondary-foreground:oklch(0.205 0 0);
   --muted:oklch(0.97 0 0);
   --muted-foreground:oklch(0.556 0 0);

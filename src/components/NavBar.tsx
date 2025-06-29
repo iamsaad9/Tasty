@@ -492,7 +492,7 @@ export function Nav() {
   // }
 
   return (
-    <nav className="bg-black/30 absolute py-2 top-0  w-full z-50 lg:px-10 px-5 backdrop-blur-xs">
+    <nav className=" absolute py-2 top-0  w-full z-50 lg:px-10 px-5 backdrop-blur-xs">
       <div className="w-full">
         <div className="flex justify-between py-2 items-center">
           <div className="flex items-center">

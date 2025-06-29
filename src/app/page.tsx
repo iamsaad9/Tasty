@@ -5,6 +5,9 @@ import { CarouselDemo } from '@/components/BgCarousel';
 import About from '@/components/About';
 import { MenuItem } from '@heroui/react';
 import MenuItems from '@/components/MenuItems';
+import Speacials from '@/components/Speacials';
+import ImageGallery from '@/components/ImageGallery';
+import Footer from '@/components/Footer';
 function Home() {
   return (
     <div>
@@ -20,14 +23,20 @@ function Home() {
             <About/>
           </div>
 
-          <div className='w-full flex justify-center'>
+          <div className='w-full flex justify-center z-10'>
               <MenuItems/>
           </div>
 
-          <div className='h-[100vh] w-full flex items-center justify-center'>
-
+          <div className='w-full flex items-center justify-center'>
+            <Speacials/>
           </div>
 
+          <div className='w-full flex items-center justify-center'>
+            <ImageGallery/>
+          </div>
+
+          <Footer/>
+    
        
     </div>
   )

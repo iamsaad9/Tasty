@@ -28,6 +28,8 @@ export function CarouselDemo() {
           <CarouselItem key={index}>
             <div>
               <Card>
+                <div className="absolute h-full w-full bg-[#404044] opacity-40" />
+
                 <CardContent
                   className="h-96 md:h-[80vh]  flex aspect-square items-center justify-center "
                   style={{
@@ -37,8 +39,7 @@ export function CarouselDemo() {
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                   }}
-                >
-                </CardContent>
+                />
               </Card>
             </div>
           </CarouselItem>
