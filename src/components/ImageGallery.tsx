@@ -1,6 +1,6 @@
 import React from "react";
 import ExpandableImage from "./ExpandableImage";
-
+import FadeInSection from "./ui/scrollAnimated";
 const images = [
   "/images/Gallery/insta-1.jpg.webp",
   "/images/Gallery/insta-2.jpg.webp",
@@ -16,9 +16,9 @@ function ImageGallery() {
 
     <div className="w-full flex flex-col sm:flex-row">
       {images.map((src, index) => (
-        <div key={index} className="flex-1 relative">
+        <FadeInSection delay={index*0.1} className="flex-1 relative">
           <ExpandableImage src={src} alt={`Special ${index + 1}`} />
-        </div>
+        </FadeInSection>
       ))}
     </div>
     </div>

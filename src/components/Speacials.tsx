@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { Card } from "@heroui/react";
-
+import FadeInSection from "./ui/scrollAnimated";
 
 function Speacials() {
   const specialItems = [
@@ -59,16 +59,17 @@ function Speacials() {
   }}
 >
   <div className="absolute h-full w-full bg-[#404044] opacity-40"></div>
-  <h1 className="text-4xl text-white font-semibold relative z-10 mb-10">
+  <FadeInSection className="text-4xl text-white font-semibold relative z-10 mb-10">
     Our Specialities
-  </h1>
+  </FadeInSection>
 </div>
 
       <div className="h-auto w-full bg-[var(--body-bg)] flex justify-center items-center pb-20">
-        <Card className="h-auto w-[80%] 2xl:w-[60%] grid grid-cols-1 lg:grid-cols-2 -mt-20 z-1 rounded-none">
+        <Card className="h-auto w-[80%] 2xl:w-[60%] grid grid-cols-1 lg:grid-cols-2 -mt-20 z-1 rounded-none bg-transparent">
           {specialItems.map((items) => (
-            <div
+            <FadeInSection
               key={items.id}
+              delay={items.id * 0.1}
               className="flex flex-col-reverse md:grid md:grid-cols-2 w-full bg-foreground"
             >
               {/* Text Content */}
@@ -90,7 +91,7 @@ function Speacials() {
                 alt={`Special Dish ${items.id}`}
                 className="h-80 w-full object-cover"
               />
-            </div>
+            </FadeInSection>
           ))}
         </Card>
       </div>

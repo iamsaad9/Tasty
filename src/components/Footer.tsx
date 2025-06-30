@@ -1,12 +1,12 @@
 import React from "react";
 import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
-
+import FadeInSection from "./ui/scrollAnimated";
 const Footer = () => {
   return (
     <footer className="w-full bg-(--secondary-theme) text-white  px-6 flex flex-col items-center justify-center py-20">
       <div className="w-[80%] sm:w-[60%] flex flex-wrap justify-between gap-8 grid-cols-1 sm:grid-cols-3">
         {/* Tasty Section */}
-        <div className="w-60">
+        <FadeInSection className="w-60">
           <div className=" text-2xl my-5">Tasty</div>
           <p className="mb-4 text-md text-secondary ">
             Far far away, behind the word mountains, far from the countries
@@ -32,10 +32,10 @@ const Footer = () => {
               <FaInstagram size={25} />
             </a>
           </div>
-        </div>
+        </FadeInSection>
 
         {/* Opening Hours */}
-        <div className="w-60">
+        <FadeInSection delay={0.2} className="w-60">
           <div className=" text-2xl my-5">Opening Hours</div>
           <ul className=" text-md space-y-5 ">
             {[
@@ -53,10 +53,10 @@ const Footer = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </FadeInSection>
 
         {/* Contact Info */}
-        <div className="w-60">
+        <FadeInSection delay={0.3} className="w-60">
           <div className=" text-2xl my-5">Contact Information</div>
           <div className=" flex flex-col gap-2 text-md text-secondary ">
             <a
@@ -73,13 +73,13 @@ const Footer = () => {
             <a className="hover:text-foreground transition-colors duration-300" href="mailto:info@yoursite.com">info@yoursite.com</a>
             <a className="hover:text-foreground transition-colors duration-300" href="mailto:tasty@email.com">tasty@email.com</a>
           </div>
-        </div>
+        </FadeInSection>
       </div>
 
       {/* Copyright */}
-      <div className="copyrightcontainer text-center text-md mt-20 text-secondary">
+      <FadeInSection className="copyrightcontainer text-center text-md mt-20 text-secondary">
         <span>Copyright ©2024 All rights reserved</span>
-      </div>
+      </FadeInSection>
     </footer>
   );
 };

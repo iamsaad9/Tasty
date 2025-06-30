@@ -2,7 +2,7 @@ import { Card } from "@heroui/react";
 import React from "react";
 import { FaWineGlassAlt, FaIceCream, FaDrumstickBite } from "react-icons/fa";
 import { motion } from "framer-motion";
-
+import FadeInSection from "./ui/scrollAnimated";
 function MenuItems() {
   const [activeMenu, setActiveMenu] = React.useState(1);
   const menuType = [
@@ -115,15 +115,15 @@ function MenuItems() {
   };
   return (
     <div className=" w-full lg:w-[90vw] xl:w-[80vw] flex flex-col gap-10 py-20 justify-center items-center px-5 lg:px-0">
-      <div className="flex flex-col justify-center items-center gap-2">
+      <FadeInSection className="flex flex-col justify-center items-center gap-2">
         <h1 className="text-background/30 text-md font-semibold">OUR MENU</h1>
         <h1 className="text-accent text-center text-2xl sm:text-3xl font-semibold ">
           Discover Our Exclusive Menu
         </h1>
-      </div>
+      </FadeInSection>
 
       <div className="w-full sm:px-0 py-5">
-        <div className="flex sm:flex-row justify-center flex-col gap-2 sm:gap-10 p-2 ">
+        <FadeInSection delay={0.2} className="flex sm:flex-row justify-center flex-col gap-2 sm:gap-10 p-2 ">
           {menuType.map((item) => (
             <Card
               key={item.id}
@@ -144,7 +144,7 @@ function MenuItems() {
               </div>
             </Card>
           ))}
-        </div>
+        </FadeInSection>
       </div>
 
       <div className="w-full grid gap-5 md:grid-cols-2">
@@ -161,6 +161,7 @@ function MenuItems() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.8 }}
             >
+              <FadeInSection  className="w-full">
              
               <Card
                 key={item.id}
@@ -196,6 +197,7 @@ function MenuItems() {
                   </div>
                 </div>
               </Card>
+              </FadeInSection>
             </motion.div>
           ))}
       </div>

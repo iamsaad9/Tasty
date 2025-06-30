@@ -1,5 +1,7 @@
 import React from "react";
 import { Image } from "@heroui/react";
+import FadeInSection from "./ui/scrollAnimated";
+
 function About() {
   return (
     <div className="w-[100vw] lg:w-[90vw] xl:w-[80vw] flex sm:flex-row flex-col">
@@ -11,7 +13,7 @@ function About() {
         />
       </div>
 
-      <div className="p-5 lg:p-10  sm:w-[50%] flex flex-col justify-center gap-5 lg:gap-10 ">
+      <FadeInSection className="p-5 lg:p-10  sm:w-[50%] flex flex-col justify-center gap-5 lg:gap-10 ">
         <div className="  w-full xl:w-[90%]">
           <h2 className="text-sm md:text-md lg:text-lg font-semibold mt-4 text-background/30">
             ABOUT TASTY
@@ -35,7 +37,7 @@ function About() {
             roasted parts of sentences fly into your mouth.
           </p>
         </div>
-      </div>
+      </FadeInSection>
     </div>
   );
 }

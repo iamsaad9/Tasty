@@ -6,7 +6,7 @@ const ExpandableImage = ({ src, alt }: { src: string; alt?: string }) => {
   return (
     <>
       {/* Image with full width and no spacing */}
-      <div className="absolute h-full w-full bg-[#404044] opacity-20 hover:opacity-70 transition-colors-opacity duration-300 cursor-zoom-in"onClick={() => setIsOpen(true)} />
+      <div className="absolute h-full w-full bg-[#404044] opacity-20 hover:opacity-70 transition-colors-opacity duration-300 cursor-zoom-in" onClick={() => setIsOpen(true)} />
 
       <img
         src={src}

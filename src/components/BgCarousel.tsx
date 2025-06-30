@@ -9,42 +9,64 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import ReservationForm from "@/components/ReservationForm";
+import { Button } from "@/components/ui/button"; 
+import { indie } from "@/components/utils/fonts"; 
+import FadeInSection from "./ui/scrollAnimated";
 
 export function CarouselDemo() {
+  const slides = [
+    {
+      id: 1,
+      image: "/images/BgCarousel/bg_1.jpg",
+      title: "Tasty & Delicious Food",
+      showButton: true,
+    },
+    {
+      id: 2,
+      image: "/images/BgCarousel/bg_2.jpg",
+      title: "Tasty & Delicious Food",
+      showButton: true,
+    },
+    {
+      id: 3,
+      image: "/images/BgCarousel/bg_3.jpg",
+      title: "Book a table for yourself at a time convenient for you",
+      showButton: true, 
+    },
+  ];
+
   return (
-    <Carousel
-      className="w-full mt-0"
-      opts={{ loop: true }}
-      plugins={[
-        // Autoplay({
-        //   delay: 5000,
-        // }),
-        Fade(),
-      ]}
-    >
+    <Carousel className="w-full mt-0" opts={{ loop: true }} plugins={[Fade(), Autoplay({ delay: 4000, stopOnInteraction: false })]}>
       <CarouselContent>
-        {Array.from({ length: 3 }).map((_, index) => (
+        {slides.map((slide, index) => (
           <CarouselItem key={index}>
-            <div>
-              <Card>
-                <div className="absolute h-full w-full bg-[#404044] opacity-40" />
+            <div className="relative w-full h-96 md:h-[80vh]">
+              <Card className="w-full h-full">
+                <div className="absolute inset-0 bg-black opacity-40 z-10" />
 
                 <CardContent
-                  className="h-96 md:h-[80vh]  flex aspect-square items-center justify-center "
+                  className="h-full w-full bg-center bg-cover z-0 relative"
                   style={{
-                    backgroundImage: `url('/images/BgCarousel/bg_${
-                      index + 1
-                    }.jpg')`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
+                    backgroundImage: `url('${slide.image}')`,
                   }}
                 />
+                <div className="absolute w-full h-full bg-[#404044] opacity-30"/>
+                <FadeInSection className=" absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
+                  <h2 className={`${indie.className} w-[50%] text-white text-3xl md:text-7xl  mb-4`}>
+                    {slide.title}
+                  </h2>
+                  {slide.showButton && (
+                    <Button className="bg-transparent border-2 rounded-none border-foreground text-foreground px-10 py-8 mt-15 text-xl cursor-pointer hover:bg-foreground hover:text-background transition-colors duration-300">
+                    ORDER NOW
+                    </Button>
+                  )}
+                </FadeInSection>
               </Card>
             </div>
           </CarouselItem>
         ))}
       </CarouselContent>
+
       <CarouselPrevious />
       <CarouselNext />
     </Carousel>

@@ -3,6 +3,8 @@ import { Raleway } from "next/font/google";
 import "./globals.css";
 import NavBar from "../components/NavBar";
 import {Providers} from "@/components/providers";
+import { Indie_Flower } from 'next/font/google';
+
 
 
 const RalewaySans = Raleway({
