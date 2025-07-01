@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Avatar } from "@heroui/react";
+import { Avatar, Button } from "@heroui/react";
 // import { ThemeSwitcher } from "@/components/theme/theme-switcher"; // Uncommented this line
 // import { useFindManymenu_tab } from "@/lib/hooks/menu-tab"; // No longer needed
 import { getIcon } from "@/components/utils/iconUtils";
@@ -47,12 +47,11 @@ interface ProcessedMobileNavItem {
   // icon: React.ReactElement;
 }
 
-type VisibleTabType = MenuTabType & { items: MenuItemType[]};
+type VisibleTabType = MenuTabType & { items: MenuItemType[] };
 
 // --- Mock Data for Static Links ---
 const staticMenuTabsData: VisibleTabType[] = [
-
-   {
+  {
     id: "dashboard",
     name: "Dashboard",
     // icon: "Settings",
@@ -64,7 +63,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         href: "/",
         // icon: "User",
         order: 1,
-      }
+      },
     ],
   },
   {
@@ -79,7 +78,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         href: "/menu",
         // icon: "User",
         order: 1,
-      }
+      },
     ],
   },
   {
@@ -97,7 +96,7 @@ const staticMenuTabsData: VisibleTabType[] = [
       },
     ],
   },
-   {
+  {
     id: "reservations",
     name: "Reservations",
     // icon: "HelpCircle",
@@ -112,7 +111,7 @@ const staticMenuTabsData: VisibleTabType[] = [
       },
     ],
   },
-   {
+  {
     id: "about",
     name: "About",
     // icon: "HelpCircle",
@@ -127,7 +126,7 @@ const staticMenuTabsData: VisibleTabType[] = [
       },
     ],
   },
-   {
+  {
     id: "contact",
     name: "Contact",
     // icon: "HelpCircle",
@@ -279,7 +278,7 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
   }, [openDropdownId]);
 
   return (
-    <div className="hidden md:flex items-center space-x-4">
+    <div className="hidden md:flex items-center  space-x-5">
       {visibleMenuTabs.map((tab) => {
         const active = isTabActive(tab);
         const hasMultipleItems = tab.items.length > 1;
@@ -293,21 +292,20 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
               dropdownRefs.current[tab.id] = el;
             }}
           >
-           
-              <Link
-                href={singleItemHref}
-                title={tab.name}
-                className={`flex items-center px-3 py-2 rounded-lg transition-colors text-base lg:text-lg 
+            <Link
+              href={singleItemHref}
+              title={tab.name}
+              className={`flex items-center  lg:px-3 py-2 rounded-lg transition-colors text-base lg:text-lg 
                   ${
                     active
                       ? " text-gray-300 text-base lg:text-lg"
                       : "text-white hover:text-gray-300 "
                   }`}
-              >
-                {/* {getIcon(tab.icon, "h-4 w-4 mr-1.5")} */}
-                {tab.name}
-              </Link>
-          
+            >
+              {/* {getIcon(tab.icon, "h-4 w-4 mr-1.5")} */}
+              {tab.name}
+            </Link>
+
             {hasMultipleItems && (
               <AnimatePresence>
                 {openDropdownId === tab.id && (
@@ -323,7 +321,7 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
                         key={item.id}
                         href={item.href}
                         title={item.name}
-                        className={`flex items-center w-full px-3 py-2 text-sm 
+                        className={`flex items-center  w-full px-3 py-2 text-sm 
                           ${
                             pathname === item.href ||
                             (item.href !== "/" &&
@@ -344,6 +342,11 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
           </div>
         );
       })}
+      <Button className="bg-theme">
+        <Link href="/login" title="login" className="text-background text-base" >
+          Login
+        </Link>
+      </Button>
     </div>
   );
 };
@@ -436,6 +439,16 @@ export function Nav() {
     () => staticMenuTabsData.filter((tab) => tab.items && tab.items.length > 0),
     []
   );
+  const [showFixedNavbar, setShowFixedNavbar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowFixedNavbar(window.scrollY > 150);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const processedMobileNavLinks = useMemo(() => {
     const links: ProcessedMobileNavItem[] = [];
@@ -492,22 +505,71 @@ export function Nav() {
   // }
 
   return (
-    <nav className=" absolute py-2 top-0  w-full z-50 lg:px-10 px-5 backdrop-blur-xs">
-      <div className="w-full">
-        <div className="flex justify-between py-2 items-center">
-          <div className="flex items-center">
-            <Link
-              // href={session ? "/dashboard" : "/login"}
-              href={"/"}
-              className="text-base md:text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
-            >
-              
+    <>
+      <AnimatePresence>
+        {showFixedNavbar && (
+          <motion.div
+            initial={{ y: -80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -80, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed py-2 top-0 w-full z-50 lg:px-10 px-5 bg-(--secondary-theme)"
+          >
+            <div className="flex justify-between py-2 items-center ">
+              <Link
+                href="/"
+                className="text-base md:text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
+              >
                 Tasty
-            </Link>
-          </div>
+              </Link>
 
-          {/* {session?.user && ( */}
-            <div className="flex items-center">
+              {/* Desktop Nav */}
+              <div className="hidden md:flex ">
+                <DesktopNavLinks
+                  visibleMenuTabs={visibleMenuTabs}
+                  pathname={pathname}
+                />
+              </div>
+
+              {/* Mobile Hamburger */}
+              <div className="flex md:hidden">
+                <button
+                  onClick={toggleMobileMenu}
+                  className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground cursor-pointer"
+                  aria-expanded={isMobileMenuOpen}
+                  aria-label="Open main menu"
+                >
+                  {isMobileMenuOpen ? (
+                    <X className="block h-6 w-6 text-white" />
+                  ) : (
+                    <Menu className="block h-6 w-6 text-white" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <nav
+        className={` absolute py-2 top-0 w-full z-50 lg:px-10 px-5  ${
+          isMobileMenuOpen ? "backdrop-blur-xl" : "backdrop-blur-xs"
+        }`}
+      >
+        <div className="w-full">
+          <div className="flex justify-between py-2 items-center">
+            <div className="flex items-center ">
+              <Link
+                // href={session ? "/dashboard" : "/login"}
+                href={"/"}
+                className="text-base md:text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
+              >
+                Tasty
+              </Link>
+            </div>
+
+            {/* {session?.user && ( */}
+            <div className="flex items-center ">
               <DesktopNavLinks
                 visibleMenuTabs={visibleMenuTabs}
                 pathname={pathname}
@@ -532,36 +594,38 @@ export function Nav() {
                 </button>
               </div>
             </div>
-          {/* )} */}
+            {/* )} */}
+          </div>
         </div>
-      </div>
-
-       {/* {session?.user && ( */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className=" md:hidden overflow-hidden border-t border-border bg-transparent "
-              ref={mobileMenuRef}
-            >
-              <MobileNavMenu
-                navLinks={processedMobileNavLinks}
-                user={{
-                  id: "1",
-                  name: "Saad",
-                  email: "saad@example.com",
-                  image: "",
-                  role: "admin"
-                }}
-                onCloseMenu={toggleMobileMenu}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      </nav>
+      {/* {session?.user && ( */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className={`md:hidden overflow-hidden border-t border-border ${
+              showFixedNavbar ? "bg-(--secondary-theme)" : "bg-transparent"
+            } fixed top-16 left-0 right-0 z-40 backdrop-blur-xl`}
+            ref={mobileMenuRef}
+          >
+            <MobileNavMenu
+              navLinks={processedMobileNavLinks}
+              user={{
+                id: "1",
+                name: "Saad",
+                email: "saad@example.com",
+                image: "",
+                role: "admin",
+              }}
+              onCloseMenu={toggleMobileMenu}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* )}  */}
-    </nav>
+    </>
   );
 }
 

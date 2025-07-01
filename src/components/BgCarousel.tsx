@@ -36,7 +36,7 @@ export function CarouselDemo() {
   ];
 
   return (
-    <Carousel className="w-full mt-0" opts={{ loop: true }} plugins={[Fade(), Autoplay({ delay: 4000, stopOnInteraction: false })]}>
+    <Carousel className="w-full mt-0" opts={{ loop: true }} plugins={[Fade(), Autoplay({ delay: 5000, stopOnInteraction: false })]}>
       <CarouselContent>
         {slides.map((slide, index) => (
           <CarouselItem key={index}>
@@ -52,11 +52,11 @@ export function CarouselDemo() {
                 />
                 <div className="absolute w-full h-full bg-[#404044] opacity-30"/>
                 <FadeInSection className=" absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
-                  <h2 className={`${indie.className} w-[50%] text-white text-3xl md:text-7xl  mb-4`}>
+                  <h2 className={`${indie.className} w-[80%] md:w-[50%] text-white text-2xl md:text-7xl mt-10 mb-4`}>
                     {slide.title}
                   </h2>
                   {slide.showButton && (
-                    <Button className="bg-transparent border-2 rounded-none border-foreground text-foreground px-10 py-8 mt-15 text-xl cursor-pointer hover:bg-foreground hover:text-background transition-colors duration-300">
+                    <Button className="backdrop-blur-xs bg-transparent border-2 rounded-none border-foreground text-foreground px-5 md:px-10 py-5 md:py-8 mt-5 md:mt-15 text-md md:text-xl cursor-pointer hover:bg-foreground hover:text-background transition-colors duration-300">
                     ORDER NOW
                     </Button>
                   )}
