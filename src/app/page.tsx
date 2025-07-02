@@ -1,12 +1,12 @@
 "use client";
 import React from 'react'
-import ReservationForm from '@/components/ReservationForm';
-import { CarouselDemo } from '@/components/BgCarousel';
-import About from '@/components/About';
+import ReservationForm from '@/components/Dashboard/ReservationForm';
+import { CarouselDemo } from '@/components/Dashboard/BgCarousel';
+import About from '@/components/Dashboard/About';
 import { MenuItem } from '@heroui/react';
-import MenuItems from '@/components/MenuItems';
-import Speacials from '@/components/Speacials';
-import ImageGallery from '@/components/ImageGallery';
+import MenuItems from '@/components/Dashboard/MenuItems';
+import Speacials from '@/components/Dashboard/Speacials';
+import ImageGallery from '@/components/Dashboard/ImageGallery';
 import Footer from '@/components/Footer';
 function Home() {
   return (
@@ -35,7 +35,6 @@ function Home() {
             <ImageGallery/>
           </div>
 
-          <Footer/>
     
        
     </div>

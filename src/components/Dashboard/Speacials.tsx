@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { Card } from "@heroui/react";
-import FadeInSection from "./ui/scrollAnimated";
+import FadeInSection from "../ui/scrollAnimated";
 
 function Speacials() {
   const specialItems = [

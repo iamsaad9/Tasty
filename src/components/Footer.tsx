@@ -3,7 +3,7 @@ import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 import FadeInSection from "./ui/scrollAnimated";
 const Footer = () => {
   return (
-    <footer className="w-full bg-(--secondary-theme) text-white  px-6 flex flex-col items-center justify-center py-20">
+    <footer className="w-full bg-(--secondary-theme) z-10 text-white  px-6 flex flex-col items-center justify-center py-20 relative">
       <div className="w-[80%] sm:w-[60%] flex flex-wrap justify-between gap-8 grid-cols-1 sm:grid-cols-3">
         {/* Tasty Section */}
         <FadeInSection className="w-60">

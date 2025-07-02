@@ -2,7 +2,9 @@ import { Card } from "@heroui/react";
 import React from "react";
 import { FaWineGlassAlt, FaIceCream, FaDrumstickBite } from "react-icons/fa";
 import { motion } from "framer-motion";
-import FadeInSection from "./ui/scrollAnimated";
+import FadeInSection from "../ui/scrollAnimated";
+import { Link } from "@heroui/react";
+
 function MenuItems() {
   const [activeMenu, setActiveMenu] = React.useState(1);
   const menuType = [
@@ -123,7 +125,10 @@ function MenuItems() {
       </FadeInSection>
 
       <div className="w-full sm:px-0 py-5">
-        <FadeInSection delay={0.2} className="flex sm:flex-row justify-center flex-col gap-2 sm:gap-10 p-2 ">
+        <FadeInSection
+          delay={0.2}
+          className="flex sm:flex-row justify-center flex-col gap-2 sm:gap-10 p-2 "
+        >
           {menuType.map((item) => (
             <Card
               key={item.id}
@@ -158,49 +163,57 @@ function MenuItems() {
                 duration: 0.3,
                 ease: "easeInOut",
               }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.8 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.8 }}
             >
-              <FadeInSection  className="w-full">
-             
-              <Card
-                key={item.id}
-                className="bg-foreground p-4 rounded-sm hover:bg-theme cursor-pointer"
-              >
-                <div className="flex flex-row sm:items-center sm:justify-between gap-4">
-                  {/* Left: Image + Text */}
-                  <div className="flex items-center sm:items-center gap-4 flex-1">
-                    <div
-                      className="min-w-[70px] min-h-[70px] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-red-500 flex items-center justify-center text-white font-bold"
-                      style={{
-                        backgroundImage: `url(./images/MenuItems/Main/item${item.id}.jpg)`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      }}
-                    />
+              <FadeInSection className="w-full">
+                <Card
+                  key={item.id}
+                  className="bg-foreground p-4 rounded-sm hover:bg-theme cursor-pointer"
+                >
+                  <div className="flex flex-row sm:items-center sm:justify-between gap-4">
+                    {/* Left: Image + Text */}
+                    <div className="flex items-center sm:items-center gap-4 flex-1">
+                      <div
+                        className="min-w-[70px] min-h-[70px] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-red-500 flex items-center justify-center text-white font-bold"
+                        style={{
+                          backgroundImage: `url(./images/MenuItems/Main/item${item.id}.jpg)`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      />
 
-                    <div className="flex flex-col">
-                      <h2 className="text-base sm:text-lg font-semibold text-accent">
-                        {item.name}
-                      </h2>
-                      <p className="text-sm text-accent/60 mt-1 sm:mt-2">
-                        {item.description}
-                      </p>
+                      <div className="flex flex-col">
+                        <h2 className="text-base sm:text-lg font-semibold text-accent">
+                          {item.name}
+                        </h2>
+                        <p className="text-sm text-accent/60 mt-1 sm:mt-2">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right: Price */}
+                    <div className="text-right flex items-center">
+                      <h1 className="text-2xl font-semibold text-accent">
+                        {item.price}
+                      </h1>
                     </div>
                   </div>
-
-                  {/* Right: Price */}
-                  <div className="text-right flex items-center">
-                    <h1 className="text-2xl font-semibold text-accent">
-                      {item.price}
-                    </h1>
-                  </div>
-                </div>
-              </Card>
+                </Card>
               </FadeInSection>
             </motion.div>
           ))}
       </div>
+
+      <FadeInSection>
+        <Link
+          href="/menu"
+          className="bg-transparent border-2 rounded-none border-secondary text-secondary px-2 md:px-10 py-3 text-sm md:text-xl cursor-pointer hover:bg-secondary hover:text-foreground transition-colors duration-300"
+        >
+          SEE MORE
+        </Link>
+      </FadeInSection>
     </div>
   );
 }

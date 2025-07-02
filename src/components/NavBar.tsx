@@ -82,21 +82,6 @@ const staticMenuTabsData: VisibleTabType[] = [
     ],
   },
   {
-    id: "specialities",
-    name: "Specialities",
-    // icon: "HelpCircle",
-    order: 3,
-    items: [
-      {
-        id: "specialities",
-        name: "Specialities",
-        href: "/specialities",
-        // icon: "HelpCircle",
-        order: 1,
-      },
-    ],
-  },
-  {
     id: "reservations",
     name: "Reservations",
     // icon: "HelpCircle",
@@ -343,7 +328,7 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
         );
       })}
       <Button className="bg-theme">
-        <Link href="/login" title="login" className="text-background text-base" >
+        <Link href="/login" title="login" className="text-background text-base">
           Login
         </Link>
       </Button>
@@ -512,8 +497,9 @@ export function Nav() {
             initial={{ y: -80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -80, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed py-2 top-0 w-full z-50 lg:px-10 px-5 bg-(--secondary-theme)"
+            transition={{ duration: 0.4, ease: "easeOut" }} // slightly slower, smoother
+            className="fixed py-2 top-0 w-full z-50 lg:px-10 px-5 bg-[var(--secondary-theme)]"
+            style={{ willChange: "transform, opacity" }}
           >
             <div className="flex justify-between py-2 items-center ">
               <Link
@@ -553,7 +539,7 @@ export function Nav() {
 
       <nav
         className={` absolute py-2 top-0 w-full z-50 lg:px-10 px-5  ${
-          isMobileMenuOpen ? "backdrop-blur-xl" : "backdrop-blur-xs"
+          isMobileMenuOpen ? "bg-(--secondary-theme)" : "backdrop-blur-xs"
         }`}
       >
         <div className="w-full">
@@ -605,9 +591,7 @@ export function Nav() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className={`md:hidden overflow-hidden border-t border-border ${
-              showFixedNavbar ? "bg-(--secondary-theme)" : "bg-transparent"
-            } fixed top-16 left-0 right-0 z-40 backdrop-blur-xl`}
+            className={`md:hidden overflow-hidden border-t border-border ${"bg-(--secondary-theme)"} fixed top-16 left-0 right-0 z-40`}
             ref={mobileMenuRef}
           >
             <MobileNavMenu

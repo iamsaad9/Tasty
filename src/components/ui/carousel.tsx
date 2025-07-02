@@ -19,6 +19,7 @@ type CarouselProps = {
   plugins?: CarouselPlugin
   orientation?: "horizontal" | "vertical"
   setApi?: (api: CarouselApi) => void
+  buttonColor?: string
 }
 
 type CarouselContextProps = {
@@ -49,6 +50,7 @@ function Carousel({
   plugins,
   className,
   children,
+  buttonColor,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
   const [carouselRef, api] = useEmblaCarousel(

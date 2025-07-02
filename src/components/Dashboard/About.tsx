@@ -1,6 +1,6 @@
 import React from "react";
 import { Image } from "@heroui/react";
-import FadeInSection from "./ui/scrollAnimated";
+import FadeInSection from "../ui/scrollAnimated";
 
 function About() {
   return (
