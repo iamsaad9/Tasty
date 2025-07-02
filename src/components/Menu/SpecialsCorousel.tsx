@@ -18,7 +18,7 @@ function SpecialsCorousel() {
       <FadeInSection className="flex flex-col justify-center items-center gap-2 py-10">
         <h1 className="text-background/30 text-md font-semibold">SPECIALS</h1>
         <h1 className="text-accent text-center text-2xl sm:text-3xl font-semibold ">
-          Discover Our Specialities
+           Our Specialities
         </h1>
       </FadeInSection>
 
@@ -36,7 +36,7 @@ function SpecialsCorousel() {
                 className="pl-1 basis-1/1 sm:basis-1/3 lg:basis-1/5"
               >
                 <div className="p-1 flex justify-center">
-                  <Card className="rounded-2xl border-2 border-theme overflow-hidden transition-shadow duration-300 max-w-xs group cursor-pointer">
+                  <Card className="rounded-2xl border-3 border-theme overflow-hidden transition-shadow duration-300 max-w-xs group cursor-pointer">
                     <CardContent className="p-0">
                       <div className="aspect-[1/1] overflow-hidden">
                         <img

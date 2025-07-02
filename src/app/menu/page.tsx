@@ -3,6 +3,7 @@ import React from "react";
 import FadeInSection from "@/components/ui/scrollAnimated";
 import { indie } from "@/components/utils/fonts";
 import SpecialsCorousel from "@/components/Menu/SpecialsCorousel";
+import MenuFilter from "@/components/Menu/MenuSearch";
 
 function MenuPage() {
  
@@ -20,6 +21,8 @@ function MenuPage() {
         </FadeInSection>
       </div>
       <SpecialsCorousel />
+
+      <MenuFilter/>
     </div>
   );    
 }
