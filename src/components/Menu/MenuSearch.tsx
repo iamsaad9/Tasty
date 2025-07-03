@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface MenuSearchProps {
   onApplySearch?: (searchText: { searchText: string }) => void;
   onApplyFilters?: (filters: {
-    selectedCategory: string;
+    selectedDiet: string;
     priceRange: number[];
     selectedSort: string;
   }) => void;
@@ -25,22 +25,22 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
 }) => {
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedDiet, setSelectedDiet] = useState("");
   const [selectedSort, setSelectedSort] = useState("");
   const [priceRange, setPriceRange] = useState<number[]>([0, 200]);
 
-  const category = [
-    { id: 1, label: "All Categories", value: "all" },
-    { id: 2, label: "New Arrivals", value: "new" },
-    { id: 3, label: "Best Sellers", value: "best" },
-    { id: 4, label: "On Sale", value: "sale" },
-    { id: 5, label: "Main Course", value: "main-course" },
-    { id: 6, label: "Appetizer", value: "appetizer" },
-    { id: 7, label: "Fast Food", value: "fast-food" },
-    { id: 8, label: "Desserts", value: "desserts" },
-    { id: 9, label: "Drinks", value: "drinks" },
-    { id: 10, label: "Vegan", value: "vegan" },
-    { id: 11, label: "Pizza", value: "pizza" },
+  const filterCount =
+  (selectedDiet && selectedDiet !== "all" ? 1 : 0) +
+  (selectedSort ? 1 : 0) +
+  (priceRange[0] !== 0 || priceRange[1] !== 200 ? 1 : 0);
+
+  const dietaryPreferences = [
+    { id: 1, label: "All Category", value: "all" },
+    { id: 2, label: "Vegetarian", value: "veg" },
+    { id: 3, label: "Non-Vegetarian", value: "nonveg" },
+    { id: 4, label: "Halal", value: "halal" },
+    { id: 5, label: "Dairy-Free", value: "dairyFree" },
+    { id: 6, label: "Gluten-Free", value: "glutenFree" },
   ];
 
   const sortingOptions = [
@@ -93,7 +93,7 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
             color="default"
             onPress={() => setIsFilterMenuOpen((prev) => !prev)}
           >
-            Filters {isFilterMenuOpen ? <X /> : <ChevronDown />}
+            Filters {filterCount > 0 ? `(${filterCount})` : ""} {isFilterMenuOpen ? <X /> : <ChevronDown />}
           </Button>
         </div>
 
@@ -110,13 +110,16 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                 {/* Category Filter */}
                 <div>
                   <Autocomplete
-                    label="Category"
-                    placeholder="Select Category"
+                  classNames={{
+                    listboxWrapper:'text-accent',
+                  }}
+                    label="Dietary Preferences"
+                    placeholder="Select Diet"
                     onSelectionChange={(val) => {
-                      setSelectedCategory(val as string);
+                      setSelectedDiet(val as string);
                     }}
                   >
-                    {category.map((item) => (
+                    {dietaryPreferences.map((item) => (
                       <AutocompleteItem key={item.value}>
                         {item.label}
                       </AutocompleteItem>
@@ -137,7 +140,7 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                     defaultValue={priceRange}
                     minValue={0}
                     maxValue={200}
-                    step={10}
+                    step={2}
                     label="Price Range"
                     formatOptions={{ style: "currency", currency: "USD" }}
                     onChange={(val) => {
@@ -154,6 +157,9 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                     onSelectionChange={(val) => {
                       setSelectedSort(val as string);
                     }}
+                     classNames={{
+                    listboxWrapper:'text-accent',
+                  }}
                   >
                     {sortingOptions.map((item) => (
                       <AutocompleteItem key={item.value}>
@@ -172,7 +178,7 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                   color="success"
                   onPress={() =>
                     onApplyFilters?.({
-                      selectedCategory,
+                      selectedDiet,
                       priceRange,
                       selectedSort,
                     })
@@ -185,10 +191,11 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                   color="default"
                   onPress={() => {
                     setSearchText("");
-                    setSelectedCategory("");
+                    setSelectedDiet("");
                     setSelectedSort("");
                     setPriceRange([0, 200]);
                     onResetFilters?.();
+                    
                   }}
                 >
                   Reset

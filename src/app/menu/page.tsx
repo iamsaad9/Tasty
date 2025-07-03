@@ -15,12 +15,21 @@ import {
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 function MenuPage() {
+    const dietaryPreferences = [
+    { id: 1, label: "All Category", value: "all" },
+    { id: 2, label: "Vegetarian", value: "veg" },
+    { id: 3, label: "Non-Vegetarian", value: "nonVeg" },
+    { id: 4, label: "Halal", value: "halal" },
+    { id: 5, label: "Dairy-Free", value: "dairyFree" },
+    { id: 6, label: "Gluten-Free", value: "glutenFree" },
+  ];
   const menuItems = [
     // Main Course
     {
       id: 1,
       title: "Butter Chicken",
       category: "Main Course",
+       diet: ["nonveg","halal","all"],
       price: 12.99,
       description:
         "A delicious blend of spices and tender chicken cooked in a creamy tomato sauce.",
@@ -31,7 +40,8 @@ function MenuPage() {
       id: 2,
       title: "Grilled Salmon",
       category: "Main Course",
-      price: 15.49,
+       diet: ["nonveg","halal","all"],
+      price: 15.50,
       description:
         "Fresh salmon grilled to perfection served with herbs and lemon.",
       image:
@@ -41,6 +51,7 @@ function MenuPage() {
       id: 3,
       title: "Lasagna",
       category: "Main Course",
+       diet: ["veg","halal","all"],
       price: 11.75,
       description: "Layered pasta with rich meat sauce and creamy cheese.",
       image:
@@ -52,6 +63,7 @@ function MenuPage() {
       id: 4,
       title: "Spring Rolls",
       category: "Appetizer",
+       diet: ["veg","halal","all"],
       price: 5.25,
       description:
         "Crispy fried rolls stuffed with vegetables and served with sweet chili sauce.",
@@ -62,6 +74,7 @@ function MenuPage() {
       id: 5,
       title: "Bruschetta",
       category: "Appetizer",
+       diet: ["veg","halal","all"],
       price: 6.99,
       description:
         "Grilled bread topped with garlic, tomatoes, olive oil, and basil.",
@@ -72,6 +85,7 @@ function MenuPage() {
       id: 6,
       title: "Mozzarella Sticks",
       category: "Appetizer",
+       diet: ["veg","halal","all"],
       price: 6.5,
       description: "Deep-fried cheese sticks served with marinara sauce.",
       image:
@@ -83,6 +97,7 @@ function MenuPage() {
       id: 7,
       title: "Cheeseburger",
       category: "Fast Food",
+       diet: ["nonveg","halal","all"],
       price: 8.99,
       description:
         "Juicy grilled beef patty with cheese, lettuce, and tomato in a sesame bun.",
@@ -93,16 +108,18 @@ function MenuPage() {
       id: 8,
       title: "Shawarma Wrap",
       category: "Fast Food",
+       diet: ["nonveg","halal","all"],
       price: 7.49,
       description:
         "Middle Eastern wrap with spiced meat, veggies, and garlic sauce.",
       image:
-        "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=999&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1605888983099-e33007b6ff27?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 9,
       title: "Chicken Nuggets",
       category: "Fast Food",
+       diet: ["nonveg","halal","all"],
       price: 6.75,
       description: "Crispy golden chicken nuggets served with dipping sauce.",
       image:
@@ -114,6 +131,7 @@ function MenuPage() {
       id: 10,
       title: "Chocolate Lava Cake",
       category: "Dessert",
+      diet: ["halal","all"],
       price: 5.99,
       description: "Warm chocolate cake with a gooey molten center.",
       image:
@@ -123,6 +141,7 @@ function MenuPage() {
       id: 11,
       title: "Tiramisu",
       category: "Dessert",
+      diet: ["halal","all"],
       price: 6.49,
       description:
         "Classic Italian dessert with coffee-soaked layers and mascarpone cream.",
@@ -133,6 +152,7 @@ function MenuPage() {
       id: 12,
       title: "Ice Cream Sundae",
       category: "Dessert",
+      diet: ["halal","all"],
       price: 4.5,
       description:
         "Scoop of vanilla ice cream topped with chocolate syrup and a cherry.",
@@ -145,6 +165,7 @@ function MenuPage() {
       id: 13,
       title: "Mojito",
       category: "Drinks",
+      diet: ["halal","all"],
       price: 3.99,
       description: "Refreshing mint and lime drink served with ice.",
       image:
@@ -154,6 +175,7 @@ function MenuPage() {
       id: 14,
       title: "Strawberry Smoothie",
       category: "Drinks",
+      diet: ["halal","all"],
       price: 4.25,
       description: "Creamy blend of strawberries, yogurt, and honey.",
       image:
@@ -163,6 +185,7 @@ function MenuPage() {
       id: 15,
       title: "Cold Brew Coffee",
       category: "Drinks",
+      diet: ["halal","all"],
       price: 3.5,
       description: "Chilled, slow-brewed coffee with a smooth flavor.",
       image:
@@ -204,6 +227,11 @@ function MenuPage() {
   ];
   const [searchText,setSearchText] = React.useState("");
   const [activeMenu, setActiveMenu] = React.useState("Main Course");
+  const [filters, setFilters] = React.useState({
+    selectedDiet: "all",
+    priceRange: [0, 100],
+    selectedSort: "default",
+  });
 
   const handleApplySearch = (searchText: {
     searchText: string;
@@ -219,10 +247,15 @@ function MenuPage() {
 
 
   const handleApplyFilters = (filters: {
-    selectedCategory: string;
+    selectedDiet: string;
     priceRange: number[];
     selectedSort: string;
   }) => {
+    setFilters(prev => ({
+      ...prev,
+      selectedDiet: filters.selectedDiet === "" ? "all" : filters.selectedDiet,
+      priceRange: filters.priceRange,
+    }))
     console.log("Applying filters:", filters);
   };
 
@@ -244,11 +277,11 @@ function MenuPage() {
       </div>
       <SpecialsCorousel />
 
-       <MenuFilter
-       onApplySearch={handleApplySearch}
-      onApplyFilters={handleApplyFilters}
-      onResetFilters={handleResetFilters}
-    />
+      <MenuFilter
+        onApplySearch={handleApplySearch}
+        onApplyFilters={handleApplyFilters}
+        onResetFilters={handleResetFilters}
+      />
 
       <div className="w-full flex flex-col items-center justify-center  gap-5 p-5">
         <div className="w-full sm:px-0 py-5">
@@ -278,10 +311,14 @@ function MenuPage() {
 
         <FadeInSection className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
           <AnimatePresence mode="wait">
-            {menuItems.filter((item) =>
-  item.category === activeMenu &&
-  (searchText.trim() === "" || item.title.toLowerCase().includes(searchText.toLowerCase()))
-)
+            {menuItems
+              .filter(
+                (item) =>
+                  item.category === activeMenu &&
+                  (searchText.trim() === "" ||
+                    item.title.toLowerCase().includes(searchText.toLowerCase())) && (item.diet.includes(filters.selectedDiet) && (item.price >= filters.priceRange[0] && item.price <= filters.priceRange[1]
+))
+              )
               .map((item) => (
                 <motion.div
                   key={`${activeMenu}-${item.id}`} // IMPORTANT: this key must change when activeMenu changes
@@ -291,9 +328,9 @@ function MenuPage() {
                     duration: 0.3,
                     ease: "easeInOut",
                   }}
-                  className="w-full"
+                  className="w-full h-full"
                 >
-                  <Card className="rounded-2xl max-w-sm border-3 border-theme overflow-hidden transition-shadow duration-300 group cursor-pointer">
+                  <Card className="h-full rounded-2xl max-w-sm border-3 border-theme overflow-hidden transition-shadow duration-300 group cursor-pointer">
                     <CardContent className="p-0">
                       <div className="aspect-[1/1] overflow-hidden">
                         <img
@@ -302,7 +339,7 @@ function MenuPage() {
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       </div>
-                      <div className="p-4 flex flex-col gap-2">
+                      <div className="p-4 flex flex-col gap-2 ">
                         <h3 className="text-lg font-semibold text-accent">
                           {item.title}
                         </h3>
