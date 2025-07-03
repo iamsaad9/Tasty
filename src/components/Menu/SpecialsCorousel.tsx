@@ -22,7 +22,7 @@ function SpecialsCorousel() {
         </h1>
       </FadeInSection>
 
-      <div className="w-full flex items-center justify-center">
+      <FadeInSection className="w-full flex items-center justify-center">
         {/* <Carousel className="w-full relative flex flex-row justify-center items-center " plugins={[ Autoplay({ delay: 3000, stopOnInteraction: false  }) ]} opts={{loop:true}}> */}
         <Carousel className="w-[95%] sm:w-full relative flex flex-row justify-center items-center">
           {/* Left Button */}
@@ -72,7 +72,7 @@ function SpecialsCorousel() {
           {/* Right Button */}
           <CarouselNext className=" z-10 backdrop-blur-lg bg-black/30 hover:bg-black/30 text-white hover:text-theme h-20 " />
         </Carousel>
-      </div>
+      </FadeInSection>
     </div>
   );
 }
