@@ -82,7 +82,7 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
       selectedSort: resetSort,
     });
 
-    // Optionally trigger onResetFilters if needed
+    setIsFilterMenuOpen(false);
     onResetFilters?.();
   };
 
@@ -195,6 +195,7 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                   <Autocomplete
                     label="Sort By"
                     placeholder="Select"
+                    selectedKey={selectedSort} // <-- This tells Autocomplete which option is selected
                     onSelectionChange={(val) => {
                       setSelectedSort(val as string);
                     }}
@@ -203,7 +204,7 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                     }}
                   >
                     {sortingOptions.map((item) => (
-                      <AutocompleteItem key={item.value}>
+                      <AutocompleteItem key={item.value} textValue={item.label}>
                         <div className="flex flex-row gap-2">
                           {item.icon} {item.label}
                         </div>

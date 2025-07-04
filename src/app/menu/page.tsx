@@ -35,6 +35,8 @@ function MenuPage() {
         "A delicious blend of spices and tender chicken cooked in a creamy tomato sauce.",
       image:
         "https://plus.unsplash.com/premium_photo-1661419883163-bb4df1c10109?q=80&w=687&auto=format&fit=crop",
+      popularity: 120,
+      rating: 4.2,
     },
     {
       id: 2,
@@ -46,6 +48,8 @@ function MenuPage() {
         "Fresh salmon grilled to perfection served with herbs and lemon.",
       image:
         "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 110,
+      rating: 4.5,
     },
     {
       id: 3,
@@ -56,6 +60,8 @@ function MenuPage() {
       description: "Layered pasta with rich meat sauce and creamy cheese.",
       image:
         "https://plus.unsplash.com/premium_photo-1671559021023-3da68c12aeed?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 80,
+      rating: 4,
     },
 
     // Appetizers
@@ -69,6 +75,8 @@ function MenuPage() {
         "Crispy fried rolls stuffed with vegetables and served with sweet chili sauce.",
       image:
         "https://images.unsplash.com/photo-1679310290259-78d9eaa32700?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 150,
+      rating: 4.8,
     },
     {
       id: 5,
@@ -80,6 +88,8 @@ function MenuPage() {
         "Grilled bread topped with garlic, tomatoes, olive oil, and basil.",
       image:
         "https://plus.unsplash.com/premium_photo-1677686707252-16013f466e61?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 60,
+      rating: 3.9,
     },
     {
       id: 6,
@@ -90,6 +100,8 @@ function MenuPage() {
       description: "Deep-fried cheese sticks served with marinara sauce.",
       image:
         "https://images.unsplash.com/photo-1734774924912-dcbb467f8599?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 125,
+      rating: 4.4,
     },
 
     // Fast Food
@@ -103,6 +115,8 @@ function MenuPage() {
         "Juicy grilled beef patty with cheese, lettuce, and tomato in a sesame bun.",
       image:
         "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=687&auto=format&fit=crop",
+      popularity: 102,
+      rating: 4.0,
     },
     {
       id: 8,
@@ -114,6 +128,8 @@ function MenuPage() {
         "Middle Eastern wrap with spiced meat, veggies, and garlic sauce.",
       image:
         "https://images.unsplash.com/photo-1605888983099-e33007b6ff27?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 90,
+      rating: 4.7,
     },
     {
       id: 9,
@@ -124,6 +140,8 @@ function MenuPage() {
       description: "Crispy golden chicken nuggets served with dipping sauce.",
       image:
         "https://images.unsplash.com/photo-1562967916-eb82221dfb92?q=80&w=686&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 210,
+      rating: 4.8,
     },
 
     // Dessert
@@ -136,6 +154,8 @@ function MenuPage() {
       description: "Warm chocolate cake with a gooey molten center.",
       image:
         "https://images.unsplash.com/photo-1511911063855-2bf39afa5b2e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 200,
+      rating: 4.9,
     },
     {
       id: 11,
@@ -147,6 +167,8 @@ function MenuPage() {
         "Classic Italian dessert with coffee-soaked layers and mascarpone cream.",
       image:
         "https://plus.unsplash.com/premium_photo-1695028378225-97fbe39df62a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 180,
+      rating: 4.6,
     },
     {
       id: 12,
@@ -158,6 +180,8 @@ function MenuPage() {
         "Scoop of vanilla ice cream topped with chocolate syrup and a cherry.",
       image:
         "https://plus.unsplash.com/premium_photo-1669680785558-c189b49aed4e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 160,
+      rating: 4.3,
     },
 
     // Drinks
@@ -170,6 +194,8 @@ function MenuPage() {
       description: "Refreshing mint and lime drink served with ice.",
       image:
         "https://plus.unsplash.com/premium_photo-1722194069219-16ec49c08625?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 140,
+      rating: 4.1,
     },
     {
       id: 14,
@@ -180,6 +206,8 @@ function MenuPage() {
       description: "Creamy blend of strawberries, yogurt, and honey.",
       image:
         "https://images.unsplash.com/photo-1611928237590-087afc90c6fd?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 130,
+      rating: 4.4,
     },
     {
       id: 15,
@@ -190,6 +218,8 @@ function MenuPage() {
       description: "Chilled, slow-brewed coffee with a smooth flavor.",
       image:
         "https://images.unsplash.com/photo-1592663527359-cf6642f54cff?q=80&w=719&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      popularity: 170,
+      rating: 4.0,
     },
   ];
 
@@ -253,17 +283,16 @@ function MenuPage() {
       selectedDiet:
         filters.selectedDiet.length === 0 ? ["all"] : filters.selectedDiet,
       priceRange: filters.priceRange,
+      selectedSort: filters.selectedSort || "default",
     }));
     console.log("Applying filters:", filters);
   };
 
-
-
   const handleResetFilters = () => {
     setFilters({
-     selectedDiet: ["all"],
-    priceRange: [0, 100],
-    selectedSort: "default"
+      selectedDiet: ["all"],
+      priceRange: [0, 100],
+      selectedSort: "default",
     });
     console.log("Filters reset");
   };
@@ -330,6 +359,20 @@ function MenuPage() {
                   item.price >= filters.priceRange[0] &&
                   item.price <= filters.priceRange[1]
               )
+              .sort((a, b) => {
+                switch (filters.selectedSort) {
+                  case "price-asc":
+                    return a.price - b.price;
+                  case "price-desc":
+                    return b.price - a.price;
+                  case "popularity":
+                    return b.popularity - a.popularity;
+                  case "rating":
+                    return b.rating - a.rating;
+                  default:
+                    return 0; // No sorting applied
+                }
+              })
               .map((item) => (
                 <motion.div
                   key={`${activeMenu}-${item.id}`} // IMPORTANT: this key must change when activeMenu changes

@@ -58,7 +58,7 @@ const Footer = () => {
         {/* Contact Info */}
         <FadeInSection delay={0.3} className="w-60">
           <div className=" text-2xl my-5">Contact Information</div>
-          <div className=" flex flex-col gap-2 text-md text-secondary ">
+          <div className=" flex flex-col gap-5 text-md text-secondary ">
             <a
             className="hover:text-foreground transition-colors duration-300"
               href="https://www.google.com/maps?q=198+West+21th+Street,+New+York+NY+10016"
