@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 function MenuPage() {
-    const dietaryPreferences = [
+  const dietaryPreferences = [
     { id: 1, label: "All Category", value: "all" },
     { id: 2, label: "Vegetarian", value: "veg" },
     { id: 3, label: "Non-Vegetarian", value: "nonVeg" },
@@ -29,7 +29,7 @@ function MenuPage() {
       id: 1,
       title: "Butter Chicken",
       category: "Main Course",
-       diet: ["nonveg","halal","all"],
+      diet: ["nonveg", "halal", "all"],
       price: 12.99,
       description:
         "A delicious blend of spices and tender chicken cooked in a creamy tomato sauce.",
@@ -40,8 +40,8 @@ function MenuPage() {
       id: 2,
       title: "Grilled Salmon",
       category: "Main Course",
-       diet: ["nonveg","halal","all"],
-      price: 15.50,
+      diet: ["nonveg", "halal", "all"],
+      price: 15.5,
       description:
         "Fresh salmon grilled to perfection served with herbs and lemon.",
       image:
@@ -51,7 +51,7 @@ function MenuPage() {
       id: 3,
       title: "Lasagna",
       category: "Main Course",
-       diet: ["veg","halal","all"],
+      diet: ["veg", "halal", "all"],
       price: 11.75,
       description: "Layered pasta with rich meat sauce and creamy cheese.",
       image:
@@ -63,7 +63,7 @@ function MenuPage() {
       id: 4,
       title: "Spring Rolls",
       category: "Appetizer",
-       diet: ["veg","halal","all"],
+      diet: ["veg", "halal", "all"],
       price: 5.25,
       description:
         "Crispy fried rolls stuffed with vegetables and served with sweet chili sauce.",
@@ -74,7 +74,7 @@ function MenuPage() {
       id: 5,
       title: "Bruschetta",
       category: "Appetizer",
-       diet: ["veg","halal","all"],
+      diet: ["veg", "halal", "all"],
       price: 6.99,
       description:
         "Grilled bread topped with garlic, tomatoes, olive oil, and basil.",
@@ -85,7 +85,7 @@ function MenuPage() {
       id: 6,
       title: "Mozzarella Sticks",
       category: "Appetizer",
-       diet: ["veg","halal","all"],
+      diet: ["veg", "halal", "all"],
       price: 6.5,
       description: "Deep-fried cheese sticks served with marinara sauce.",
       image:
@@ -97,7 +97,7 @@ function MenuPage() {
       id: 7,
       title: "Cheeseburger",
       category: "Fast Food",
-       diet: ["nonveg","halal","all"],
+      diet: ["nonveg", "halal", "all"],
       price: 8.99,
       description:
         "Juicy grilled beef patty with cheese, lettuce, and tomato in a sesame bun.",
@@ -108,7 +108,7 @@ function MenuPage() {
       id: 8,
       title: "Shawarma Wrap",
       category: "Fast Food",
-       diet: ["nonveg","halal","all"],
+      diet: ["nonveg", "halal", "all"],
       price: 7.49,
       description:
         "Middle Eastern wrap with spiced meat, veggies, and garlic sauce.",
@@ -119,7 +119,7 @@ function MenuPage() {
       id: 9,
       title: "Chicken Nuggets",
       category: "Fast Food",
-       diet: ["nonveg","halal","all"],
+      diet: ["nonveg", "halal", "all"],
       price: 6.75,
       description: "Crispy golden chicken nuggets served with dipping sauce.",
       image:
@@ -131,7 +131,7 @@ function MenuPage() {
       id: 10,
       title: "Chocolate Lava Cake",
       category: "Dessert",
-      diet: ["halal","all"],
+      diet: ["halal", "all"],
       price: 5.99,
       description: "Warm chocolate cake with a gooey molten center.",
       image:
@@ -141,7 +141,7 @@ function MenuPage() {
       id: 11,
       title: "Tiramisu",
       category: "Dessert",
-      diet: ["halal","all"],
+      diet: ["halal", "all"],
       price: 6.49,
       description:
         "Classic Italian dessert with coffee-soaked layers and mascarpone cream.",
@@ -152,7 +152,7 @@ function MenuPage() {
       id: 12,
       title: "Ice Cream Sundae",
       category: "Dessert",
-      diet: ["halal","all"],
+      diet: ["halal", "all"],
       price: 4.5,
       description:
         "Scoop of vanilla ice cream topped with chocolate syrup and a cherry.",
@@ -165,7 +165,7 @@ function MenuPage() {
       id: 13,
       title: "Mojito",
       category: "Drinks",
-      diet: ["halal","all"],
+      diet: ["halal", "all"],
       price: 3.99,
       description: "Refreshing mint and lime drink served with ice.",
       image:
@@ -175,7 +175,7 @@ function MenuPage() {
       id: 14,
       title: "Strawberry Smoothie",
       category: "Drinks",
-      diet: ["halal","all"],
+      diet: ["halal", "all"],
       price: 4.25,
       description: "Creamy blend of strawberries, yogurt, and honey.",
       image:
@@ -185,7 +185,7 @@ function MenuPage() {
       id: 15,
       title: "Cold Brew Coffee",
       category: "Drinks",
-      diet: ["halal","all"],
+      diet: ["halal", "all"],
       price: 3.5,
       description: "Chilled, slow-brewed coffee with a smooth flavor.",
       image:
@@ -225,17 +225,15 @@ function MenuPage() {
       icon: <FaWineGlassAlt className="text-2xl text-background" />,
     },
   ];
-  const [searchText,setSearchText] = React.useState("");
+  const [searchText, setSearchText] = React.useState("");
   const [activeMenu, setActiveMenu] = React.useState("Main Course");
   const [filters, setFilters] = React.useState({
-    selectedDiet: "all",
+    selectedDiet: ["all"],
     priceRange: [0, 100],
     selectedSort: "default",
   });
 
-  const handleApplySearch = (searchText: {
-    searchText: string;
-  }) => {
+  const handleApplySearch = (searchText: { searchText: string }) => {
     console.log("Search applied:", searchText);
     setSearchText(searchText.searchText);
   };
@@ -245,21 +243,28 @@ function MenuPage() {
     setActiveMenu(name);
   };
 
-
   const handleApplyFilters = (filters: {
-    selectedDiet: string;
+    selectedDiet: string[];
     priceRange: number[];
     selectedSort: string;
   }) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      selectedDiet: filters.selectedDiet === "" ? "all" : filters.selectedDiet,
+      selectedDiet:
+        filters.selectedDiet.length === 0 ? ["all"] : filters.selectedDiet,
       priceRange: filters.priceRange,
-    }))
+    }));
     console.log("Applying filters:", filters);
   };
 
+
+
   const handleResetFilters = () => {
+    setFilters({
+     selectedDiet: ["all"],
+    priceRange: [0, 100],
+    selectedSort: "default"
+    });
     console.log("Filters reset");
   };
   return (
@@ -316,8 +321,14 @@ function MenuPage() {
                 (item) =>
                   item.category === activeMenu &&
                   (searchText.trim() === "" ||
-                    item.title.toLowerCase().includes(searchText.toLowerCase())) && (item.diet.includes(filters.selectedDiet) && (item.price >= filters.priceRange[0] && item.price <= filters.priceRange[1]
-))
+                    item.title
+                      .toLowerCase()
+                      .includes(searchText.toLowerCase())) &&
+                  filters.selectedDiet.some((diet) =>
+                    item.diet.includes(diet)
+                  ) &&
+                  item.price >= filters.priceRange[0] &&
+                  item.price <= filters.priceRange[1]
               )
               .map((item) => (
                 <motion.div

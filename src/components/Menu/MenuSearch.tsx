@@ -5,6 +5,8 @@ import {
   Autocomplete,
   AutocompleteItem,
   Slider,
+  Select,
+  SelectItem,
 } from "@heroui/react";
 import { X, ChevronDown, ArrowUp, ArrowDown, Star, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface MenuSearchProps {
   onApplySearch?: (searchText: { searchText: string }) => void;
   onApplyFilters?: (filters: {
-    selectedDiet: string;
+    selectedDiet: string[];
     priceRange: number[];
     selectedSort: string;
   }) => void;
@@ -25,17 +27,16 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
 }) => {
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [selectedDiet, setSelectedDiet] = useState("");
+  const [selectedDiet, setSelectedDiet] = useState<string[]>([]);
   const [selectedSort, setSelectedSort] = useState("");
   const [priceRange, setPriceRange] = useState<number[]>([0, 200]);
 
   const filterCount =
-  (selectedDiet && selectedDiet !== "all" ? 1 : 0) +
-  (selectedSort ? 1 : 0) +
-  (priceRange[0] !== 0 || priceRange[1] !== 200 ? 1 : 0);
+    (selectedDiet && selectedDiet.length === 0 ? 0 : 1) +
+    (selectedSort ? 1 : 0) +
+    (priceRange[0] !== 0 || priceRange[1] !== 200 ? 1 : 0);
 
   const dietaryPreferences = [
-    { id: 1, label: "All Category", value: "all" },
     { id: 2, label: "Vegetarian", value: "veg" },
     { id: 3, label: "Non-Vegetarian", value: "nonveg" },
     { id: 4, label: "Halal", value: "halal" },
@@ -65,6 +66,26 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
     { id: 4, label: "Rating", value: "rating", icon: <Star size={20} /> },
   ];
 
+  const handleResetFilters = () => {
+    const resetDiet: string[] = [];
+    const resetSort = "";
+    const resetPriceRange = [0, 200];
+
+    setSelectedDiet(resetDiet);
+    setSelectedSort(resetSort);
+    setPriceRange(resetPriceRange);
+
+    // Send the reset filters immediately
+    onApplyFilters?.({
+      selectedDiet: resetDiet,
+      priceRange: resetPriceRange,
+      selectedSort: resetSort,
+    });
+
+    // Optionally trigger onResetFilters if needed
+    onResetFilters?.();
+  };
+
   return (
     <div className="w-full">
       <div className="w-full p-5 py-10 bg-foreground flex flex-col gap-2">
@@ -83,17 +104,17 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
             }}
           />
 
-          {/* <Button className="bg-theme" onPress={() =>
-                    onApplySearch?.({
-                      searchText: searchText,
-                    })
-                  }>Search</Button> */}
-
           <Button
-            color="default"
+            className="bg-(--secondary-theme) text-foreground"
             onPress={() => setIsFilterMenuOpen((prev) => !prev)}
           >
-            Filters {filterCount > 0 ? `(${filterCount})` : ""} {isFilterMenuOpen ? <X /> : <ChevronDown />}
+            Filters{" "}
+            {filterCount > 0 ? (
+              <span className="font-semibold text-theme">{`(${filterCount})`}</span>
+            ) : (
+              ""
+            )}{" "}
+            {isFilterMenuOpen ? <X /> : <ChevronDown />}
           </Button>
         </div>
 
@@ -101,18 +122,18 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
           {isFilterMenuOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 170,opacity: 1 }}
-              exit={{ height: 0,opacity: 0}}
+              animate={{ height: 170, opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="w-full bg-foreground overflow-hidden"
             >
               <div className="grid grid-cols-3 py-5 gap-5">
                 {/* Category Filter */}
                 <div>
-                  <Autocomplete
-                  classNames={{
-                    listboxWrapper:'text-accent',
-                  }}
+                  {/* <Autocomplete
+                    classNames={{
+                      listboxWrapper: "text-accent",
+                    }}
                     label="Dietary Preferences"
                     placeholder="Select Diet"
                     onSelectionChange={(val) => {
@@ -124,7 +145,27 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                         {item.label}
                       </AutocompleteItem>
                     ))}
-                  </Autocomplete>
+                  </Autocomplete> */}
+
+                  <Select
+                    classNames={{ listboxWrapper: "text-accent" }}
+                    label="Dietary Preferences"
+                    placeholder="Select Diet"
+                    selectionMode="multiple"
+                    selectedKeys={selectedDiet}
+                    onSelectionChange={(val) => {
+                      const selected = Array.from(val)
+                        .map((key) => String(key))
+                        .filter((item) => item !== "all"); // Remove "all"
+
+                      setSelectedDiet(selected);
+                      console.log("Selected Diet:", selected);
+                    }}
+                  >
+                    {dietaryPreferences.map((item) => (
+                      <SelectItem key={item.value}>{item.label}</SelectItem>
+                    ))}
+                  </Select>
                 </div>
 
                 {/* Price Range */}
@@ -157,9 +198,9 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                     onSelectionChange={(val) => {
                       setSelectedSort(val as string);
                     }}
-                     classNames={{
-                    listboxWrapper:'text-accent',
-                  }}
+                    classNames={{
+                      listboxWrapper: "text-accent",
+                    }}
                   >
                     {sortingOptions.map((item) => (
                       <AutocompleteItem key={item.value}>
@@ -190,12 +231,7 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                 <Button
                   color="default"
                   onPress={() => {
-                    setSearchText("");
-                    setSelectedDiet("");
-                    setSelectedSort("");
-                    setPriceRange([0, 200]);
-                    onResetFilters?.();
-                    
+                    handleResetFilters();
                   }}
                 >
                   Reset
