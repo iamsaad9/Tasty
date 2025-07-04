@@ -14,7 +14,7 @@ import Fade from "embla-carousel-fade";
 
 function SpecialsCorousel() {
   return (
-    <div className="w-full flex flex-col items-center justify-center my-10">
+    <div className="w-full flex flex-col items-center justify-center mb-10">
       <FadeInSection className="flex flex-col justify-center items-center gap-2 py-10">
         <h1 className="text-background/30 text-md font-semibold">SPECIALS</h1>
         <h1 className="text-accent text-center text-2xl sm:text-3xl font-semibold ">
