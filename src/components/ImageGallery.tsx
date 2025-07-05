@@ -1,6 +1,6 @@
 import React from "react";
-import ExpandableImage from "./ExpandableImage";
-import FadeInSection from "../ui/scrollAnimated";
+import ExpandableImage from "./Dashboard/ExpandableImage";
+import FadeInSection from "./ui/scrollAnimated";
 const images = [
   "/images/Gallery/insta-1.jpg.webp",
   "/images/Gallery/insta-2.jpg.webp",

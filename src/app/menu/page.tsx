@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import PageBanner from "@/components/PageBanner";
+import ImageGallery from "@/components/ImageGallery";
 function MenuPage() {
 
   const menuItems = [
@@ -400,6 +401,8 @@ function MenuPage() {
           </AnimatePresence>
         </FadeInSection>
       </div>
+
+      <ImageGallery/>
     </div>
   );
 }
