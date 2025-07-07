@@ -4,7 +4,7 @@ import FadeInSection from "../ui/scrollAnimated";
 
 function About() {
   return (
-    <div className="w-[100vw] lg:w-[90vw] xl:w-[80vw] flex sm:flex-row flex-col">
+    <div className="w-[100vw] lg:w-[70vw] xl:w-[60vw] flex sm:flex-row flex-col">
       <div className="sm:w-[50%]">
         <Image
           src={"/images/about.jpg"}

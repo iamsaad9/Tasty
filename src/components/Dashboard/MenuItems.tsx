@@ -1,12 +1,39 @@
 import { Card } from "@heroui/react";
-import React from "react";
+import React,{useState,useEffect} from "react";
 import { FaWineGlassAlt, FaIceCream, FaDrumstickBite } from "react-icons/fa";
 import { motion } from "framer-motion";
 import FadeInSection from "../ui/scrollAnimated";
 import { Link } from "@heroui/react";
 
+interface MenuItems {
+  id:number,
+  title:string,
+  category:string,
+  diet:string[],
+  price:number,
+  description:string,
+  image:string,
+  popularity:number,
+  rating:number,
+  special:boolean,
+  delivery:{
+    isDeliverable:boolean,
+    estimatedTime:string,
+    baseFee:number,
+    freeAbove:number,
+    minOrder:number,
+    areas:[
+      {
+        name:string,
+        postalCode:string,
+        fee:number,
+      }
+    ]
+  }
+}
+
 function MenuItems() {
-  const [activeMenu, setActiveMenu] = React.useState(1);
+  const [activeMenu, setActiveMenu] = useState<string>('Main');
   const menuType = [
     {
       id: 1,
@@ -28,92 +55,22 @@ function MenuItems() {
     },
   ];
 
-  const menuItems = [
-    {
-      type: 1,
-      id: 1,
-      name: "Grilled Beef with Potatoes",
-      price: "$29",
-      description:
-        "Tender grilled beef served with seasoned potatoes and a side of rice and tomatoes.",
-    },
-    {
-      type: 1,
-      id: 2,
-      name: "Fruit Vanilla Ice Cream",
-      price: "$29",
-      description:
-        "Refreshing vanilla ice cream topped with fresh seasonal fruits.",
-    },
-    {
-      type: 1,
-      id: 3,
-      name: "Asian Hoisin Pork",
-      price: "$29",
-      description:
-        "Sweet and savory pork glazed in hoisin sauce, served with rice and vegetables.",
-    },
-    {
-      type: 1,
-      id: 4,
-      name: "Spicy Fried Rice & Bacon",
-      price: "$29",
-      description:
-        "A spicy blend of fried rice and crispy bacon with savory seasonings.",
-    },
-    {
-      type: 1,
-      id: 5,
-      name: "Mango Chili Chutney",
-      price: "$29",
-      description:
-        "Tangy mango chutney with a kick of chili, perfect as a sweet-spicy main.",
-    },
-    {
-      type: 1,
-      id: 6,
-      name: "Savory Watercress Pancakes",
-      price: "$29",
-      description:
-        "Chinese-style pancakes with fresh watercress and a savory stuffing.",
-    },
-    {
-      type: 1,
-      id: 7,
-      name: "Soup with Vegetables and Meat",
-      price: "$29",
-      description:
-        "Hearty soup filled with mixed vegetables and tender cuts of meat.",
-    },
-    {
-      type: 1,
-      id: 8,
-      name: "Udon Noodles with Vegetables",
-      price: "$29",
-      description:
-        "Thick udon noodles stir-fried with assorted vegetables and light sauce.",
-    },
-    {
-      type: 1,
-      id: 9,
-      name: "Baked Lobster with Garnish",
-      price: "$29",
-      description:
-        "Oven-baked lobster with herbs and gourmet garnish, served hot.",
-    },
-    {
-      type: 1,
-      id: 10,
-      name: "Octopus with Vegetables",
-      price: "$29",
-      description:
-        "Grilled octopus with a medley of vegetables, rich in flavor and texture.",
-    },
-  ];
+  const [menuItems,setMenuItems] = useState<MenuItems[]>([])
+ 
+   useEffect(()=>{
+     const fetchMenuItems = async () => {
+       const res = await fetch('/Data/menu.json');
+       const data = await res.json();
+       setMenuItems(data);
+     }
+ 
+     fetchMenuItems();
+   },[]);
 
   const handleMenuClick = (id: number) => {
     console.log("Menu clicked:", id);
-    setActiveMenu(id);
+    console.log(menuType[id-1].name)
+    setActiveMenu(menuType[id-1].name);
   };
   return (
     <div className=" w-full lg:w-[90vw] xl:w-[80vw] flex flex-col gap-10 py-20 justify-center items-center px-5 lg:px-0">
@@ -133,7 +90,7 @@ function MenuItems() {
             <Card
               key={item.id}
               className={`${
-                activeMenu == item.id
+                activeMenu == item.name
                   ? "bg-theme scale-105"
                   : "bg-foreground hover:bg-background/10"
               } rounded-sm cursor-pointer px-5`}
@@ -154,15 +111,16 @@ function MenuItems() {
 
       <div className="w-full grid gap-5 md:grid-cols-2">
         {menuItems
-          .filter((item) => item.type === activeMenu)
+          .filter((item) => item.category.split(' ')[0] === activeMenu)
           .map((item) => (
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
+              key={`${activeMenu}-${item.id}`} 
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    ease: "easeInOut",
+                  }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.8 }}
             >
@@ -177,7 +135,7 @@ function MenuItems() {
                       <div
                         className="min-w-[70px] min-h-[70px] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-red-500 flex items-center justify-center text-white font-bold"
                         style={{
-                          backgroundImage: `url(./images/MenuItems/Main/item${item.id}.jpg)`,
+                          backgroundImage: `url(${item.image})`,
                           backgroundSize: "cover",
                           backgroundPosition: "center",
                         }}
@@ -185,7 +143,7 @@ function MenuItems() {
 
                       <div className="flex flex-col">
                         <h2 className="text-base sm:text-lg font-semibold text-accent">
-                          {item.name}
+                          {item.title}
                         </h2>
                         <p className="text-sm text-accent/60 mt-1 sm:mt-2">
                           {item.description}
@@ -196,7 +154,7 @@ function MenuItems() {
                     {/* Right: Price */}
                     <div className="text-right flex items-center">
                       <h1 className="text-2xl font-semibold text-accent">
-                        {item.price}
+                        ${item.price}
                       </h1>
                     </div>
                   </div>

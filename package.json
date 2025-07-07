@@ -25,7 +25,9 @@
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^9.16.0",
     "react-scroll-parallax": "^3.4.5",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "zod": "^3.25.74",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -1,0 +1,60 @@
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "date": "2025-07-05",
+    "time": "19:30",
+    "phone": "+1 555-123-4567",
+    "guests": 2,
+    "email": "john@example.com",
+    "status": "confirmed",
+    "occasion": "Anniversary",
+    "requests": "Window seat"
+  },
+  {
+    "id": 2,
+    "name": "Jane Smith",
+    "date": "2025-07-06",
+    "time": "18:00",
+    "phone": "+1 555-234-5678",
+    "guests": 4,
+    "email": "jane@example.com",
+    "status": "pending",
+    "occasion": "Birthday",
+    "requests": "Gluten-free meal"
+  },
+  {
+    "id": 3,
+    "name": "Alex Johnson",
+    "date": "2025-07-07",
+    "time": "20:00",
+    "phone": "+1 555-345-6789",
+    "guests": 3,
+    "email": "alex@example.com",
+    "status": "cancelled",
+    "occasion": "Business"
+  },
+  {
+    "id": 4,
+    "name": "Sara Lee",
+    "date": "2025-07-08",
+    "time": "21:00",
+    "phone": "+1 555-456-7890",
+    "guests": 5,
+    "email": "sara@example.com",
+    "status": "confirmed",
+    "occasion": "Casual",
+    "requests": "High chair for child"
+  },
+  {
+    "id": 5,
+    "name": "Michael Chan",
+    "date": "2025-07-09",
+    "time": "17:30",
+    "phone": "+1 555-567-8901",
+    "guests": 1,
+    "email": "michael@example.com",
+    "status": "confirmed",
+    "occasion": "Solo Meal"
+  }
+]

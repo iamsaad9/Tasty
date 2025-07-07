@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -27,7 +27,7 @@ interface Reservation {
   status: string;
   occasion: string;
   requests?: string;
-}
+} 
 
 interface Column {
   name: string;
@@ -39,67 +39,6 @@ interface ViewReservationsTableProps {
   onAddNew: () => void;
   onEditReservation: (reservation: Reservation) => void;
 }
-
-const reservations: Reservation[] = [
-  {
-    id: 1,
-    name: "John Doe",
-    date: "2025-07-05",
-    time: "19:30",
-    phone: "+1 555-123-4567",
-    guests: 2,
-    email: "john@example.com",
-    status: "confirmed",
-    occasion: "Anniversary",
-    requests: "Window seat",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    date: "2025-07-06",
-    time: "18:00",
-    phone: "+1 555-234-5678",
-    guests: 4,
-    email: "jane@example.com",
-    status: "pending",
-    occasion: "Birthday",
-    requests: "Gluten-free meal",
-  },
-  {
-    id: 3,
-    name: "Alex Johnson",
-    date: "2025-07-07",
-    time: "20:00",
-    phone: "+1 555-345-6789",
-    guests: 3,
-    email: "alex@example.com",
-    status: "cancelled",
-    occasion: "Business",
-  },
-  {
-    id: 4,
-    name: "Sara Lee",
-    date: "2025-07-08",
-    time: "21:00",
-    phone: "+1 555-456-7890",
-    guests: 5,
-    email: "sara@example.com",
-    status: "confirmed",
-    occasion: "Casual Dinner",
-    requests: "High chair for child",
-  },
-  {
-    id: 5,
-    name: "Michael Chan",
-    date: "2025-07-09",
-    time: "17:30",
-    phone: "+1 555-567-8901",
-    guests: 1,
-    email: "michael@example.com",
-    status: "confirmed",
-    occasion: "Solo Meal",
-  },
-];
 
 const columns: Column[] = [
   { name: "ID", uid: "id", sortable: true },
@@ -133,12 +72,22 @@ export default function ViewReservations({
     description:'',
     button:''
   });
-
+  const [reservations,setReservations] = useState<Reservation[]>([]);
   const handleEditReservation = (reservations: Reservation) => {
     console.log("Reservation Data", reservations);
     onEditReservation(reservations);
     onAddNew();
   };
+
+  useEffect(()=>{
+    const fetchData = async () => {
+      const res = await fetch("/Data/reservations.json")
+      const data = await res.json();
+      console.log('reservationdata',data)
+      setReservations(data);
+    }
+    fetchData();
+  },[]);
 
   const sortedItems = React.useMemo(() => {
     return [...reservations].sort((a, b) => {

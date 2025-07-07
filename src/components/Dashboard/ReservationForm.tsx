@@ -1,20 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   Form,
-  Input,
+  Autocomplete,
   Button,
-  NumberInput,
-  DatePicker,
-  TimeInput,
+  AutocompleteItem,
 } from "@heroui/react";
+import { LocateIcon } from "lucide-react";
+import { useLocationStore } from "@/lib/store/locationStore";
 
-function ReservationForm() {
+interface Location {
+  area: string;
+  postalCode: string;
+}
+
+function LocationForm() {
   const [action, setAction] = useState<string>("");
+  const [locationData, setLocationData] = useState<Location[]>([]);
+  const { selectedLocation, setSelectedLocation } = useLocationStore();
+  const [ currentLocation, setCurrentLocation ] = useState<string>('');
 
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const res = await fetch("/Data/location.json");
+      const data = await res.json();
+      console.log("data", data);
+      setLocationData(data);
+    };
+    fetchLocation();
+  }, []);
   return (
     <div className="w-full bg-foreground">
-      <Card className="bg-theme mx-auto w-full lg:w-[90vw] xl:w-[80vw] p-5 2xl:p-10 rounded-none">
+      <Card className="bg-theme mx-auto w-full lg:w-[70vw] xl:w-[60vw] p-5 2xl:p-10 rounded-none">
         <Form
           className="w-full flex-col justify-center items-center md:flex-row gap-5 lg:gap-10"
           onReset={() => setAction("reset")}
@@ -25,86 +42,45 @@ function ReservationForm() {
             setAction(`submit ${JSON.stringify(data)}`);
           }}
         >
-          <DatePicker
+          <Autocomplete
+            className="border-2 !text-accent border-black "
             classNames={{
-              label: "text-black",
-              inputWrapper:
-                "border-1 border-black !text-black hover:border-black bg-transparent",
-              selectorIcon: "text-black",
-              segment: "text-black",
+              listboxWrapper: "!text-accent ",
             }}
-            id="date"
-            variant="bordered"
-            label="Reservation Date"
-            name="date"
-            radius="none"
-          />
-          <Input
-            classNames={{
-              label: "!text-black",
-              inputWrapper:
-                "border-1 border-black hover:border-black bg-transparent",
-              input: "text-white",
+            inputProps={{
+              classNames: {
+                label: "!text-accent font-medium",
+                base: "focus:!bg-transparent",
+                inputWrapper:
+                  "text-accent rounded-none  bg-transparent hover:!bg-transparent focus:!bg-transparent active:!bg-transparent",
+              },
             }}
-            id="fullname"
-            errorMessage="Please enter a valid Full Name"
-            label="Full Name"
-            name="fullname"
-            // placeholder="Enter your Full Name"
-            type="text"
-            radius="none"
-          />
-
-          <NumberInput
-            classNames={{
-              label: "!text-black",
-              inputWrapper:
-                "border-1 border-black hover:border-black bg-transparent",
-              input: "text-black ",
-            }}
-            id="phone"
-            hideStepper
-            // isRequired
-            label="Phone #"
-            name="phone"
-            // placeholder="Phone Number"
-            radius="none"
-          />
-
-          <TimeInput
-            classNames={{
-              label: "!text-black",
-              inputWrapper:
-                "border-1 border-black hover:border-black bg-transparent",
-              input: "text-black ",
-              //  segment: "text-black",
-            }}
-            variant="bordered"
-            label="Event Time"
-            name="time"
-            radius="none"
-          />
-
-          <NumberInput
-            classNames={{
-              label: "!text-black",
-              inputWrapper:
-                "border-1 border-black hover:border-black bg-transparent",
-              input: "text-black ",
-            }}
-            name="persons"
-            label="Persons"
-            radius="none"
-          />
+            label="Location"
+            placeholder="Select your Location"
+            startContent={<LocateIcon size={20} />}
+            defaultSelectedKey={selectedLocation}
+            onSelectionChange={(key) =>
+              setCurrentLocation(key ? String(key) : "")
+            }
+          >
+            {locationData.map((loc) => (
+              <AutocompleteItem
+                key={loc.area}
+                className="text-accent font-medium"
+              >
+                {loc.area}
+              </AutocompleteItem>
+            ))}
+          </Autocomplete>
 
           <Button
-            //   className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
             className="bg-white text-black hover:bg-transparent hover:text-white border-white"
             variant="bordered"
             radius="none"
             size="lg"
+            onPress={()=>setSelectedLocation(currentLocation)}
           >
-            Submit
+            Select
           </Button>
         </Form>
       </Card>
@@ -112,4 +88,4 @@ function ReservationForm() {
   );
 }
 
-export default ReservationForm;
+export default LocationForm;

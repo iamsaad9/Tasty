@@ -8,9 +8,19 @@ import {
   Select,
   SelectItem,
   Textarea,
+  TimeInput,
 } from "@heroui/react";
-import { CalendarDate } from "@internationalized/date";
+import {
+  CalendarDate,
+  CalendarDateTime,
+  parseTime,
+  Time,
+  toTime,
+} from "@internationalized/date";
 import CustomModal from "../Modal";
+import { z } from "zod";
+import { getLocalTimeZone, today } from "@internationalized/date";
+
 interface Reservation {
   id: number;
   name: string;
@@ -35,7 +45,7 @@ function ReservationForm({
 }: ReservationDataProps) {
   const [reservationData, setReservationData] = useState(reservationDataProp);
   const occasionType = [
-    { id: 0, label: "Casual Dinner" },
+    { id: 0, label: "Casual" },
     { id: 1, label: "Birthday" },
     { id: 2, label: "Anniversary" },
     { id: 3, label: "Wedding" },
@@ -56,9 +66,18 @@ function ReservationForm({
             d.getDate()
           );
         })()
+      : today(getLocalTimeZone()).add({ days: 3 })
+  );
+  const [time, setTime] = useState<Time | null>(
+    reservationDataProp?.time
+      ? (() => {
+          const [hours, minutes] = reservationDataProp.time
+            .split(":")
+            .map(Number);
+          return new Time(hours, minutes);
+        })()
       : null
   );
-  const [time, setTime] = useState(reservationDataProp?.time || "");
   const [guests, setGuests] = useState(reservationDataProp?.guests || 1);
   const [occasion, setOccasion] = useState<number | null>(
     reservationDataProp?.occasion
@@ -68,13 +87,131 @@ function ReservationForm({
   );
   const [requests, setRequests] = useState(reservationDataProp?.requests || "");
   const [showModal, setShowModal] = useState(false);
+
+  const schema = z.object({
+    name: z
+      .string({ required_error: "Name is required" })
+      .min(1, "Name is required")
+      .regex(/^[A-Za-z]+(?: [A-Za-z]+)+$/, "Please enter full name"),
+
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Invalid email address"),
+
+    phone: z
+      .string()
+      .min(1, "Phone number is required")
+      .regex(/^03[0-9]{2}[-]?[0-9]{7}$/, "Invalid format eg: 03xx-xxxxxxx"),
+
+    person: z
+      .number()
+      .min(1, "Number of Person must be at least 1")
+      .max(50, "Maximum 50 person allowed per Reservation"),
+
+    occasion: z
+      .number({
+        required_error: "Please select an occasion",
+        invalid_type_error: "Please select an occasion",
+      })
+      .refine((val) => !isNaN(val) && [0, 1, 2, 3, 4, 5, 6].includes(val), {
+        message: "Please select a valid occasion",
+      }),
+
+    time: z
+      .object({
+        hour: z.number(),
+        minute: z.number(),
+      })
+      .refine((val) => val.hour >= 8 && val.hour < 24, {
+        message: "Reservation time must be between 8:00 and 23:59",
+      }),
+  });
+
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    phone?: string;
+    person?: string;
+    occasion?: string;
+    time?: string;
+  }>({});
+
+  type FieldType = "name" | "email" | "phone" | "person" | "occasion";
+  const validateField = (field: FieldType, value: string | number) => {
+    const data = { name, email, phone, person: guests };
+    if (field === "person") {
+      data.person = typeof value === "number" ? value : Number(value);
+    } else {
+      (data as any)[field] = value;
+    }
+    const result = schema.safeParse(data);
+
+    if (!result.success) {
+      const fieldErrors = result.error.format();
+      setErrors((prev) => ({
+        ...prev,
+        [field]: fieldErrors[field]?._errors?.[0],
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate all fields before proceeding
+    const result = schema.safeParse({
+      name,
+      email,
+      phone,
+      person: guests,
+      occasion,
+      time, // this must be an object like { hour: number, minute: number }
+    });
+
+    if (!result.success) {
+      const fieldErrors = result.error.format();
+      setErrors({
+        name: fieldErrors.name?._errors[0],
+        email: fieldErrors.email?._errors[0],
+        phone: fieldErrors.phone?._errors[0],
+        person: fieldErrors.person?._errors[0],
+        occasion: fieldErrors.occasion?._errors[0],
+        time: fieldErrors.time?._errors[0],
+      });
+      return;
+    }
+
+    const formData: Reservation = {
+      id: Math.random(),
+      name,
+      email,
+      phone,
+      guests,
+      date: date ? date.toDate("CST").toISOString().split("T")[0] : "",
+      time: time
+        ? `${time.hour.toString().padStart(2, "0")}:${time.minute
+            .toString()
+            .padStart(2, "0")}`
+        : "",
+      occasion: occasionType.find((o) => o.id === occasion)?.label ?? "",
+      status: "pending",
+      requests,
+    };
+
+    console.log("✅ Submitted Data:", formData);
+    // Here: send to API or state
+  };
+
   const handleReset = () => {
     setReservationData(null);
     setName("");
     setEmail("");
     setPhone("");
     setDate(null);
-    setTime("");
+    setTime(null);
     setGuests(1);
     setOccasion(null);
     setRequests("");
@@ -105,7 +242,10 @@ function ReservationForm({
 
           {/* Right Form */}
           <div className="p-8 flex flex-col justify-around flex-1">
-            <form className="grid grid-cols-1 items-start sm:grid-cols-2 gap-5 h-full p-5">
+            <form
+              className="grid grid-cols-1 items-start sm:grid-cols-2 gap-5 h-full p-5"
+              onSubmit={handleSubmit}
+            >
               {/* Name */}
               <div>
                 <Input
@@ -114,46 +254,61 @@ function ReservationForm({
                   label="Full Name"
                   labelPlacement="outside-top"
                   classNames={{
-                    clearButton:'text-secondary',
+                    clearButton: "text-secondary",
                     label: "text-accent font-medium",
                     input: "text-accent",
                   }}
                   value={name}
-                  onValueChange={setName}
+                  onValueChange={(val) => {
+                    setName(val);
+                    validateField("name", val);
+                  }}
+                  errorMessage={errors.name}
+                  isInvalid={!!errors.name}
                 />
               </div>
 
               {/* Email */}
               <div>
                 <Input
-                isClearable
+                  isClearable
                   placeholder="eg: abc@gmail.com"
                   label="Email"
                   labelPlacement="outside-top"
                   classNames={{
-                    clearButton:'text-secondary',
+                    clearButton: "text-secondary",
                     label: "text-accent font-medium",
                     input: "text-accent",
                   }}
                   value={email}
-                  onValueChange={setEmail}
+                  onValueChange={(val) => {
+                    setEmail(val);
+                    validateField("email", val);
+                  }}
+                  errorMessage={errors.email}
+                  isInvalid={!!errors.email}
                 />
               </div>
 
               {/* Phone */}
               <div>
                 <Input
-                isClearable
-                  placeholder="Phone"
+                  isClearable
+                  placeholder="03xx-xxxxxxx"
                   label="Phone #"
                   labelPlacement="outside-top"
                   classNames={{
-                    clearButton:'text-secondary',
+                    clearButton: "text-secondary",
                     label: "text-accent font-medium",
                     input: "text-accent",
                   }}
                   value={phone}
-                  onValueChange={setPhone}
+                  onValueChange={(val) => {
+                    setPhone(val);
+                    validateField("phone", val);
+                  }}
+                  errorMessage={errors.phone}
+                  isInvalid={!!errors.phone}
                 />
               </div>
 
@@ -164,6 +319,8 @@ function ReservationForm({
                   labelPlacement="outside"
                   value={date}
                   onChange={setDate}
+                  minValue={today(getLocalTimeZone()).add({ days: 3 })}
+                  maxValue={today(getLocalTimeZone()).add({ days: 30 })}
                   calendarProps={{
                     classNames: {
                       gridBody: "bg-white text-accent",
@@ -172,30 +329,32 @@ function ReservationForm({
                   }}
                   classNames={{
                     label: "text-accent font-medium",
-                    segment: "!text-black", // <- Force override here
+                    segment: "!text-accent font-medium",
                   }}
                 />
               </div>
 
-              {/* Time */}
               <div>
-                <Input
-                isClearable
-                  type="time"
+                <TimeInput
                   label="Time"
-                  labelPlacement="outside-top"
-                  classNames={{ label: "text-accent font-medium",clearButton:'text-secondary', }}
+                  labelPlacement="outside"
+                  classNames={{
+                    label: "text-accent font-medium",
+                    segment: "!text-accent",
+                  }}
                   value={time}
-                  onValueChange={setTime}
+                  onChange={setTime}
+                  minValue={new Time(8.0)}
+                  maxValue={new Time(24.0)}
                 />
               </div>
 
               {/* Person Count */}
               <div>
                 <NumberInput
-                isClearable
+                  isClearable
                   classNames={{
-                    clearButton:'text-secondary',
+                    clearButton: "text-secondary",
                     label: "!text-accent font-medium",
                   }}
                   key={"numberOfPerson"}
@@ -204,19 +363,22 @@ function ReservationForm({
                   label="Number of Person"
                   labelPlacement="outside"
                   value={guests}
-                  onValueChange={setGuests}
+                  onValueChange={(num) => {
+                    setGuests(num);
+                    validateField("person", num);
+                  }}
                   hideStepper
+                  errorMessage={errors.person}
+                  isInvalid={!!errors.person}
                 />
               </div>
 
               <div>
                 <Textarea
-                isClearable
-
+                  isClearable
                   labelPlacement="outside-top"
-                  
                   classNames={{
-                    clearButton:'text-secondary',
+                    clearButton: "text-secondary",
                     label: "text-accent font-medium",
                     input: "py-2 text-accent",
                   }}
@@ -240,10 +402,16 @@ function ReservationForm({
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
                     setOccasion(Number(selected)); // convert back to number
+                    validateField("occasion", Number(selected));
                   }}
+                  errorMessage={errors.occasion}
+                  isInvalid={!!errors.occasion}
                 >
                   {occasionType.map((type) => (
-                    <SelectItem key={type.id.toString()} className="text-accent">
+                    <SelectItem
+                      key={type.id.toString()}
+                      className="text-accent"
+                    >
                       {type.label}
                     </SelectItem>
                   ))}
@@ -252,7 +420,10 @@ function ReservationForm({
 
               {/* Button */}
               <div className="">
-                <Button className="w-full bg-theme text-md text-white font-semibold rounded-none h-14 hover:bg-transparent border-2 border-theme hover:border-theme hover:text-theme transition-colors duration-300">
+                <Button
+                  type="submit"
+                  className="w-full bg-theme text-md text-white font-semibold rounded-none h-14 hover:bg-transparent border-2 border-theme hover:border-theme hover:text-theme transition-colors duration-300"
+                >
                   {reservationData
                     ? "Update Reservation"
                     : "Make a Reservation"}

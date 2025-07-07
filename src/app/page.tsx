@@ -7,7 +7,7 @@ import { MenuItem } from '@heroui/react';
 import MenuItems from '@/components/Dashboard/MenuItems';
 import Speacials from '@/components/Dashboard/Speacials';
 import ImageGallery from '@/components/ImageGallery';
-import Footer from '@/components/Footer';
+
 function Home() {
   return (
     <div>

@@ -88,9 +88,10 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
 
   return (
     <div className="w-full">
-      <div className="w-full p-5 py-10 bg-foreground flex flex-col gap-2">
-        <div className="w-full h-auto flex flex-row gap-2 items-center">
+      <div className="w-full p-5 md:py-10 bg-foreground flex flex-col gap-2">
+        <div className="w-full h-auto flex justify-between gap-2 items-center">
           <Input
+            className="w-[70%] sm:w-full"
             isClearable
             label="Search any Item"
             value={searchText}
@@ -121,13 +122,14 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
         <AnimatePresence>
           {isFilterMenuOpen && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 170, opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              layout
+              transition={{ duration: 0.3, ease: "easeOut" }}
               className="w-full bg-foreground overflow-hidden"
             >
-              <div className="grid grid-cols-3 py-5 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 py-5 gap-5">
                 {/* Category Filter */}
                 <div>
                   {/* <Autocomplete

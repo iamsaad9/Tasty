@@ -1,0 +1,469 @@
+[
+  {
+    "id": 1,
+    "title": "Butter Chicken",
+    "category": "Main Course",
+    "diet": ["nonveg", "halal", "all"],
+    "price": 12.99,
+    "description": "A delicious blend of spices and tender chicken cooked in a creamy tomato sauce.",
+    "image": "https://plus.unsplash.com/premium_photo-1661419883163-bb4df1c10109?q=80&w=687&auto=format&fit=crop",
+    "popularity": 120,
+    "rating": 4.2,
+    "special":true,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "30-45 mins",
+      "baseFee": 2.5,
+      "freeAbove": 25,
+      "minOrder": 10,
+      "areas": [
+        {
+          "name": "Clifton",
+          "postalCode": "75500",
+          "fee": 2.5
+        },
+        {
+          "name": "Gulshan-e-Iqbal",
+          "postalCode": "75600",
+          "fee": 3.0
+        },
+        {
+          "name": "DHA",
+          "postalCode": "75530",
+          "fee": 2.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "title": "Grilled Salmon",
+    "category": "Main Course",
+    "diet": ["nonveg", "halal", "all"],
+    "price": 15.50,
+    "description": "Fresh salmon grilled to perfection served with herbs and lemon.",
+    "image": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 110,
+    "rating": 4.5,
+    "special":false,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "40-55 mins",
+      "baseFee": 3.5,
+      "freeAbove": 35,
+      "minOrder": 15,
+      "areas": [
+        {
+          "name": "Malir Cantonment",
+          "postalCode": "75080",
+          "fee": 3.5
+        },
+        {
+          "name": "Korangi",
+          "postalCode": "74900",
+          "fee": 4.0
+        },
+        {
+          "name": "Shah Faisal Colony",
+          "postalCode": "75230",
+          "fee": 3.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "title": "Vegetable Lasagna",
+    "category": "Main Course",
+    "diet": ["veg", "halal", "all"],
+    "price": 11.75,
+    "description": "Layered pasta with rich vegetable sauce and creamy cheese.",
+    "image": "https://plus.unsplash.com/premium_photo-1671559021023-3da68c12aeed?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 80,
+    "rating": 4.0,
+    "special":false,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "25-40 mins",
+      "baseFee": 2.0,
+      "freeAbove": 20,
+      "minOrder": 9,
+      "areas": [
+        {
+          "name": "North Nazimabad",
+          "postalCode": "74600",
+          "fee": 2.0
+        },
+        {
+          "name": "Gulshan-e-Iqbal",
+          "postalCode": "75850",
+          "fee": 2.5
+        }
+      ]
+    }
+  },
+  {
+    "id": 4,
+    "title": "Crispy Spring Rolls",
+    "category": "Appetizer",
+    "diet": ["veg", "halal", "all"],
+    "price": 5.25,
+    "description": "Crispy fried rolls stuffed with vegetables and served with sweet chili sauce.",
+    "image": "https://images.unsplash.com/photo-1679310290259-78d9eaa32700?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 150,
+    "rating": 4.8,
+    "special":true,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "15-30 mins",
+      "baseFee": 1.5,
+      "freeAbove": 10,
+      "minOrder": 5,
+      "areas": [
+        {
+          "name": "Saddar",
+          "postalCode": "75950",
+          "fee": 1.5
+        },
+        {
+          "name": "North Karachi",
+          "postalCode": "75800",
+          "fee": 2.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "title": "Tomato Bruschetta",
+    "category": "Appetizer",
+    "diet": ["veg", "halal", "all"],
+    "price": 6.99,
+    "description": "Grilled bread topped with garlic, fresh tomatoes, olive oil, and basil.",
+    "image": "https://plus.unsplash.com/premium_photo-1677686707252-16013f466e61?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 60,
+    "rating": 3.9,
+    "special":false,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "20-35 mins",
+      "baseFee": 2.0,
+      "freeAbove": 18,
+      "minOrder": 7,
+      "areas": [
+        {
+          "name": "Garden East",
+          "postalCode": "74400",
+          "fee": 2.0
+        },
+        {
+          "name": "Liaquatabad",
+          "postalCode": "75900",
+          "fee": 2.5
+        }
+      ]
+    }
+  },
+  {
+    "id": 6,
+    "title": "Golden Mozzarella Sticks",
+    "category": "Appetizer",
+    "diet": ["veg", "halal", "all"],
+    "price": 6.50,
+    "description": "Deep-fried cheese sticks served with savory marinara sauce.",
+    "image": "https://images.unsplash.com/photo-1734774924912-dcbb467f8599?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 125,
+    "rating": 4.4,
+    "special":false,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "20-30 mins",
+      "baseFee": 1.8,
+      "freeAbove": 16,
+      "minOrder": 6,
+      "areas": [
+        {
+          "name": "Gulistan-e-Jauhar",
+          "postalCode": "75290",
+          "fee": 1.8
+        }
+       
+      ]
+    }
+  },
+  {
+    "id": 7,
+    "title": "Classic Cheeseburger",
+    "category": "Fast Food",
+    "diet": ["nonveg", "halal", "all"],
+    "price": 8.99,
+    "description": "Juicy grilled beef patty with melted cheese, crisp lettuce, and fresh tomato in a sesame bun.",
+    "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=687&auto=format&fit=crop",
+    "popularity": 102,
+    "rating": 4.0,
+    "special":true,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "25-40 mins",
+      "baseFee": 2.2,
+      "freeAbove": 22,
+      "minOrder": 9,
+      "areas": [
+        {
+          "name": "Saddar",
+          "postalCode": "74400",
+          "fee": 2.2
+        },
+        {
+          "name": "Lyari",
+          "postalCode": "75660",
+          "fee": 2.8
+        }
+      ]
+    }
+  },
+  {
+    "id": 8,
+    "title": "Chicken Shawarma Wrap",
+    "category": "Fast Food",
+    "diet": ["nonveg", "halal", "all"],
+    "price": 7.49,
+    "description": "Middle Eastern wrap with spiced chicken, fresh veggies, and a creamy garlic sauce.",
+    "image": "https://images.unsplash.com/photo-1605888983099-e33007b6ff27?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 90,
+    "rating": 4.7,
+    "special":true,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "20-35 mins",
+      "baseFee": 1.9,
+      "freeAbove": 17,
+      "minOrder": 7,
+      "areas": [
+        {
+          "name": "Orangi Town",
+          "postalCode": "75810",
+          "fee": 1.9
+        },
+        {
+          "name": "Baldia Town",
+          "postalCode": "75820",
+          "fee": 2.3
+        }
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "title": "Crispy Chicken Nuggets",
+    "category": "Fast Food",
+    "diet": ["nonveg", "halal", "all"],
+    "price": 6.75,
+    "description": "Crispy golden chicken nuggets served with your choice of dipping sauce.",
+    "image": "https://images.unsplash.com/photo-1562967916-eb82221dfb92?q=80&w=686&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 210,
+    "rating": 4.8,
+    "special":false,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "15-25 mins",
+      "baseFee": 1.5,
+      "freeAbove": 14,
+      "minOrder": 6,
+      "areas": [
+        {
+          "name": "Karsaz",
+          "postalCode": "75290",
+          "fee": 1.5
+        },
+        {
+          "name": "Landhi",
+          "postalCode": "75160",
+          "fee": 2.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "title": "Rich Chocolate Lava Cake",
+    "category": "Dessert",
+    "diet": ["halal", "all"],
+    "price": 5.99,
+    "description": "Warm chocolate cake with a gooey molten center, served with a dusting of cocoa.",
+    "image": "https://images.unsplash.com/photo-1511911063855-2bf39afa5b2e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 200,
+    "rating": 4.9,
+    "special":false,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "20-30 mins",
+      "baseFee": 1.7,
+      "freeAbove": 15,
+      "minOrder": 6,
+      "areas": [
+        {
+          "name": "Bahadurabad",
+          "postalCode": "75400",
+          "fee": 1.7
+        },
+        {
+          "name": "Tariq Road",
+          "postalCode": "75450",
+          "fee": 2.1
+        }
+      ]
+    }
+  },
+  {
+    "id": 11,
+    "title": "Classic Tiramisu",
+    "category": "Dessert",
+    "diet": ["halal", "all"],
+    "price": 6.49,
+    "description": "Classic Italian dessert with coffee-soaked layers and creamy mascarpone.",
+    "image": "https://plus.unsplash.com/premium_photo-1695028378225-97fbe39df62a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 180,
+    "rating": 4.6,
+    "special":true,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "25-40 mins",
+      "baseFee": 2.0,
+      "freeAbove": 18,
+      "minOrder": 7,
+      "areas": [
+        {
+          "name": "PECHS",
+          "postalCode": "75400",
+          "fee": 2.0
+        },
+        {
+          "name": "Jamshed Town",
+          "postalCode": "74800",
+          "fee": 2.5
+        }
+      ]
+    }
+  },
+  {
+    "id": 12,
+    "title": "Deluxe Ice Cream Sundae",
+    "category": "Dessert",
+    "diet": ["halal", "all"],
+    "price": 4.50,
+    "description": "Scoops of vanilla ice cream topped with chocolate syrup, whipped cream, and a cherry.",
+    "image": "https://plus.unsplash.com/premium_photo-1669680785558-c189b49aed4e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 160,
+    "rating": 4.3,
+    "special":false,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "15-25 mins",
+      "baseFee": 1.2,
+      "freeAbove": 10,
+      "minOrder": 5,
+      "areas": [
+        {
+          "name": "DHA",
+          "postalCode": "75500",
+          "fee": 1.2
+        }
+       
+      ]
+    }
+  },
+  {
+    "id": 13,
+    "title": "Refreshing Mojito",
+    "category": "Drinks",
+    "diet": ["halal", "all"],
+    "price": 3.99,
+    "description": "Refreshing mint and lime drink served with ice, perfect for a hot day.",
+    "image": "https://plus.unsplash.com/premium_photo-1722194069219-16ec49c08625?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 140,
+    "rating": 4.1,
+    "special":false,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "10-20 mins",
+      "baseFee": 0.8,
+      "freeAbove": 8,
+      "minOrder": 4,
+      "areas": [
+        {
+          "name": "Clifton",
+          "postalCode": "75500",
+          "fee": 0.8
+        },
+        {
+          "name": "DHA",
+          "postalCode": "75530",
+          "fee": 1.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 14,
+    "title": "Creamy Strawberry Smoothie",
+    "category": "Drinks",
+    "diet": ["halal", "all"],
+    "price": 4.25,
+    "description": "Creamy blend of fresh strawberries, yogurt, and a touch of honey.",
+    "image": "https://images.unsplash.com/photo-1611928237590-087afc90c6fd?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 130,
+    "rating": 4.4,
+    "special":true,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "15-25 mins",
+      "baseFee": 1.0,
+      "freeAbove": 10,
+      "minOrder": 5,
+      "areas": [
+        {
+          "name": "Gulshan-e-Iqbal",
+          "postalCode": "75300",
+          "fee": 1.0
+        },
+        {
+          "name": "Johar",
+          "postalCode": "75290",
+          "fee": 1.2
+        }
+      ]
+    }
+  },
+  {
+    "id": 15,
+    "title": "Smooth Cold Brew Coffee",
+    "category": "Drinks",
+    "diet": ["halal", "all"],
+    "price": 3.50,
+    "description": "Chilled, slow-brewed coffee with a smooth, low-acid flavor, perfect over ice.",
+    "image": "https://images.unsplash.com/photo-1592663527359-cf6642f54cff?q=80&w=719&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "popularity": 170,
+    "rating": 4.0,
+    "special":false,
+    "delivery": {
+      "isDeliverable": true,
+      "estimatedTime": "10-20 mins",
+      "baseFee": 0.7,
+      "freeAbove": 7,
+      "minOrder": 3,
+      "areas": [
+        {
+          "name": "DHA",
+          "postalCode": "75500",
+          "fee": 0.7
+        },
+        {
+          "name": "Seaview",
+          "postalCode": "75500",
+          "fee": 0.9
+        }
+      ]
+    }
+  }
+]
