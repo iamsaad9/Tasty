@@ -1,16 +1,17 @@
 "use client";
-import React from 'react'
+import React, { useState } from 'react'
 import ReservationForm from '@/components/Dashboard/ReservationForm';
 import { CarouselDemo } from '@/components/Dashboard/BgCarousel';
 import About from '@/components/Dashboard/About';
-import { MenuItem } from '@heroui/react';
 import MenuItems from '@/components/Dashboard/MenuItems';
 import Speacials from '@/components/Dashboard/Speacials';
 import ImageGallery from '@/components/ImageGallery';
-
+import LoadingScreen from '@/components/Loading';
 function Home() {
+  const [loading, setLoading] = useState<boolean>(false);
   return (
     <div>
+      <LoadingScreen showLoading={loading}/>
      
         <div className='overflow-hidden -z-10 top-0 flex items-center justify-center '>
           <CarouselDemo/>
@@ -24,7 +25,7 @@ function Home() {
           </div>
 
           <div className='w-full flex justify-center z-10'>
-              <MenuItems/>
+              <MenuItems showLoading={(val)=>setLoading(val)}/>
           </div>
 
           <div className='w-full flex items-center justify-center'>

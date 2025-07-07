@@ -43,7 +43,6 @@ interface ViewReservationsTableProps {
 const columns: Column[] = [
   { name: "ID", uid: "id", sortable: true },
   { name: "NAME", uid: "name", sortable: true },
-  { name: "EMAIL", uid: "email", sortable: true },
   { name: "DATE", uid: "date", sortable: true },
   { name: "TIME", uid: "time" },
   { name: "GUESTS", uid: "guests", sortable: true },
@@ -78,6 +77,7 @@ export default function ViewReservations({
     onEditReservation(reservations);
     onAddNew();
   };
+  
 
   useEffect(()=>{
     const fetchData = async () => {
@@ -120,19 +120,15 @@ export default function ViewReservations({
           return item.id;
         case "name":
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-40">
               <p className="text-bold  capitalize">{item.name}</p>
+              <p className="text-bold text-xs text-secondary capitalize">{item.email}</p>
             </div>
           );
-        case "email":
-          return (
-            <div className="flex flex-col">
-              <p className="text-bold  capitalize">{item.email}</p>
-            </div>
-          );
+       
         case "date":
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-30">
               <p className="text-bold  capitalize">{item.date}</p>
             </div>
           );
@@ -150,19 +146,19 @@ export default function ViewReservations({
           );
         case "phone":
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-40">
               <p className="text-bold  capitalize">{item.phone}</p>
             </div>
           );
         case "occasion":
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-40">
               <p className="text-bold  capitalize">{item.occasion}</p>
             </div>
           );
         case "requests":
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-40 line-clamp-1">
               <p className="text-bold  capitalize">
                 {item.requests ? item.requests : "N/A"}
               </p>
@@ -286,7 +282,7 @@ export default function ViewReservations({
 
   return (
     <FadeInSection>
-      <Card className="max-w-[90rem] mx-auto p-4 my-5  rounded-lg shadow-md">
+      <Card className=" mx-auto p-4 my-5  rounded-lg shadow-md">
         <Table
           isCompact
           removeWrapper
@@ -298,6 +294,7 @@ export default function ViewReservations({
                 "after:bg-foreground after:text-background text-background",
             },
           }}
+          className="overflow-auto"
           sortDescriptor={sortDescriptor}
           topContent={topContent}
           topContentPlacement="outside"
@@ -311,9 +308,9 @@ export default function ViewReservations({
               </TableColumn>
             )}
           </TableHeader>
-          <TableBody emptyContent={"You dont have any Reservations"} items={reservations}>
+          <TableBody emptyContent={"You dont have any Reservations"}   items={reservations}>
             {(item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item.id} >
                 {columns
                   .filter((column) => renderCell(item, column.uid) !== null)
                   .map((column) => {
@@ -321,7 +318,7 @@ export default function ViewReservations({
                     return (
                       <TableCell
                         key={column.uid}
-                        className="text-accent py-5 text-md"
+                        className="text-accent py-5 text-md "
                       >
                         {content}
                       </TableCell>

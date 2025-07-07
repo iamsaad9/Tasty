@@ -6,6 +6,7 @@ import FadeInSection from "@/components/ui/scrollAnimated";
 import ReservationForm from "@/components/Reservation/ReservationForm";
 import ImageGallery from "@/components/ImageGallery";
 import ViewReservationsTable from "@/components/Reservation/ReservationTable";
+import Heading from "@/components/Heading";
 
 interface Reservation {
   id: number;
@@ -37,11 +38,13 @@ function ReservationPage() {
             selectedKey={selectedTab}
             onSelectionChange={(key) => setSelectedTab(String(key))}
             aria-label="Options"
-            size="lg"
+            size="md"
             color="warning"
             classNames={{ tabList: "bg-secondary/30" }}
           >
             <Tab key="newReservation" title="New Reservation">
+              <Heading title="RESERVATIONS" subheading="New Reservation"/>
+
               <FadeInSection>
                 <ReservationForm
                   reservationDataProp={editReservation}
@@ -49,17 +52,12 @@ function ReservationPage() {
                   // clearReservationData={() => setEditReservation(null)}
                 />
               </FadeInSection>
+              
             </Tab>
 
             <Tab isDisabled={editReservation!==null} key="viewReservation" title="View Reservation">
-              <FadeInSection className="flex flex-col justify-center items-center gap-2 py-10">
-                <h1 className="text-background/30 text-md font-semibold">
-                  RESERVATIONS
-                </h1>
-                <h1 className="text-accent text-center text-2xl sm:text-3xl font-semibold">
-                  View Reservation
-                </h1>
-              </FadeInSection>
+              
+              <Heading title="RESERVATIONS" subheading="View Reservation"/>
 
               <ViewReservationsTable
                 onAddNew={() => setSelectedTab("newReservation")}

@@ -17,8 +17,19 @@ interface Location {
 function LocationForm() {
   const [action, setAction] = useState<string>("");
   const [locationData, setLocationData] = useState<Location[]>([]);
-  const { selectedLocation, setSelectedLocation } = useLocationStore();
+  const {
+  selectedLocation,
+  setSelectedLocation,
+  hasHydrated,
+} = useLocationStore();
   const [ currentLocation, setCurrentLocation ] = useState<string>('');
+
+  useEffect(() => {
+  if (hasHydrated) {
+    console.log("Hydrated selectedLocation", selectedLocation);
+    setCurrentLocation(selectedLocation);
+  }
+}, [hasHydrated, selectedLocation]);
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -31,7 +42,7 @@ function LocationForm() {
   }, []);
   return (
     <div className="w-full bg-foreground">
-      <Card className="bg-theme mx-auto w-full lg:w-[70vw] xl:w-[60vw] p-5 2xl:p-10 rounded-none">
+      <Card className="bg-theme mx-auto w-[100vw] xl:w-[70vw] 2xl:w-[60vw] p-5 2xl:p-10 rounded-none">
         <Form
           className="w-full flex-col justify-center items-center md:flex-row gap-5 lg:gap-10"
           onReset={() => setAction("reset")}
@@ -43,22 +54,23 @@ function LocationForm() {
           }}
         >
           <Autocomplete
-            className="border-2 !text-accent border-black "
+          isClearable={false}
+            className="border-1 !text-accent border-black "
             classNames={{
               listboxWrapper: "!text-accent ",
             }}
             inputProps={{
               classNames: {
                 label: "!text-accent font-medium",
-                base: "focus:!bg-transparent",
+                base: "focus:!bg-foreground",
                 inputWrapper:
-                  "text-accent rounded-none  bg-transparent hover:!bg-transparent focus:!bg-transparent active:!bg-transparent",
+                  "text-accent rounded-none  bg-foreground hover:!bg-foreground focus:!bg-foreground active:!bg-foreground",
               },
             }}
             label="Location"
             placeholder="Select your Location"
             startContent={<LocateIcon size={20} />}
-            defaultSelectedKey={selectedLocation}
+            selectedKey={currentLocation}
             onSelectionChange={(key) =>
               setCurrentLocation(key ? String(key) : "")
             }
@@ -79,6 +91,7 @@ function LocationForm() {
             radius="none"
             size="lg"
             onPress={()=>setSelectedLocation(currentLocation)}
+            isDisabled={currentLocation===''}
           >
             Select
           </Button>

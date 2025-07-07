@@ -14,7 +14,7 @@ function PageBanner({title,image}:PageBannerProps) {
         <div className="absolute w-full h-full bg-[#404044] opacity-50" />
         <FadeInSection className=" absolute flex flex-col items-center justify-center text-center px-4">
           <h2
-            className={`${indie.className}  text-white text-2xl md:text-7xl mt-10 mb-4`}
+            className={`${indie.className}  text-white text-4xl md:text-7xl mt-10 mb-4`}
           >
            {title}
           </h2>

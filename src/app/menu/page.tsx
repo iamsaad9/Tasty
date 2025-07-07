@@ -17,7 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import PageBanner from "@/components/PageBanner";
 import ImageGallery from "@/components/ImageGallery";
 import { useLocationStore } from "@/lib/store/locationStore";
-
+import LoadingScreen from "@/components/Loading";
 interface MenuItems {
   id:number,
   title:string,
@@ -88,15 +88,18 @@ function MenuPage() {
     selectedSort: "default",
   });
  const [menuItems,setMenuItems] = useState<MenuItems[]>([])
+ const [loading,setLoading]=useState<boolean>(false);
 
   useEffect(()=>{
     console.log('selectedLocation',selectedLocation)
     const fetchMenuItems = async () => {
+      console.log('fetchingMenu')
+      setLoading(true);
       const res = await fetch('/Data/menu.json');
       const data = await res.json();
       setMenuItems(data);
+      setLoading(false);
     }
-
     fetchMenuItems();
   },[]);
 
@@ -136,6 +139,7 @@ function MenuPage() {
   };
   return (
     <div className="w-full">
+      <LoadingScreen showLoading={loading}/>
       {/* Background Section */}
       <PageBanner title="Discover Our Exclusive Menu" image="/images/PageBanners/menuPage.jpg"/>
       <SpecialsCorousel />

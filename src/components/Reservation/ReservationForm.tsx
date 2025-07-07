@@ -220,19 +220,11 @@ function ReservationForm({
   };
   return (
     <div className="flex flex-col items-center ">
-      <FadeInSection className="flex flex-col justify-center items-center gap-2 py-10">
-        <h1 className="text-background/30 text-md font-semibold">
-          RESERVATIONS
-        </h1>
-        <h1 className="text-accent text-center text-2xl sm:text-3xl font-semibold ">
-          New Reservation
-        </h1>
-      </FadeInSection>
-
+      
       <FadeInSection className="w-full flex justify-center ">
-        <div className="flex flex-row justify-around  h-auto w-[60%] my-10 bg-foreground">
+        <div className="flex flex-col md:flex-row justify-around  h-auto w-full lg:w-[80%] xl:w-[60%] my-10 bg-foreground">
           {/* Left Image */}
-          <div className="  w-[30%] ">
+          <div className="  md:w-[30%] ">
             <img
               src="/images/BgCarousel/bg_1.jpg" // Replace with your image path
               alt="Bar Interior"
@@ -241,7 +233,7 @@ function ReservationForm({
           </div>
 
           {/* Right Form */}
-          <div className="p-8 flex flex-col justify-around flex-1">
+          <div className="p-5 md:p-8 flex flex-col justify-around flex-1">
             <form
               className="grid grid-cols-1 items-start sm:grid-cols-2 gap-5 h-full p-5"
               onSubmit={handleSubmit}
@@ -419,7 +411,7 @@ function ReservationForm({
               </div>
 
               {/* Button */}
-              <div className="">
+              <div className="flex flex-row">
                 <Button
                   type="submit"
                   className="w-full bg-theme text-md text-white font-semibold rounded-none h-14 hover:bg-transparent border-2 border-theme hover:border-theme hover:text-theme transition-colors duration-300"

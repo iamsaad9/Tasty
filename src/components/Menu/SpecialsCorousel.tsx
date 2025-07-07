@@ -11,7 +11,7 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@heroui/react";
 import LoginModal from "../LoginModal";
-
+import Heading from "../Heading";
 interface MenuItems {
   id:number,
   title:string,
@@ -55,12 +55,7 @@ function SpecialsCorousel() {
   },[])
   return (
     <div className="w-full flex flex-col items-center justify-center mb-10">
-      <FadeInSection className="flex flex-col justify-center items-center gap-2 py-10">
-        <h1 className="text-background/30 text-md font-semibold">SPECIALS</h1>
-        <h1 className="text-accent text-center text-2xl sm:text-3xl font-semibold ">
-           Our Specialities
-        </h1>
-      </FadeInSection>
+       <Heading title="SPECIALS" subheading="Our Specialities"/>
 
       <FadeInSection className="w-full flex items-center justify-center">
         <Carousel className="w-full relative flex flex-row justify-center items-center " plugins={[ Autoplay({ delay: 3000, stopOnInteraction: false  }) ]} opts={{loop:true}}>

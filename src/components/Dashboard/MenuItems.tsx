@@ -4,7 +4,7 @@ import { FaWineGlassAlt, FaIceCream, FaDrumstickBite } from "react-icons/fa";
 import { motion } from "framer-motion";
 import FadeInSection from "../ui/scrollAnimated";
 import { Link } from "@heroui/react";
-
+import Heading from "../Heading";
 interface MenuItems {
   id:number,
   title:string,
@@ -32,7 +32,11 @@ interface MenuItems {
   }
 }
 
-function MenuItems() {
+interface MenuItemProps{
+ showLoading: (val: boolean) => void;
+}
+
+function MenuItems({showLoading}:MenuItemProps) {
   const [activeMenu, setActiveMenu] = useState<string>('Main');
   const menuType = [
     {
@@ -59,9 +63,11 @@ function MenuItems() {
  
    useEffect(()=>{
      const fetchMenuItems = async () => {
+      showLoading(true);
        const res = await fetch('/Data/menu.json');
        const data = await res.json();
        setMenuItems(data);
+       showLoading(false);
      }
  
      fetchMenuItems();
@@ -73,15 +79,10 @@ function MenuItems() {
     setActiveMenu(menuType[id-1].name);
   };
   return (
-    <div className=" w-full lg:w-[90vw] xl:w-[80vw] flex flex-col gap-10 py-20 justify-center items-center px-5 lg:px-0">
-      <FadeInSection className="flex flex-col justify-center items-center gap-2">
-        <h1 className="text-background/30 text-md font-semibold">OUR MENU</h1>
-        <h1 className="text-accent text-center text-2xl sm:text-3xl font-semibold ">
-          Discover Our Exclusive Menu
-        </h1>
-      </FadeInSection>
+    <div className=" w-full lg:w-[90vw] xl:w-[80vw] flex flex-col gap-10 py-10 justify-center items-center px-5 lg:px-0">
+      <Heading title="OUR MENU" subheading="Discover Our Exclusive Menu"/>
 
-      <div className="w-full sm:px-0 py-5">
+      <div className="w-full sm:px-0 ">
         <FadeInSection
           delay={0.2}
           className="flex sm:flex-row justify-center flex-col gap-2 sm:gap-10 p-2 "
@@ -129,11 +130,10 @@ function MenuItems() {
                   key={item.id}
                   className="bg-foreground p-4 rounded-sm hover:bg-theme cursor-pointer"
                 >
-                  <div className="flex flex-row sm:items-center sm:justify-between gap-4">
-                    {/* Left: Image + Text */}
+                  <div className="flex flex-row sm:items-center sm:justify-between sm:gap-4">
                     <div className="flex items-center sm:items-center gap-4 flex-1">
                       <div
-                        className="min-w-[70px] min-h-[70px] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-red-500 flex items-center justify-center text-white font-bold"
+                        className="min-w-[70px] min-h-[70px] w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-red-500 flex items-center justify-center text-white font-bold"
                         style={{
                           backgroundImage: `url(${item.image})`,
                           backgroundSize: "cover",
@@ -142,10 +142,10 @@ function MenuItems() {
                       />
 
                       <div className="flex flex-col">
-                        <h2 className="text-base sm:text-lg font-semibold text-accent">
+                        <h2 className="text-base sm:text-lg font-semibold text-accent line-clamp-1">
                           {item.title}
                         </h2>
-                        <p className="text-sm text-accent/60 mt-1 sm:mt-2">
+                        <p className="text-xs md:text-sm text-accent/60 mt-1 sm:mt-2 line-clamp-3">
                           {item.description}
                         </p>
                       </div>
@@ -153,7 +153,7 @@ function MenuItems() {
 
                     {/* Right: Price */}
                     <div className="text-right flex items-center">
-                      <h1 className="text-2xl font-semibold text-accent">
+                      <h1 className="text-lg md:text-2xl font-semibold text-accent">
                         ${item.price}
                       </h1>
                     </div>
