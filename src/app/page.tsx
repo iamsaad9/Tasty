@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import ReservationForm from "@/components/Dashboard/ReservationForm";
+import ReservationForm from "@/components/Dashboard/LocationForm";
 import { CarouselDemo } from "@/components/Dashboard/BgCarousel";
 import About from "@/components/Dashboard/About";
 import MenuItems from "@/components/Dashboard/MenuItems";

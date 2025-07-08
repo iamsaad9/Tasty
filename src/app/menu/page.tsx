@@ -18,6 +18,7 @@ import PageBanner from "@/components/PageBanner";
 import ImageGallery from "@/components/ImageGallery";
 import { useLocationStore } from "@/lib/store/locationStore";
 import LoadingScreen from "@/components/Loading";
+import LocationModal from "@/components/LocationModal";
 interface MenuItems {
   id:number,
   title:string,
@@ -89,9 +90,15 @@ function MenuPage() {
   });
  const [menuItems,setMenuItems] = useState<MenuItems[]>([])
  const [loading,setLoading]=useState<boolean>(false);
-
+  const [showAddressModal, setShowAddressModal] = useState(false);
   useEffect(()=>{
-    console.log('selectedLocation',selectedLocation)
+
+    if(selectedLocation === ''){
+      setShowAddressModal(true);
+    }
+
+
+
     const fetchMenuItems = async () => {
       console.log('fetchingMenu')
       setLoading(true);
@@ -139,6 +146,10 @@ function MenuPage() {
   };
   return (
     <div className="w-full">
+      {/* <CustomModal isOpen={showAddressModal} onClose={()=>setShowAddressModal(false)} title="Select Your Location" description="Please select your location">
+
+      </CustomModal> */}
+      <LocationModal isOpen={showAddressModal} onClose={()=>setShowAddressModal(false)} title="Select Your Location" description="Please select your location"/>
       <LoadingScreen showLoading={loading}/>
       {/* Background Section */}
       <PageBanner title="Discover Our Exclusive Menu" image="/images/PageBanners/menuPage.jpg"/>

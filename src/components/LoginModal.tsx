@@ -11,10 +11,9 @@ import {
   Link,
   Divider,
 } from "@heroui/react";
-import { Mail, Lock, Facebook, Github } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { FaGoogle,FaFacebook } from "react-icons/fa";
 import SignInButton from "./SignInButton";
 interface AuthModalProps {
   open: boolean;
@@ -25,13 +24,22 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <Modal isOpen={open} placement="top-center" onClose={onClose} className="py-5">
+    <Modal
+      isOpen={open}
+      placement="top-center"
+      onClose={onClose}
+      className="py-5"
+      classNames={{
+        closeButton:'m-2 cursor-pointer'
+      }}
+    >
       <ModalContent>
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1 ">
-              <h1 className="text-2xl font-bold text-accent">{isLogin ? "Log in" : "Create an account"}</h1>
-              
+              <h1 className="text-2xl font-bold text-accent">
+                {isLogin ? "Log in" : "Create an account"}
+              </h1>
             </ModalHeader>
             <ModalBody>
               <Input
@@ -47,18 +55,21 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 placeholder="Enter your password"
                 type="password"
                 variant="bordered"
-                 className="text-black font-medium"
+                className="text-black font-medium"
               />
               <div className="flex py-2 px-1 justify-between">
                 {isLogin && (
-                  <Link href="#" size="sm" className="w-full flex justify-end text-blue-500 font-medium">
+                  <Link
+                    href="#"
+                    size="sm"
+                    className="w-full flex justify-end text-blue-500 font-medium"
+                  >
                     Forgot password?
                   </Link>
                 )}
               </div>
-
               <Button
-                className="w-full mt-2 bg-theme"
+                className="w-full mt-2 bg-theme text-medium"
                 onPress={() => {
                   // Handle email login/signup logic here
                   isLogin ? signIn("credentials") : alert("Sign up logic");
@@ -68,19 +79,18 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               </Button>
 
               <Divider className="my-4" />
-
-              <div className="flex flex-col gap-2">
-                {/* <Button
-                  onPress={() => signIn("google")}
-                  className="w-full text-accent"
-                  variant="bordered"
-                  startContent={<FaGoogle size={20}/>}
-                >
-                  Continue with Google
-                </Button> */}
-                <SignInButton provider="google" onClick={() => signIn("google")}/>
-                <SignInButton provider="facebook" onClick={() => signIn("facebook")}/>
-              </div>
+              {isLogin && (
+                <div className="flex flex-col gap-2">
+                  <SignInButton
+                    provider="google"
+                    onClick={() => signIn("google")}
+                  />
+                  <SignInButton
+                    provider="facebook"
+                    onClick={() => signIn("facebook")}
+                  />
+                </div>
+              )}
             </ModalBody>
 
             <ModalFooter className="justify-center text-sm text-accent">
@@ -88,7 +98,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 <>
                   Don’t have an account?{" "}
                   <button
-                    className="text-primary font-medium ml-1"
+                    className="text-blue-500 font-medium ml-1 cursor-pointer"
                     onClick={() => setIsLogin(false)}
                   >
                     Sign up
@@ -98,7 +108,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 <>
                   Already have an account?{" "}
                   <button
-                    className="text-primary font-medium ml-1"
+                    className="text-blue-500 font-medium ml-1 cursor-pointer"
                     onClick={() => setIsLogin(true)}
                   >
                     Log in

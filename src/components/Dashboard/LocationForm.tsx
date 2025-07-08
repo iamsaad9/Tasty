@@ -90,7 +90,7 @@ function LocationForm() {
             variant="bordered"
             radius="none"
             size="lg"
-            onPress={()=>setSelectedLocation(currentLocation)}
+            onPress={()=>setSelectedLocation('')}
             isDisabled={currentLocation==='' || currentLocation===selectedLocation}
           >
             Select

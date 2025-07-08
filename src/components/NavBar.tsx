@@ -219,10 +219,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
 interface DesktopNavLinksProps {
   visibleMenuTabs: VisibleTabType[];
   pathname: string;
+  fixedHeader?: boolean;
 }
 
 const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
   visibleMenuTabs,
+  fixedHeader,
   pathname,
 }) => {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -281,11 +283,13 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
               href={singleItemHref}
               title={tab.name}
               className={`flex items-center  lg:px-3 py-2 rounded-lg transition-colors text-base lg:text-lg 
-                  ${
-                    active
-                      ? " text-gray-300 text-base lg:text-lg"
-                      : "text-white hover:text-gray-300 "
-                  }`}
+                 ${
+                   active && fixedHeader
+                     ? "text-theme text-base lg:text-lg"
+                     : active
+                     ? "text-gray-300 text-base lg:text-lg"
+                     : "text-white hover:text-gray-300"
+                 }`}
             >
               {/* {getIcon(tab.icon, "h-4 w-4 mr-1.5")} */}
               {tab.name}
@@ -510,15 +514,19 @@ export function Nav() {
               </Link>
 
               {/* Desktop Nav */}
-              <div className="hidden md:flex ">
+              <div className="hidden lg:flex gap-5 items-center">
                 <DesktopNavLinks
+                  fixedHeader={showFixedNavbar}
                   visibleMenuTabs={visibleMenuTabs}
                   pathname={pathname}
                 />
+                <span className="text-xl font-medium text-white">Saddar</span>
               </div>
 
               {/* Mobile Hamburger */}
-              <div className="flex md:hidden">
+              <div className="flex lg:hidden gap-5 items-center">
+                <span className="text-xl font-medium text-white">Saddar</span>
+
                 <button
                   onClick={toggleMobileMenu}
                   className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground cursor-pointer"
@@ -531,6 +539,7 @@ export function Nav() {
                     <Menu className="block h-6 w-6 text-white" />
                   )}
                 </button>
+
               </div>
             </div>
           </motion.div>
@@ -538,7 +547,7 @@ export function Nav() {
       </AnimatePresence>
 
       <nav
-        className={` absolute py-2 top-0 w-full z-50 lg:px-10 px-5  ${
+        className={` absolute py-2 top-0 w-full z-50 px-5  ${
           isMobileMenuOpen ? "bg-(--secondary-theme)" : "backdrop-blur-xs"
         }`}
       >
@@ -555,17 +564,24 @@ export function Nav() {
             </div>
 
             {/* {session?.user && ( */}
-            <div className="flex items-center ">
+            <div className="flex items-center justify-end">
+              <div className="hidden lg:flex gap-5 items-center">
+
               <DesktopNavLinks
                 visibleMenuTabs={visibleMenuTabs}
                 pathname={pathname}
               />
+                <span className="text-xl font-medium text-white">Saddar</span>
+
+              </div>
               <div className={`${visibleMenuTabs.length > 0 ? "ml-6" : ""}`}>
                 {/* <UserProfile
                   user={session.user as NextAuthUser & { role: string }}
                 /> */}
               </div>
-              <div className="flex items-center md:hidden ml-3">
+              <div className="flex items-center lg:hidden gap-2">
+                <span className="text-xl font-medium text-white">Saddar</span>
+
                 <button
                   onClick={toggleMobileMenu}
                   className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground  cursor-pointer"
@@ -578,6 +594,7 @@ export function Nav() {
                     <Menu className="block h-6 w-6 text-white" />
                   )}
                 </button>
+                
               </div>
             </div>
             {/* )} */}
@@ -591,7 +608,7 @@ export function Nav() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className={`md:hidden overflow-hidden border-t border-border ${"bg-(--secondary-theme)"} fixed top-16 left-0 right-0 z-40`}
+            className={`lg:hidden overflow-hidden border-t border-border ${"bg-(--secondary-theme)"} fixed top-16 left-0 right-0 z-40`}
             ref={mobileMenuRef}
           >
             <MobileNavMenu
