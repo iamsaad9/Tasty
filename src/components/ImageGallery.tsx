@@ -16,7 +16,7 @@ function ImageGallery() {
 
     <div className="w-full flex flex-col sm:flex-row">
       {images.map((src, index) => (
-        <FadeInSection delay={index*0.1} className="flex-1 relative">
+        <FadeInSection key={src} delay={index*0.1} className="flex-1 relative">
           <ExpandableImage src={src} alt={`Special ${index + 1}`} />
         </FadeInSection>
       ))}

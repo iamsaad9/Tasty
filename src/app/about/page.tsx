@@ -12,9 +12,9 @@ function AboutPage() {
       <div className="w-full flex items-center justify-center">
         <About />
       </div>
-              <Heading title="OUT CHEF" subheading="Our Master Chef"/>
+      <Heading title="OUT CHEF" subheading="Our Master Chef" />
       <div className="w-[70vw] 2xl:w-[60vw] flex items-center justify-center mx-auto">
-          <AboutChefs/>
+        <AboutChefs />
       </div>
       <ImageGallery />
     </div>

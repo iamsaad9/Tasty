@@ -6,7 +6,6 @@ import {Providers} from "@/components/providers";
 import Footer from "@/components/Footer";
 
 
-
 const RalewaySans = Raleway({
   variable: "--font-raleway",
   subsets: ["latin"],

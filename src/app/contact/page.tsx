@@ -8,14 +8,14 @@ import AboutChefs from "@/components/About/AboutChefs";
 import ContactForm from "@/components/Contact/ContactForm";
 function page() {
   return (
-     <div className="w-full">
+    <div className="w-full">
       <PageBanner title="Contact Us" image="/images/BgCarousel/bg_3.jpg" />
       <div className="w-[80vw] 2xl:w-[60vw] flex items-center justify-center mx-auto my-10">
-        <ContactForm/>
+        <ContactForm />
       </div>
       <ImageGallery />
     </div>
-  )
+  );
 }
 
-export default page
+export default page;

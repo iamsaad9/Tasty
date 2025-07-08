@@ -53,16 +53,16 @@ function Speacials() {
   return (
     <div className="w-full">
       <div
-  className="h-96 xl:h-[30rem] w-full flex items-center justify-center relative bg-fixed bg-center bg-cover"
-  style={{
-    backgroundImage: `url('/images/parallexBg.jpg')`,
-  }}
->
-  <div className="absolute h-full w-full bg-[#404044] opacity-40"></div>
-  <FadeInSection className="text-4xl text-white font-semibold relative z-10 mb-10">
-    Our Specialities
-  </FadeInSection>
-</div>
+        className="h-96 xl:h-[30rem] w-full flex items-center justify-center relative bg-fixed bg-center bg-cover"
+        style={{
+          backgroundImage: `url('/images/parallexBg.jpg')`,
+        }}
+      >
+        <div className="absolute h-full w-full bg-[#404044] opacity-40"></div>
+        <FadeInSection className="text-4xl text-white font-semibold relative z-10 mb-10">
+          Our Specialities
+        </FadeInSection>
+      </div>
 
       <div className="h-auto w-full bg-[var(--body-bg)] flex justify-center items-center pb-20">
         <Card className="h-auto w-[80%] 2xl:w-[60%] grid grid-cols-1 lg:grid-cols-2 -mt-20 z-1 rounded-none bg-transparent">
