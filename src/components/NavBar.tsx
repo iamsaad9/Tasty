@@ -10,33 +10,26 @@ import {
   ChevronDown,
   User as UserIconLucide,
   LogOut,
-  LayoutDashboard,
-  Settings,
-  Shield,
-  HelpCircle,
-  Mail, // Added Mail icon for the static data
 } from "lucide-react";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, Button } from "@heroui/react";
-// import { ThemeSwitcher } from "@/components/theme/theme-switcher"; // Uncommented this line
-// import { useFindManymenu_tab } from "@/lib/hooks/menu-tab"; // No longer needed
-import { getIcon } from "@/components/utils/iconUtils";
 import type { User as NextAuthUser } from "next-auth";
+import { MdLocationPin } from "react-icons/md";
+import AuthModal from "./LoginModal";
+
 
 // --- Type Definitions (Re-added as inline types) ---
 interface MenuItemType {
   id: string;
   name: string;
   href: string;
-  // icon: string; // Changed to string to match Lucide icon names
   order: number;
 }
 
 interface MenuTabType {
   id: string;
   name: string;
-  // icon: string; // Changed to string to match Lucide icon names
   order: number;
 }
 
@@ -44,7 +37,6 @@ interface MenuTabType {
 interface ProcessedMobileNavItem {
   href: string;
   title: string;
-  // icon: React.ReactElement;
 }
 
 type VisibleTabType = MenuTabType & { items: MenuItemType[] };
@@ -229,13 +221,14 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
 }) => {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-
+  const [showLogin, setShowLogin] = useState(false);
   const isTabActive = (tab: VisibleTabType) =>
     tab.items.some(
       (item) =>
         pathname === item.href ||
         (item.href !== "/" && pathname.startsWith(item.href))
     );
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -265,7 +258,10 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
   }, [openDropdownId]);
 
   return (
-    <div className="hidden md:flex items-center  space-x-5">
+    <div className="hidden md:flex items-center gap-5">
+      {showLogin && (
+        <AuthModal open={showLogin} onClose={() => setShowLogin(false)} />
+      )}
       {visibleMenuTabs.map((tab) => {
         const active = isTabActive(tab);
         const hasMultipleItems = tab.items.length > 1;
@@ -282,12 +278,12 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
             <Link
               href={singleItemHref}
               title={tab.name}
-              className={`flex items-center  lg:px-3 py-2 rounded-lg transition-colors text-base lg:text-lg 
+              className={`flex items-center xl:px-3 py-2 rounded-lg transition-colors lg:text-base 2xl:text-lg
                  ${
                    active && fixedHeader
-                     ? "text-theme text-base lg:text-lg"
+                     ? "text-theme  lg:text-base 2xl:text-lg"
                      : active
-                     ? "text-gray-300 text-base lg:text-lg"
+                     ? "text-gray-300 lg:text-base 2xl:text-lg"
                      : "text-white hover:text-gray-300"
                  }`}
             >
@@ -303,7 +299,7 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     onMouseLeave={() => setOpenDropdownId(null)}
-                    className=" card absolute left-0 mt-2  origin-top-left rounded-md shadow-lg bg-card ring-1 ring-border py-1 z-50"
+                    className=" card absolute left-0 mt-2 origin-top-left rounded-md shadow-lg bg-card ring-1 ring-border py-1 z-50"
                   >
                     {tab.items.map((item) => (
                       <Link
@@ -331,10 +327,11 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
           </div>
         );
       })}
-      <Button className="bg-theme">
-        <Link href="/login" title="login" className="text-background text-base">
-          Login
-        </Link>
+      <Button
+        className="bg-theme text-background text-base 2xl:text-lg"
+        onPress={() => setShowLogin(true)}
+      >
+        Login
       </Button>
     </div>
   );
@@ -353,8 +350,12 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
   onCloseMenu,
 }) => {
   const pathname = usePathname();
+  const [showLogin, setShowLogin] = useState(false);
   return (
     <div className="px-2 pt-2 pb-4 space-y-1 bg-transparent">
+      {showLogin && (
+        <AuthModal open={showLogin} onClose={() => setShowLogin(false)} />
+      )}
       {navLinks.map((link) => (
         <Link
           key={link.href}
@@ -373,7 +374,7 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
         </Link>
       ))}
       <div className="border-t border-border mt-3 pt-3 ">
-        <div className="flex items-center px-3 py-2 mb-2">
+        {/* <div className="flex items-center px-3 py-2 mb-2">
           <Avatar
             src={user?.image || undefined}
             fallback={
@@ -399,9 +400,10 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
               </div>
             )}
           </div>
-        </div>
+        </div> */}
+
         {/* <ThemeSwitcher /> */}
-        <button
+        {/* <button
           onClick={() => {
             onCloseMenu();
             signOut({ callbackUrl: "/login" });
@@ -409,7 +411,15 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
           className="flex items-center w-full px-3 py-2 mt-1 text-sm  bg-destructive/30 hover:bg-destructive/50 rounded-lg cursor-pointer"
         >
           <LogOut className="h-4 w-4 mr-2 " /> Sign Out
-        </button>
+        </button> */}
+        <div className="flex items-center justify-center">
+          <Button
+            className="bg-theme text-background text-base 2xl:text-lg w-full sm:w-[50%]"
+            onPress={() => setShowLogin(true)}
+          >
+            Login
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -520,12 +530,24 @@ export function Nav() {
                   visibleMenuTabs={visibleMenuTabs}
                   pathname={pathname}
                 />
-                <span className="text-xl font-medium text-white">Saddar</span>
+                <Button className="border-1 border-white bg-transparent">
+                  <MdLocationPin size={20} color="white" />
+
+                  <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                    Shah Faisal Colony
+                  </span>
+                </Button>
               </div>
 
               {/* Mobile Hamburger */}
               <div className="flex lg:hidden gap-5 items-center">
-                <span className="text-xl font-medium text-white">Saddar</span>
+                <Button className="border-1 border-white bg-transparent">
+                  <MdLocationPin size={15} color="white" />
+
+                  <span className="text-xs md:text-base lg:text-base 2xl:text-lg font-medium text-white">
+                    Shah Faisal Colony
+                  </span>
+                </Button>
 
                 <button
                   onClick={toggleMobileMenu}
@@ -539,7 +561,6 @@ export function Nav() {
                     <Menu className="block h-6 w-6 text-white" />
                   )}
                 </button>
-
               </div>
             </div>
           </motion.div>
@@ -566,13 +587,19 @@ export function Nav() {
             {/* {session?.user && ( */}
             <div className="flex items-center justify-end">
               <div className="hidden lg:flex gap-5 items-center">
+                <DesktopNavLinks
+                  visibleMenuTabs={visibleMenuTabs}
+                  pathname={pathname}
+                />
+                <div className="flex gap-2 items-center">
+                  <Button className="border-1 border-white bg-transparent">
+                    <MdLocationPin size={20} color="white" />
 
-              <DesktopNavLinks
-                visibleMenuTabs={visibleMenuTabs}
-                pathname={pathname}
-              />
-                <span className="text-xl font-medium text-white">Saddar</span>
-
+                    <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                      Shah Faisal Colony
+                    </span>
+                  </Button>
+                </div>
               </div>
               <div className={`${visibleMenuTabs.length > 0 ? "ml-6" : ""}`}>
                 {/* <UserProfile
@@ -580,7 +607,13 @@ export function Nav() {
                 /> */}
               </div>
               <div className="flex items-center lg:hidden gap-2">
-                <span className="text-xl font-medium text-white">Saddar</span>
+                <Button className="border-1 border-white bg-transparent">
+                  <MdLocationPin size={15} color="white" />
+
+                  <span className="text-xs md:text-base lg:text-base 2xl:text-lg font-medium text-white">
+                    Shah Faisal Colony
+                  </span>
+                </Button>
 
                 <button
                   onClick={toggleMobileMenu}
@@ -594,7 +627,6 @@ export function Nav() {
                     <Menu className="block h-6 w-6 text-white" />
                   )}
                 </button>
-                
               </div>
             </div>
             {/* )} */}

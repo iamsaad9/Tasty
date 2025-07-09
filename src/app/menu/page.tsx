@@ -163,7 +163,7 @@ function MenuPage() {
 
       <div className="w-full flex flex-col items-center justify-center  gap-5 p-2 md:p-5">
         <div className="lg:w-[90%] w-full sm:px-2 py-5">
-          <FadeInSection className="flex md:flex-row justify-center flex-col gap-3 sm:gap-5 xl:gap-10 p-2 ">
+          <FadeInSection className="w-full flex md:flex-row justify-center flex-col gap-3 sm:gap-5 xl:gap-10 p-2 ">
             {menuType.map((item) => (
               <Card
                 key={item.id}

@@ -53,7 +53,7 @@ export function CarouselDemo() {
                 />
                 <div className="absolute w-full h-full bg-[#404044] opacity-40"/>
                 <FadeInSection className=" absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
-                  <h2 className={`${indie.className} w-[80%] md:w-[50%] text-white text-2xl md:text-7xl mt-10 mb-4`}>
+                  <h2 className={`${indie.className} w-[70%]  text-white text-2xl md:text-5xl lg:text-6xl xl:text-7xl mt-10 mb-4`}>
                     {slide.title}
                   </h2>
                   {slide.showButton && (
