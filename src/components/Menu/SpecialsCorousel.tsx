@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from "react";
 import FadeInSection from "@/components/ui/scrollAnimated";
 import { Card, CardContent } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 import {
   Carousel,
   CarouselContent,
@@ -10,7 +11,6 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@heroui/react";
-import LoginModal from "../LoginModal";
 import Heading from "../Heading";
 interface MenuItems {
   id:number,
@@ -39,9 +39,14 @@ interface MenuItems {
   }
 }
 
-function SpecialsCorousel() {
-  const [showLogin,setShowLogin] = useState(false);
+interface SpecialsCorouselProps {
+  showLogin?: () => void
+  addItemToCart: (itemId:number) => void
+}
+
+function SpecialsCorousel({showLogin,addItemToCart}:SpecialsCorouselProps) {
   const [specialItems,setSpecialItems] = useState<MenuItems[]>([])
+  const {data:session} = useSession()
 
   useEffect(()=>{
     const fetchSpecial = async () => {
@@ -53,6 +58,8 @@ function SpecialsCorousel() {
 
     fetchSpecial();
   },[])
+
+  
   return (
     <div className="w-full flex flex-col items-center justify-center mb-10">
        <Heading title="SPECIALS" subheading="Our Specialities"/>
@@ -70,7 +77,7 @@ function SpecialsCorousel() {
                 className="pl-1 basis-1/1 sm:basis-1/3 lg:basis-1/5"
               >
                 <div className="p-1 flex justify-center">
-                  <Card className="rounded-2xl border-3 border-theme overflow-hidden transition-shadow duration-300 max-w-60 md:max-w-xs  group cursor-pointer" onClick={()=>setShowLogin(true)}>
+                  <Card className="rounded-2xl border-3 border-theme overflow-hidden transition-shadow duration-300 max-w-60 md:max-w-xs  group cursor-pointer" >
                     <CardContent className="p-0">
                       <div className="h-48 md:h-auto md:aspect-square overflow-hidden">
                         <img
@@ -90,7 +97,7 @@ function SpecialsCorousel() {
                           <span className="text-theme font-bold text-lg">
                             ${item.price}
                           </span>
-                          <Button className="bg-theme text-white text-sm px-3 py-1 rounded-full hover:bg-theme-dark transition">
+                          <Button className="bg-theme text-white text-sm px-3 py-1 rounded-full hover:bg-theme-dark transition" onPress={()=>addItemToCart(item.id)}>
                             Add to Cart
                           </Button>
                         </div>
@@ -106,7 +113,6 @@ function SpecialsCorousel() {
           <CarouselNext className=" z-10 backdrop-blur-lg bg-black/30 hover:bg-black/30 text-white hover:text-theme h-20 " />
         </Carousel>
       </FadeInSection>
-    <LoginModal open={showLogin} onClose={()=>setShowLogin(false)}/>
     </div>
     
   );

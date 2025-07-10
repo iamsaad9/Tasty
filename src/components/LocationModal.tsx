@@ -16,7 +16,7 @@ import { useLocationStore } from "@/lib/store/locationStore";
 
 interface ModalProps {
   isOpen: boolean | undefined;
-  onClose: () => void;
+  onClose?: () => void;
   title: string;
   description: string;
   children?: React.ReactNode;
@@ -47,6 +47,12 @@ function LocationModal({
     };
     fetchLocation();
   }, []);
+
+  useEffect(()=>{
+    if(hasHydrated){
+      setCurrentLocation(selectedLocation)
+    }
+  })
 
 
   return (

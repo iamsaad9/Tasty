@@ -4,7 +4,8 @@ import "./globals.css";
 import NavBar from "../components/NavBar";
 import {Providers} from "@/components/providers";
 import Footer from "@/components/Footer";
-
+import CartIcon from "@/components/CartIcon";
+import CartDrawer from "@/components/CartDrawer";
 
 const RalewaySans = Raleway({
   variable: "--font-raleway",
@@ -26,6 +27,8 @@ export default function RootLayout({
         >
         <Providers>
         <NavBar/>
+       <CartIcon/>
+        <CartDrawer/>
         {children}
           <Footer/>
 

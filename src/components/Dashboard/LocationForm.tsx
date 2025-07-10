@@ -8,7 +8,6 @@ import {
 } from "@heroui/react";
 import { LocateIcon } from "lucide-react";
 import { useLocationStore } from "@/lib/store/locationStore";
-
 interface Location {
   area: string;
   postalCode: string;
@@ -42,7 +41,7 @@ function LocationForm() {
   }, []);
   return (
     <div className="w-full bg-foreground">
-      <Card className="bg-theme mx-auto w-[100vw] xl:w-[70vw] 2xl:w-[60vw] p-5 2xl:p-10 rounded-none">
+      <Card className="bg-theme mx-auto  xl:w-[70vw] 2xl:w-[60vw] p-5 2xl:p-10 rounded-none">
         <Form
           className="w-full flex-col justify-center items-center md:flex-row gap-5 lg:gap-10"
           onReset={() => setAction("reset")}
@@ -89,8 +88,8 @@ function LocationForm() {
             className="bg-white text-black hover:bg-transparent hover:text-white border-white"
             variant="bordered"
             radius="none"
-            size="lg"
-            onPress={()=>setSelectedLocation('')}
+            size="md"
+            onPress={()=>setSelectedLocation(currentLocation)}
             isDisabled={currentLocation==='' || currentLocation===selectedLocation}
           >
             Select

@@ -1,11 +1,12 @@
 "use client";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 import FadeInSection from "@/components/ui/scrollAnimated";
 import SpecialsCorousel from "@/components/Menu/SpecialsCorousel";
 import MenuFilter from "@/components/Menu/MenuSearch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@heroui/react";
+import { useSession } from "next-auth/react";
 import {
   FaDrumstickBite,
   FaIceCream,
@@ -19,68 +20,80 @@ import ImageGallery from "@/components/ImageGallery";
 import { useLocationStore } from "@/lib/store/locationStore";
 import LoadingScreen from "@/components/Loading";
 import LocationModal from "@/components/LocationModal";
+import LoginModal from "@/components/LoginModal";
+
 interface MenuItems {
-  id:number,
-  title:string,
-  category:string,
-  diet:string[],
-  price:number,
-  description:string,
-  image:string,
-  popularity:number,
-  rating:number,
-  special:boolean,
-  delivery:{
-    isDeliverable:boolean,
-    estimatedTime:string,
-    baseFee:number,
-    freeAbove:number,
-    minOrder:number,
-    areas:[
+  id: number;
+  title: string;
+  category: string;
+  diet: string[];
+  price: number;
+  description: string;
+  image: string;
+  popularity: number;
+  rating: number;
+  special: boolean;
+  delivery: {
+    isDeliverable: boolean;
+    estimatedTime: string;
+    baseFee: number;
+    freeAbove: number;
+    minOrder: number;
+    areas: [
       {
-        name:string,
-        postalCode:string,
-        fee:number,
+        name: string;
+        postalCode: string;
+        fee: number;
       }
-    ]
-  }
+    ];
+  };
 }
 
 function MenuPage() {
-
+  const { data: session } = useSession();
   const menuType = [
     {
       id: 1,
       name: "Main Course",
       active: true,
-      icon: <FaDrumstickBite className="xl:text-2xl lg:text-xl text-lg text-background" />,
+      icon: (
+        <FaDrumstickBite className="xl:text-2xl lg:text-xl text-lg text-background" />
+      ),
     },
     {
       id: 2,
       name: "Appetizer",
       active: false,
-      icon: <FaBreadSlice className="xl:text-2xl lg:text-xl text-lg text-background" />,
+      icon: (
+        <FaBreadSlice className="xl:text-2xl lg:text-xl text-lg text-background" />
+      ),
     },
     {
       id: 3,
       name: "Fast Food",
       active: false,
-      icon: <FaPizzaSlice className="xl:text-2xl lg:text-xl text-lg text-background" />,
+      icon: (
+        <FaPizzaSlice className="xl:text-2xl lg:text-xl text-lg text-background" />
+      ),
     },
     {
       id: 4,
       name: "Dessert",
       active: false,
-      icon: <FaIceCream className="xl:text-2xl lg:text-xl text-lg text-background" />,
+      icon: (
+        <FaIceCream className="xl:text-2xl lg:text-xl text-lg text-background" />
+      ),
     },
     {
       id: 5,
       name: "Drinks",
       active: false,
-      icon: <FaWineGlassAlt className="xl:text-2xl lg:text-xl text-lg text-background" />,
+      icon: (
+        <FaWineGlassAlt className="xl:text-2xl lg:text-xl text-lg text-background" />
+      ),
     },
   ];
-  const { selectedLocation, setSelectedLocation } = useLocationStore();
+  const { selectedLocation, hasHydrated } = useLocationStore();
   const [searchText, setSearchText] = React.useState("");
   const [activeMenu, setActiveMenu] = React.useState("Main Course");
   const [filters, setFilters] = React.useState({
@@ -88,28 +101,30 @@ function MenuPage() {
     priceRange: [0, 100],
     selectedSort: "default",
   });
- const [menuItems,setMenuItems] = useState<MenuItems[]>([])
- const [loading,setLoading]=useState<boolean>(false);
+  const [menuItems, setMenuItems] = useState<MenuItems[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
-  useEffect(()=>{
+  const [showLogin, setShowLogin] = useState(false);
+  const [itemToCard, setItemToCart] = useState<number | null>();
+  
+  useEffect(() => {
+  if (hasHydrated && selectedLocation === "") {
+    setShowAddressModal(true);
+  }
+}, [hasHydrated, selectedLocation]);
 
-    if(selectedLocation === ''){
-      setShowAddressModal(true);
-    }
 
-
-
+  useEffect(() => {
     const fetchMenuItems = async () => {
-      console.log('fetchingMenu')
+      console.log("fetchingMenu");
       setLoading(true);
-      const res = await fetch('/Data/menu.json');
+      const res = await fetch("/Data/menu.json");
       const data = await res.json();
       setMenuItems(data);
       setLoading(false);
-    }
+    };
     fetchMenuItems();
-  },[]);
-
+  }, []);
 
   const handleApplySearch = (searchText: { searchText: string }) => {
     console.log("Search applied:", searchText);
@@ -144,16 +159,37 @@ function MenuPage() {
     });
     console.log("Filters reset");
   };
+
+  const handleAddtoCart = (itemId: number) => {
+    if (!session) {
+      setShowLogin(true);
+      return null;
+    }
+    setItemToCart(itemId);
+    console.log("Add item", itemId, " to cart");
+  };
+
   return (
     <div className="w-full">
+      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
+
       {/* <CustomModal isOpen={showAddressModal} onClose={()=>setShowAddressModal(false)} title="Select Your Location" description="Please select your location">
 
       </CustomModal> */}
-      <LocationModal isOpen={showAddressModal} onClose={()=>setShowAddressModal(false)} title="Select Your Location" description="Please select your location"/>
-      <LoadingScreen showLoading={loading}/>
+      <LocationModal
+        isOpen={showAddressModal}
+        title="Select Your Location"
+        description="Please select your location"
+      />
+      <LoadingScreen showLoading={loading} />
       {/* Background Section */}
-      <PageBanner title="Discover Our Exclusive Menu" image="/images/PageBanners/menuPage.jpg"/>
-      <SpecialsCorousel />
+      <PageBanner
+        title="Discover Our Exclusive Menu"
+        image="/images/PageBanners/menuPage.jpg"
+      />
+      <SpecialsCorousel
+        addItemToCart={(itemId: number) => handleAddtoCart(itemId)}
+      />
 
       <MenuFilter
         onApplySearch={handleApplySearch}
@@ -219,7 +255,7 @@ function MenuPage() {
               })
               .map((item) => (
                 <motion.div
-                  key={`${activeMenu}-${item.id}`} 
+                  key={`${activeMenu}-${item.id}`}
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
@@ -249,9 +285,12 @@ function MenuPage() {
                             {item.price.toFixed(2)}$
                           </span>
                           <div className="flex gap-2 items-center">
-                          <Button className="bg-theme text-white text-sm px-3 py-1 rounded-full hover:bg-theme-dark transition">
-                            Add to Cart
-                          </Button>
+                            <Button
+                              className="bg-theme text-white text-sm px-3 py-1 rounded-full hover:bg-theme-dark transition"
+                              onPress={() => handleAddtoCart(item.id)}
+                            >
+                              Add to Cart
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -263,7 +302,7 @@ function MenuPage() {
         </FadeInSection>
       </div>
 
-      <ImageGallery/>
+      <ImageGallery />
     </div>
   );
 }

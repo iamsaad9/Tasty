@@ -17,7 +17,15 @@ import { Avatar, Button } from "@heroui/react";
 import type { User as NextAuthUser } from "next-auth";
 import { MdLocationPin } from "react-icons/md";
 import AuthModal from "./LoginModal";
-
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/react";
+import { MdSpaceDashboard,MdOutlineRestaurantMenu,MdInfoOutline,MdAdd,MdPhone   } from "react-icons/md";
+import { useLocationStore } from "@/lib/store/locationStore";
+import LocationModal from "./LocationModal";
 
 // --- Type Definitions (Re-added as inline types) ---
 interface MenuItemType {
@@ -25,6 +33,7 @@ interface MenuItemType {
   name: string;
   href: string;
   order: number;
+  icon:React.ReactNode;
 }
 
 interface MenuTabType {
@@ -37,6 +46,7 @@ interface MenuTabType {
 interface ProcessedMobileNavItem {
   href: string;
   title: string;
+  icon:React.ReactNode
 }
 
 type VisibleTabType = MenuTabType & { items: MenuItemType[] };
@@ -53,7 +63,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "dashboard",
         name: "Dashboard",
         href: "/",
-        // icon: "User",
+        icon: <MdSpaceDashboard size={20}/>,
         order: 1,
       },
     ],
@@ -68,7 +78,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "menu",
         name: "Menu",
         href: "/menu",
-        // icon: "User",
+        icon: <MdOutlineRestaurantMenu size={20}/>,
         order: 1,
       },
     ],
@@ -83,7 +93,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "reservations",
         name: "Reservations",
         href: "/reservations",
-        // icon: "HelpCircle",
+        icon: <MdAdd size={20}/>,
         order: 1,
       },
     ],
@@ -98,7 +108,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "about",
         name: "About",
         href: "/about",
-        // icon: "HelpCircle",
+        icon: <MdInfoOutline size={20}/>,
         order: 1,
       },
     ],
@@ -113,7 +123,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "contact",
         name: "Contact",
         href: "/contact",
-        // icon: "HelpCircle",
+        icon: <MdPhone size={20}/>,
         order: 1,
       },
     ],
@@ -228,7 +238,7 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
         pathname === item.href ||
         (item.href !== "/" && pathname.startsWith(item.href))
     );
-
+  const { data: session } = useSession();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -327,12 +337,45 @@ const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
           </div>
         );
       })}
-      <Button
-        className="bg-theme text-background text-base 2xl:text-lg"
-        onPress={() => setShowLogin(true)}
-      >
-        Login
-      </Button>
+      {!session ? (
+        <Button
+          className="bg-theme text-background text-base 2xl:text-lg"
+          onPress={() => setShowLogin(true)}
+        >
+          Login
+        </Button>
+      ) : (
+        <Dropdown placement="bottom-end">
+          <DropdownTrigger>
+            <Avatar
+              isBordered
+              color="warning"
+              as="button"
+              className="transition-transform cursor-pointer"
+              src={session.user.image || ""}
+            />
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Profile Actions"
+            className="text-secondary"
+            variant="flat"
+          >
+            <DropdownItem key="profile" className="h-14 gap-2 ">
+              <p className="font-semibold text-accent text-md">
+                {session.user.name}
+              </p>
+              <p className="font-semibold text-xs">{session.user.email}</p>
+            </DropdownItem>
+            <DropdownItem
+              key="logout"
+              onPress={() => signOut()}
+              className="bg-red-300 text-accent hover:!bg-red-400 hover:!text-white transition-all duration-300"
+            >
+              Log Out
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )}
     </div>
   );
 };
@@ -346,11 +389,11 @@ interface MobileNavMenuProps {
 
 const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
   navLinks,
-  user,
   onCloseMenu,
 }) => {
   const pathname = usePathname();
   const [showLogin, setShowLogin] = useState(false);
+  const { data: session } = useSession();
   return (
     <div className="px-2 pt-2 pb-4 space-y-1 bg-transparent">
       {showLogin && (
@@ -360,7 +403,7 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
         <Link
           key={link.href}
           href={link.href}
-          className={`flex items-center px-3 py-3 rounded-lg mx-2 text-white
+          className={`flex items-center px-3 gap-2 py-3 rounded-lg mx-2 text-white
             ${
               pathname === link.href ||
               (link.href !== "/" && pathname.startsWith(link.href))
@@ -369,57 +412,55 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
             }`}
           onClick={onCloseMenu}
         >
-          {/* {link.icon} */}
+          {link.icon}
           {link.title}
         </Link>
       ))}
       <div className="border-t border-border mt-3 pt-3 ">
-        {/* <div className="flex items-center px-3 py-2 mb-2">
-          <Avatar
-            src={user?.image || undefined}
-            fallback={
-              user?.name?.charAt(0).toUpperCase() || (
-                <UserIconLucide className="h-5 w-5" />
-              )
-            }
-            size="md"
-            className="mr-3"
-          />
-          <div>
-            {user?.name && (
-              <div className="text-base font-semibold text-foreground">
-                {user.name}
-              </div>
-            )}
-            {user?.email && (
-              <div className="text-sm text-foreground/70">{user.email}</div>
-            )}
-            {user.role && (
-              <div className="text-xs text-foreground/70 capitalize">
-                {user.role.toLowerCase()}
-              </div>
-            )}
+        {!session ? (
+          <div className="flex items-center justify-center">
+            <Button
+              className="bg-theme text-background text-base 2xl:text-lg w-full sm:w-[50%]"
+              onPress={() => setShowLogin(true)}
+            >
+              Login
+            </Button>
           </div>
-        </div> */}
+        ) : (
+          <div className="flex flex-col w-full">
+            <div className="flex items-center px-3 py-2 mb-2">
+              <Avatar
+                src={session.user.image || undefined}
+                fallback={
+                  session.user?.name?.charAt(0).toUpperCase() || (
+                    <UserIconLucide className="h-5 w-5" />
+                  )
+                }
+                size="md"
+                className="mr-3"
+              />
+              <div>
+                <div className="text-base font-semibold text-foreground">
+                  {session.user.name}
+                </div>
+                <div className="text-sm text-foreground/70">
+                  {session.user.email}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                onCloseMenu();
+                signOut({ callbackUrl: "/" });
+              }}
+              className="flex items-center w-full px-3 py-2 mt-1 text-sm  bg-destructive/30 hover:bg-destructive/50 rounded-lg cursor-pointer"
+            >
+              <LogOut className="h-4 w-4 mr-2 " /> Sign Out
+            </button>
+          </div>
+        )}
 
         {/* <ThemeSwitcher /> */}
-        {/* <button
-          onClick={() => {
-            onCloseMenu();
-            signOut({ callbackUrl: "/login" });
-          }}
-          className="flex items-center w-full px-3 py-2 mt-1 text-sm  bg-destructive/30 hover:bg-destructive/50 rounded-lg cursor-pointer"
-        >
-          <LogOut className="h-4 w-4 mr-2 " /> Sign Out
-        </button> */}
-        <div className="flex items-center justify-center">
-          <Button
-            className="bg-theme text-background text-base 2xl:text-lg w-full sm:w-[50%]"
-            onPress={() => setShowLogin(true)}
-          >
-            Login
-          </Button>
-        </div>
       </div>
     </div>
   );
@@ -429,17 +470,16 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
 export function Nav() {
   const pathname = usePathname();
   const router = useRouter();
-  // const { data: session, status } = useSession();
-
+  const { selectedLocation, hasHydrated } = useLocationStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-
   const visibleMenuTabs = useMemo(
     () => staticMenuTabsData.filter((tab) => tab.items && tab.items.length > 0),
     []
   );
   const [showFixedNavbar, setShowFixedNavbar] = useState(false);
-
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const [showLocationModal,setShowLocationModal] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       setShowFixedNavbar(window.scrollY > 150);
@@ -456,22 +496,13 @@ export function Nav() {
         links.push({
           href: item.href,
           title: item.name,
-          // icon: getIcon(item.icon),
+          icon:item.icon,
         });
       });
     });
     return links;
   }, [visibleMenuTabs]);
 
-  // useEffect(() => {
-  //   if (
-  //     status === "unauthenticated" &&
-  //     pathname !== "/login" &&
-  //     !pathname.startsWith("/api/auth")
-  //   ) {
-  //     router.push("/login");
-  //   }
-  // }, [status, router, pathname]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -486,25 +517,15 @@ export function Nav() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-
-  // if (status === "loading") {
-  //   return (
-  //     <nav className=" top-0 border-b shadow-sm bg-background/80 backdrop-blur-md z-50 absolute">
-  //       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  //         <div className="flex justify-between h-16 items-center">
-  //           <div className="flex items-center">
-  //             <span className="text-xl font-bold">TYSN</span>
-  //           </div>
-  //           <div className="h-8 w-36 bg-muted rounded animate-pulse"></div>
-  //         </div>
-  //       </div>
-  //     </nav>
-  //   );
-  // }
-
+   
   return (
     <>
+      <LocationModal
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        title="Select Your Location"
+        description="Please select your location"
+      />
       <AnimatePresence>
         {showFixedNavbar && (
           <motion.div
@@ -512,7 +533,7 @@ export function Nav() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -80, opacity: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }} // slightly slower, smoother
-            className="fixed py-2 top-0 w-full z-50 lg:px-10 px-5 bg-[var(--secondary-theme)]"
+            className="fixed py-2 top-0 w-full z-50 px-5  bg-[var(--secondary-theme)]"
             style={{ willChange: "transform, opacity" }}
           >
             <div className="flex justify-between py-2 items-center ">
@@ -530,25 +551,26 @@ export function Nav() {
                   visibleMenuTabs={visibleMenuTabs}
                   pathname={pathname}
                 />
-                <Button className="border-1 border-white bg-transparent">
+                <Button className="border-1 border-white bg-transparent" onPress={()=>setShowLocationModal(true)}>
                   <MdLocationPin size={20} color="white" />
 
                   <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                    Shah Faisal Colony
+                                        {selectedLocation || 'Select'}
+
                   </span>
                 </Button>
               </div>
 
-              {/* Mobile Hamburger */}
-              <div className="flex lg:hidden gap-5 items-center">
-                <Button className="border-1 border-white bg-transparent">
+              <div className="flex lg:hidden gap-2 items-center">
+                <Button className="bg-transparent"  onPress={()=>setShowLocationModal(true)}>
                   <MdLocationPin size={15} color="white" />
 
                   <span className="text-xs md:text-base lg:text-base 2xl:text-lg font-medium text-white">
-                    Shah Faisal Colony
+                    {selectedLocation || 'Select'}
                   </span>
                 </Button>
 
+              {/* Mobile Hamburger */}
                 <button
                   onClick={toggleMobileMenu}
                   className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground cursor-pointer"
@@ -572,64 +594,54 @@ export function Nav() {
           isMobileMenuOpen ? "bg-(--secondary-theme)" : "backdrop-blur-xs"
         }`}
       >
-        <div className="w-full">
-          <div className="flex justify-between py-2 items-center">
-            <div className="flex items-center ">
-              <Link
-                // href={session ? "/dashboard" : "/login"}
-                href={"/"}
-                className="text-base md:text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
-              >
-                Tasty
-              </Link>
-            </div>
+        <div className="flex justify-between py-2 items-center ">
+          <Link
+            href="/"
+            className="text-base md:text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
+          >
+            Tasty
+          </Link>
 
-            {/* {session?.user && ( */}
-            <div className="flex items-center justify-end">
-              <div className="hidden lg:flex gap-5 items-center">
-                <DesktopNavLinks
-                  visibleMenuTabs={visibleMenuTabs}
-                  pathname={pathname}
-                />
-                <div className="flex gap-2 items-center">
-                  <Button className="border-1 border-white bg-transparent">
-                    <MdLocationPin size={20} color="white" />
+          {/* Desktop Nav */}
+          <div className="hidden lg:flex gap-5 items-center">
+            <DesktopNavLinks
+              fixedHeader={showFixedNavbar}
+              visibleMenuTabs={visibleMenuTabs}
+              pathname={pathname}
+            />
+            <Button className="border-1 border-white bg-transparent"  onPress={()=>setShowLocationModal(true)}>
+              <MdLocationPin size={20} color="white" />
 
-                    <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                      Shah Faisal Colony
-                    </span>
-                  </Button>
-                </div>
-              </div>
-              <div className={`${visibleMenuTabs.length > 0 ? "ml-6" : ""}`}>
-                {/* <UserProfile
-                  user={session.user as NextAuthUser & { role: string }}
-                /> */}
-              </div>
-              <div className="flex items-center lg:hidden gap-2">
-                <Button className="border-1 border-white bg-transparent">
-                  <MdLocationPin size={15} color="white" />
+              <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                                    {selectedLocation || 'Select'}
 
-                  <span className="text-xs md:text-base lg:text-base 2xl:text-lg font-medium text-white">
-                    Shah Faisal Colony
-                  </span>
-                </Button>
+              </span>
+            </Button>
+          </div>
 
-                <button
-                  onClick={toggleMobileMenu}
-                  className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground  cursor-pointer"
-                  aria-expanded={isMobileMenuOpen}
-                  aria-label="Open main menu"
-                >
-                  {isMobileMenuOpen ? (
-                    <X className="block h-6 w-6 text-white " />
-                  ) : (
-                    <Menu className="block h-6 w-6 text-white" />
-                  )}
-                </button>
-              </div>
-            </div>
-            {/* )} */}
+          {/* Mobile Hamburger */}
+          <div className="flex lg:hidden gap-2 items-center">
+            <Button className="bg-transparent"  onPress={()=>setShowLocationModal(true)}>
+              <MdLocationPin size={15} color="white" />
+
+              <span className="text-xs md:text-base lg:text-base 2xl:text-lg font-medium text-white">
+                                    {selectedLocation || 'Select'}
+
+              </span>
+            </Button>
+
+            <button
+              onClick={toggleMobileMenu}
+              className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground cursor-pointer"
+              aria-expanded={isMobileMenuOpen}
+              aria-label="Open main menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="block h-6 w-6 text-white" />
+              ) : (
+                <Menu className="block h-6 w-6 text-white" />
+              )}
+            </button>
           </div>
         </div>
       </nav>
