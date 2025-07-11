@@ -14,12 +14,14 @@ import {
   Avatar,
   AvatarGroup,
 } from "@heroui/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Minus, Plus, Trash } from "lucide-react";
 import { useCartStore } from "@/lib/store/cartStore";
+import CheckoutButton from "./ui/CheckoutButton";
+import AddItemButton from "./ui/AddItemButton";
 
 export default function CartDrawer() {
   const { isOpen, items, toggleCart, removeItem, clearCart } = useCartStore();
-
+  
 return (
   <>
     <Drawer
@@ -47,55 +49,60 @@ return (
               {/* Cart Items */}
               <div className="space-y-4">
                 {[1, 2].map((item, i) => (
-                  <Card key={i} className="flex flex-row gap-4 items-center p-2 text-accent">
+                  <Card key={i} className="flex flex-row gap-2 items-center p-2 text-accent">
                     <img
                       src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092"
                       alt="Dish"
                       className="w-16 h-16 rounded-md object-cover"
                     />
-                    <div className="flex flex-row justify-between w-full">
+                    <div className="flex flex-row justify-between items-center w-full ">
                       <div>
                       <h3 className="font-medium text-sm">Spicy Chicken Burger</h3>
                       <p className="text-xs text-default-500">with cheese & fries</p>
                       </div>
-                      <div className="flex items-center gap-2 mt-2">
-                        <input
-                          type="number"
-                          min={1}
-                          className="w-12 px-2 py-1 text-center border rounded text-sm"
-                        />
-                        <span className="text-sm font-semibold text-foreground">Rs. 450</span>
+                      <div className="flex items-center justify-between gap-3 ">
+                        <div className="flex flex-row items-center gap-2 rounded-full border-1 border-accent p-1">
+                          <Minus size={15} className="bg-theme/50 rounded-full cursor-pointer hover:scale-110"/>
+                          <span>1</span>
+                          <Plus size={15} className="bg-theme/50 rounded-full cursor-pointer hover:scale-110"/>
+                        </div>
+                        <span className="text-sm font-semibold">Rs. 450</span>
                           <Button isIconOnly size="sm" variant="light">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-4 h-4 text-default-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                          <Trash size={15}/>
                     </Button>
                       </div>
                     </div>
                   
                   </Card>
                 ))}
+                {/* <Button className="w-full bg-theme mt-5" >
+                    <span className="font-medium t.ext-base">Continue Shopping</span>
+                </Button> */}
+                <div className="flex w-full justify-end mt-5">
+                <AddItemButton/>
+                </div>
               </div>
             </DrawerBody>
 
             {/* Footer */}
-            <DrawerFooter className="border-t p-4 bg-white">
+            <DrawerFooter className="border-t p-4 bg-white flex-col">
               <div className="flex justify-between mb-2">
                 <span className="text-sm text-default-500">Subtotal</span>
                 <span className="text-sm font-semibold">Rs. 900</span>
               </div>
-              <Button
-                className="w-full bg-primary text-white font-medium hover:bg-primary/90 transition"
-                size="lg"
-              >
-                Proceed to Checkout
-              </Button>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-default-500">Delivery</span>
+                <span className="text-sm font-semibold">Rs. 150</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-default-500">Tax</span>
+                <span className="text-sm font-semibold">Rs. 105</span>
+              </div>
+              <div className="flex justify-between mb-2 border-t py-2">
+                <span className="text-md text-accent font-medium">Total</span>
+                <span className="text-md font-semibold">Rs. 1155</span>
+              </div>
+              <CheckoutButton/>
             </DrawerFooter>
           </>
         )}
