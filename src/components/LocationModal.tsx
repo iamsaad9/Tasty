@@ -52,7 +52,7 @@ function LocationModal({
     if(hasHydrated){
       setCurrentLocation(selectedLocation)
     }
-  })
+  },[hasHydrated])
 
 
   return (

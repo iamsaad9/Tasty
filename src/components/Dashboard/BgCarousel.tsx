@@ -57,7 +57,7 @@ export function CarouselDemo() {
                     {slide.title}
                   </h2>
                   {slide.showButton && (
-                    <Link href="/menu" className="backdrop-blur-xs bg-transparent border-2 rounded-none border-foreground text-foreground px-2 md:px-10 py-3 mt-5 md:mt-15 text-sm md:text-xl cursor-pointer hover:bg-foreground hover:text-background transition-colors duration-300">ORDER NOW</Link>
+                    <Link href="/menu" className="backdrop-blur-xs  border-2 rounded-none border-foreground text-foreground px-2 md:px-10 py-3 mt-5 md:mt-15 text-sm md:text-xl cursor-pointer hover:bg-white hover:text-background transition-colors duration-300">ORDER NOW</Link>
                   )}
                 </FadeInSection>
               </Card>
