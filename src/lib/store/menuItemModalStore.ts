@@ -4,7 +4,7 @@ import { create } from "zustand";
 interface Variations {
   type:string,
   name:string,
-  price_mul:number,
+  price_multiplier:number,
 }
 
  interface MenuItem {

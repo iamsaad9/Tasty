@@ -39,10 +39,10 @@ interface MenuItems {
   popularity: number;
   rating: number;
   special: boolean;
-  variation:[
+  variations:[
     {type:string,
       name:string,
-      price_mul:number
+      price_multiplier:number
     }
   ]
   delivery: {
@@ -137,7 +137,7 @@ function MenuPage() {
     price: item?.price,
     image: item?.image,
     description: item?.description,
-    itemVariation:item?.variation
+    itemVariation:item?.variations
   };
   const path = '/menu'
    openModal(MenuItem,path);
@@ -153,13 +153,14 @@ function MenuPage() {
 
   useEffect(() => {
     const fetchMenuItems = async () => {
-      console.log("fetchingMenu");
       setLoading(true);
       const res = await fetch("/Data/menu.json");
       const data = await res.json();
       setMenuItems(data);
+      console.log("Menu items fetched:", data);
       setLoading(false);
     };
+    
     fetchMenuItems();
   }, []);
 
@@ -309,7 +310,7 @@ function MenuPage() {
                     itemDescription={item.description}
                     itemImage={item.image}
                     itemPrice={item.price}
-                    itemVariation={item.variation}
+                    itemVariation={item.variations}
                   />
                 </motion.div>
               ))}

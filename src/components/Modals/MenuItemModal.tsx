@@ -8,6 +8,7 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  addToast,
 } from '@heroui/react';
 import { useMenuItemModalStore } from '@/lib/store/menuItemModalStore';
 import { useRouter } from 'next/navigation';
@@ -30,35 +31,41 @@ function MenuItemModal() {
     setInstructions('');
   };
 
+  const handleAddtoCart = () => {
+    addToast({
+      title: 'Item Added to Cart',
+      color: 'success',
+    })
+    closeModal();
+  }
+
   const variation = selectedItem?.itemVariation?.[selectedVariation];
   const basePrice = selectedItem?.price ?? 0;
-  const finalPrice = (basePrice * (variation?.price_mul ?? 1)) * quantity;
-  console.log(variation)
+  const finalPrice = (basePrice * (variation?.price_multiplier ?? 1)) * quantity;
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} size="5xl" className="rounded-xl text-accent">
+    <Modal isOpen={isOpen} onClose={handleClose} hideCloseButton={true} size="5xl" className="rounded-xl text-accent">
       <ModalContent>
         {() => (
-          <div className="flex flex-col md:flex-row max-h-[90vh]">
+          <div className="flex flex-col md:flex-row h-[80vh]">
             {/* Left image */}
-            <div className="w-full md:w-1/2 p-4">
+            <div className="w-full h-full md:w-1/2 p-4">
               <img
                 src={selectedItem?.image || ''}
                 alt={selectedItem?.name || ''}
                 width={600}
                 height={600}
-                className="rounded-xl object-cover w-full h-full max-h-[400px]"
+                className="rounded-xl object-cover w-full h-full "
               />
             </div>
 
             {/* Right content */}
-            <div className="w-full md:w-1/2 p-4 flex flex-col">
+            <div className="w-full md:w-1/2 p-5 flex flex-col">
               {/* Header with title and buttons */}
               <div className="flex justify-between items-start">
                 <div>
-                  <h1 className="text-2xl font-bold">{selectedItem?.name}</h1>
-                  <div className="text-gray-500 line-through">Rs. {basePrice}</div>
-                  <div className="text-xl font-semibold text-green-600">
-                    Rs. {(basePrice * (variation?.price_mul ?? 1)).toFixed(0)}
+                  <h1 className="text-3xl font-bold">{selectedItem?.name}</h1>
+                  <div className="text-2xl font-semibold text-accent mt-2">
+                    Rs. {(basePrice * (variation?.price_multiplier ?? 1)).toFixed(0)}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -72,7 +79,7 @@ function MenuItemModal() {
               </div>
 
               {/* Variations */}
-              <div className="mt-6 bg-red-500">
+              <div className="mt-6  ">
                 {selectedItem?.itemVariation?.map((v, index) => (
                   <label
                     key={index}
@@ -93,13 +100,8 @@ function MenuItemModal() {
                       <span>{v.name}</span>
                     </div>
                     <div>
-                      {v.price_mul < 1 && (
-                        <span className="text-gray-400 line-through mr-2">
-                          Rs. {basePrice}
-                        </span>
-                      )}
                       <span className="font-medium">
-                        Rs. {(basePrice * v.price_mul).toFixed(0)}
+                        $ {(basePrice * v.price_multiplier).toFixed(2)}
                       </span>
                     </div>
                   </label>
@@ -138,8 +140,8 @@ function MenuItemModal() {
                   </button>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-xl font-bold">Rs. {finalPrice.toFixed(0)}</span>
-                  <Button className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800">
+                  <span className="text-xl font-bold">Rs. {finalPrice.toFixed(2)}</span>
+                  <Button className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800" onPress={handleAddtoCart}>
                     Add to Cart
                   </Button>
                 </div>

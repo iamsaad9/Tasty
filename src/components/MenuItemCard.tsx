@@ -1,14 +1,14 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Card } from "@heroui/react";
 import { CardContent } from "./ui/card";
 import { useMenuItemModalStore } from "@/lib/store/menuItemModalStore";
 import { useRouter } from "next/navigation";
 
 interface Variations {
-  type:string,
-  name:string,
-  price_mul:number,
+  type: string;
+  name: string;
+  price_multiplier: number;
 }
 interface MenuItemCardProps {
   itemId: number;
@@ -16,7 +16,7 @@ interface MenuItemCardProps {
   itemImage: string;
   itemDescription: string;
   itemPrice: number;
-  itemVariation?: Variations[]
+  itemVariation: Variations[];
 }
 
 function MenuItemCard({
@@ -25,9 +25,9 @@ function MenuItemCard({
   itemImage,
   itemDescription,
   itemPrice,
-  itemVariation
+  itemVariation,
 }: MenuItemCardProps) {
-    const { openModal } = useMenuItemModalStore();
+  const { openModal } = useMenuItemModalStore();
 
   const MenuItem = {
     id: itemId,
@@ -35,11 +35,11 @@ function MenuItemCard({
     price: itemPrice,
     image: itemImage,
     description: itemDescription,
-    itemVariation:itemVariation
+    itemVariation: itemVariation,
   };
 
   const router = useRouter();
-const handleClick = () => {
+  const handleClick = () => {
     const currentPath = window.location.pathname + window.location.search;
     openModal(MenuItem, currentPath); // Save previous location
 
@@ -48,6 +48,9 @@ const handleClick = () => {
     router.push(`/menu?${params.toString()}`, { scroll: false });
   };
 
+  useEffect(()=>{
+    console.log("MenuItemCard rendered with item:", MenuItem);
+  })
   return (
     <Card className="h-full rounded-2xl  md:max-w-xs border-2 md:border-3 border-theme overflow-hidden transition-shadow duration-300 group cursor-pointer">
       <CardContent

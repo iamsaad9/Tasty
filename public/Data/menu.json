@@ -41,9 +41,7 @@
     "special": false,
     "variations": [
       {"type": "portion", "name": "Regular", "price_multiplier": 1.0},
-      {"type": "portion", "name": "Double Fillet", "price_multiplier": 1.8},
-      {"type": "side", "name": "Asparagus", "price_extra": 2.0},
-      {"type": "side", "name": "Quinoa Salad", "price_extra": 2.5}
+      {"type": "portion", "name": "Double Fillet", "price_multiplier": 1.8}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -99,8 +97,7 @@
     "variations": [
       {"type": "quantity", "name": "3 Pieces", "price_multiplier": 0.7},
       {"type": "quantity", "name": "6 Pieces", "price_multiplier": 1.0},
-      {"type": "quantity", "name": "12 Pieces", "price_multiplier": 1.8},
-      {"type": "sauce", "name": "Spicy Peanut Sauce", "price_extra": 0.75}
+      {"type": "quantity", "name": "12 Pieces", "price_multiplier": 1.8}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -154,8 +151,7 @@
     "special": false,
     "variations": [
       {"type": "quantity", "name": "5 Pieces", "price_multiplier": 1.0},
-      {"type": "quantity", "name": "10 Pieces", "price_multiplier": 1.8},
-      {"type": "sauce", "name": "Ranch Dip", "price_extra": 0.5}
+      {"type": "quantity", "name": "10 Pieces", "price_multiplier": 1.8}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -181,9 +177,7 @@
     "special": true,
     "variations": [
       {"type": "patty", "name": "Single", "price_multiplier": 1.0},
-      {"type": "patty", "name": "Double", "price_multiplier": 1.5},
-      {"type": "cheese", "name": "Cheddar", "price_extra": 0.5},
-      {"type": "cheese", "name": "Swiss", "price_extra": 0.75}
+      {"type": "patty", "name": "Double", "price_multiplier": 1.5}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -210,8 +204,7 @@
     "special": true,
     "variations": [
       {"type": "size", "name": "Regular", "price_multiplier": 1.0},
-      {"type": "size", "name": "Large", "price_multiplier": 1.3},
-      {"type": "sauce", "name": "Spicy", "price_extra": 0.5}
+      {"type": "size", "name": "Large", "price_multiplier": 1.3}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -239,9 +232,7 @@
     "variations": [
       {"type": "quantity", "name": "6 Pieces", "price_multiplier": 0.8},
       {"type": "quantity", "name": "9 Pieces", "price_multiplier": 1.0},
-      {"type": "quantity", "name": "12 Pieces", "price_multiplier": 1.2},
-      {"type": "sauce", "name": "BBQ Sauce", "price_extra": 0.5},
-      {"type": "sauce", "name": "Honey Mustard", "price_extra": 0.5}
+      {"type": "quantity", "name": "12 Pieces", "price_multiplier": 1.2}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -267,8 +258,8 @@
     "rating": 4.9,
     "special": false,
     "variations": [
-      {"type": "add-on", "name": "Vanilla Ice Cream", "price_extra": 1.5},
-      {"type": "add-on", "name": "Raspberry Coulis", "price_extra": 1.0}
+      {"type": "add-on", "name": "Vanilla Ice Cream", "price_multiplier": 1.5},
+      {"type": "add-on", "name": "Raspberry Coulis", "price_multiplier": 1.0}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -323,9 +314,7 @@
     "variations": [
       {"type": "flavor", "name": "Vanilla", "price_multiplier": 1.0},
       {"type": "flavor", "name": "Chocolate", "price_multiplier": 1.0},
-      {"type": "flavor", "name": "Strawberry", "price_multiplier": 1.0},
-      {"type": "topping", "name": "Sprinkles", "price_extra": 0.25},
-      {"type": "topping", "name": "Nuts", "price_extra": 0.5}
+      {"type": "flavor", "name": "Strawberry", "price_multiplier": 1.0}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -351,9 +340,7 @@
     "special": false,
     "variations": [
       {"type": "size", "name": "Regular", "price_multiplier": 1.0},
-      {"type": "size", "name": "Large", "price_multiplier": 1.3},
-      {"type": "flavor", "name": "Classic Lime", "price_multiplier": 1.0},
-      {"type": "flavor", "name": "Strawberry", "price_multiplier": 1.1}
+      {"type": "size", "name": "Large", "price_multiplier": 1.3}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -381,8 +368,7 @@
     "variations": [
       {"type": "size", "name": "Small", "price_multiplier": 0.85},
       {"type": "size", "name": "Regular", "price_multiplier": 1.0},
-      {"type": "size", "name": "Large", "price_multiplier": 1.2},
-      {"type": "add-on", "name": "Protein Boost", "price_extra": 1.5}
+      {"type": "size", "name": "Large", "price_multiplier": 1.2}
     ],
     "delivery": {
       "isDeliverable": true,
@@ -410,9 +396,7 @@
     "variations": [
       {"type": "size", "name": "Small", "price_multiplier": 0.8},
       {"type": "size", "name": "Regular", "price_multiplier": 1.0},
-      {"type": "size", "name": "Large", "price_multiplier": 1.2},
-      {"type": "milk", "name": "Almond Milk", "price_extra": 0.75},
-      {"type": "sweetener", "name": "Sugar-Free Syrup", "price_extra": 0.5}
+      {"type": "size", "name": "Large", "price_multiplier": 1.2}
     ],
     "delivery": {
       "isDeliverable": true,
