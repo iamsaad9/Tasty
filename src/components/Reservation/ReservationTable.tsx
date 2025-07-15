@@ -12,7 +12,7 @@ import {
   addToast
 } from "@heroui/react";
 import { Plus, Trash, PenIcon,CircleX,Ban } from "lucide-react";
-import CustomModal from "../Modal";
+import CustomModal from "../Modals/Modal";
 import FadeInSection from "@/components/ui/scrollAnimated";
 import clsx from "clsx";
 

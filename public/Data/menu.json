@@ -9,7 +9,12 @@
     "image": "https://plus.unsplash.com/premium_photo-1661419883163-bb4df1c10109?q=80&w=687&auto=format&fit=crop",
     "popularity": 120,
     "rating": 4.2,
-    "special":true,
+    "special": true,
+    "variations": [
+      {"type": "size", "name": "Small", "price_multiplier": 0.8},
+      {"type": "size", "name": "Medium", "price_multiplier": 1.0},
+      {"type": "size", "name": "Large", "price_multiplier": 1.2}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "30-45 mins",
@@ -17,21 +22,9 @@
       "freeAbove": 25,
       "minOrder": 10,
       "areas": [
-        {
-          "name": "Clifton",
-          "postalCode": "75500",
-          "fee": 2.5
-        },
-        {
-          "name": "Gulshan-e-Iqbal",
-          "postalCode": "75600",
-          "fee": 3.0
-        },
-        {
-          "name": "DHA",
-          "postalCode": "75530",
-          "fee": 2.0
-        }
+        {"name": "Clifton", "postalCode": "75500", "fee": 2.5},
+        {"name": "Gulshan-e-Iqbal", "postalCode": "75600", "fee": 3.0},
+        {"name": "DHA", "postalCode": "75530", "fee": 2.0}
       ]
     }
   },
@@ -45,7 +38,13 @@
     "image": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 110,
     "rating": 4.5,
-    "special":false,
+    "special": false,
+    "variations": [
+      {"type": "portion", "name": "Regular", "price_multiplier": 1.0},
+      {"type": "portion", "name": "Double Fillet", "price_multiplier": 1.8},
+      {"type": "side", "name": "Asparagus", "price_extra": 2.0},
+      {"type": "side", "name": "Quinoa Salad", "price_extra": 2.5}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "40-55 mins",
@@ -53,21 +52,9 @@
       "freeAbove": 35,
       "minOrder": 15,
       "areas": [
-        {
-          "name": "Malir Cantonment",
-          "postalCode": "75080",
-          "fee": 3.5
-        },
-        {
-          "name": "Korangi",
-          "postalCode": "74900",
-          "fee": 4.0
-        },
-        {
-          "name": "Shah Faisal Colony",
-          "postalCode": "75230",
-          "fee": 3.0
-        }
+        {"name": "Malir Cantonment", "postalCode": "75080", "fee": 3.5},
+        {"name": "Korangi", "postalCode": "74900", "fee": 4.0},
+        {"name": "Shah Faisal Colony", "postalCode": "75230", "fee": 3.0}
       ]
     }
   },
@@ -81,7 +68,11 @@
     "image": "https://plus.unsplash.com/premium_photo-1671559021023-3da68c12aeed?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 80,
     "rating": 4.0,
-    "special":false,
+    "special": false,
+    "variations": [
+      {"type": "size", "name": "Individual", "price_multiplier": 0.9},
+      {"type": "size", "name": "Family (serves 4)", "price_multiplier": 3.5}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "25-40 mins",
@@ -89,16 +80,8 @@
       "freeAbove": 20,
       "minOrder": 9,
       "areas": [
-        {
-          "name": "North Nazimabad",
-          "postalCode": "74600",
-          "fee": 2.0
-        },
-        {
-          "name": "Gulshan-e-Iqbal",
-          "postalCode": "75850",
-          "fee": 2.5
-        }
+        {"name": "North Nazimabad", "postalCode": "74600", "fee": 2.0},
+        {"name": "Gulshan-e-Iqbal", "postalCode": "75850", "fee": 2.5}
       ]
     }
   },
@@ -112,7 +95,13 @@
     "image": "https://images.unsplash.com/photo-1679310290259-78d9eaa32700?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 150,
     "rating": 4.8,
-    "special":true,
+    "special": true,
+    "variations": [
+      {"type": "quantity", "name": "3 Pieces", "price_multiplier": 0.7},
+      {"type": "quantity", "name": "6 Pieces", "price_multiplier": 1.0},
+      {"type": "quantity", "name": "12 Pieces", "price_multiplier": 1.8},
+      {"type": "sauce", "name": "Spicy Peanut Sauce", "price_extra": 0.75}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "15-30 mins",
@@ -120,16 +109,8 @@
       "freeAbove": 10,
       "minOrder": 5,
       "areas": [
-        {
-          "name": "Saddar",
-          "postalCode": "75950",
-          "fee": 1.5
-        },
-        {
-          "name": "North Karachi",
-          "postalCode": "75800",
-          "fee": 2.0
-        }
+        {"name": "Saddar", "postalCode": "75950", "fee": 1.5},
+        {"name": "North Karachi", "postalCode": "75800", "fee": 2.0}
       ]
     }
   },
@@ -143,7 +124,11 @@
     "image": "https://plus.unsplash.com/premium_photo-1677686707252-16013f466e61?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 60,
     "rating": 3.9,
-    "special":false,
+    "special": false,
+    "variations": [
+      {"type": "quantity", "name": "4 Pieces", "price_multiplier": 1.0},
+      {"type": "quantity", "name": "8 Pieces", "price_multiplier": 1.7}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "20-35 mins",
@@ -151,16 +136,8 @@
       "freeAbove": 18,
       "minOrder": 7,
       "areas": [
-        {
-          "name": "Garden East",
-          "postalCode": "74400",
-          "fee": 2.0
-        },
-        {
-          "name": "Liaquatabad",
-          "postalCode": "75900",
-          "fee": 2.5
-        }
+        {"name": "Garden East", "postalCode": "74400", "fee": 2.0},
+        {"name": "Liaquatabad", "postalCode": "75900", "fee": 2.5}
       ]
     }
   },
@@ -174,7 +151,12 @@
     "image": "https://images.unsplash.com/photo-1734774924912-dcbb467f8599?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 125,
     "rating": 4.4,
-    "special":false,
+    "special": false,
+    "variations": [
+      {"type": "quantity", "name": "5 Pieces", "price_multiplier": 1.0},
+      {"type": "quantity", "name": "10 Pieces", "price_multiplier": 1.8},
+      {"type": "sauce", "name": "Ranch Dip", "price_extra": 0.5}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "20-30 mins",
@@ -182,12 +164,7 @@
       "freeAbove": 16,
       "minOrder": 6,
       "areas": [
-        {
-          "name": "Gulistan-e-Jauhar",
-          "postalCode": "75290",
-          "fee": 1.8
-        }
-       
+        {"name": "Gulistan-e-Jauhar", "postalCode": "75290", "fee": 1.8}
       ]
     }
   },
@@ -201,7 +178,13 @@
     "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=687&auto=format&fit=crop",
     "popularity": 102,
     "rating": 4.0,
-    "special":true,
+    "special": true,
+    "variations": [
+      {"type": "patty", "name": "Single", "price_multiplier": 1.0},
+      {"type": "patty", "name": "Double", "price_multiplier": 1.5},
+      {"type": "cheese", "name": "Cheddar", "price_extra": 0.5},
+      {"type": "cheese", "name": "Swiss", "price_extra": 0.75}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "25-40 mins",
@@ -209,16 +192,8 @@
       "freeAbove": 22,
       "minOrder": 9,
       "areas": [
-        {
-          "name": "Saddar",
-          "postalCode": "74400",
-          "fee": 2.2
-        },
-        {
-          "name": "Lyari",
-          "postalCode": "75660",
-          "fee": 2.8
-        }
+        {"name": "Saddar", "postalCode": "74400", "fee": 2.2},
+        {"name": "Lyari", "postalCode": "75660", "fee": 2.8}
       ]
     }
   },
@@ -232,7 +207,12 @@
     "image": "https://images.unsplash.com/photo-1605888983099-e33007b6ff27?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 90,
     "rating": 4.7,
-    "special":true,
+    "special": true,
+    "variations": [
+      {"type": "size", "name": "Regular", "price_multiplier": 1.0},
+      {"type": "size", "name": "Large", "price_multiplier": 1.3},
+      {"type": "sauce", "name": "Spicy", "price_extra": 0.5}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "20-35 mins",
@@ -240,16 +220,8 @@
       "freeAbove": 17,
       "minOrder": 7,
       "areas": [
-        {
-          "name": "Orangi Town",
-          "postalCode": "75810",
-          "fee": 1.9
-        },
-        {
-          "name": "Baldia Town",
-          "postalCode": "75820",
-          "fee": 2.3
-        }
+        {"name": "Orangi Town", "postalCode": "75810", "fee": 1.9},
+        {"name": "Baldia Town", "postalCode": "75820", "fee": 2.3}
       ]
     }
   },
@@ -263,7 +235,14 @@
     "image": "https://images.unsplash.com/photo-1562967916-eb82221dfb92?q=80&w=686&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 210,
     "rating": 4.8,
-    "special":false,
+    "special": false,
+    "variations": [
+      {"type": "quantity", "name": "6 Pieces", "price_multiplier": 0.8},
+      {"type": "quantity", "name": "9 Pieces", "price_multiplier": 1.0},
+      {"type": "quantity", "name": "12 Pieces", "price_multiplier": 1.2},
+      {"type": "sauce", "name": "BBQ Sauce", "price_extra": 0.5},
+      {"type": "sauce", "name": "Honey Mustard", "price_extra": 0.5}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "15-25 mins",
@@ -271,16 +250,8 @@
       "freeAbove": 14,
       "minOrder": 6,
       "areas": [
-        {
-          "name": "Karsaz",
-          "postalCode": "75290",
-          "fee": 1.5
-        },
-        {
-          "name": "Landhi",
-          "postalCode": "75160",
-          "fee": 2.0
-        }
+        {"name": "Karsaz", "postalCode": "75290", "fee": 1.5},
+        {"name": "Landhi", "postalCode": "75160", "fee": 2.0}
       ]
     }
   },
@@ -294,7 +265,11 @@
     "image": "https://images.unsplash.com/photo-1511911063855-2bf39afa5b2e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 200,
     "rating": 4.9,
-    "special":false,
+    "special": false,
+    "variations": [
+      {"type": "add-on", "name": "Vanilla Ice Cream", "price_extra": 1.5},
+      {"type": "add-on", "name": "Raspberry Coulis", "price_extra": 1.0}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "20-30 mins",
@@ -302,16 +277,8 @@
       "freeAbove": 15,
       "minOrder": 6,
       "areas": [
-        {
-          "name": "Bahadurabad",
-          "postalCode": "75400",
-          "fee": 1.7
-        },
-        {
-          "name": "Tariq Road",
-          "postalCode": "75450",
-          "fee": 2.1
-        }
+        {"name": "Bahadurabad", "postalCode": "75400", "fee": 1.7},
+        {"name": "Tariq Road", "postalCode": "75450", "fee": 2.1}
       ]
     }
   },
@@ -325,7 +292,11 @@
     "image": "https://plus.unsplash.com/premium_photo-1695028378225-97fbe39df62a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 180,
     "rating": 4.6,
-    "special":true,
+    "special": true,
+    "variations": [
+      {"type": "size", "name": "Regular", "price_multiplier": 1.0},
+      {"type": "size", "name": "Large (double portion)", "price_multiplier": 1.8}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "25-40 mins",
@@ -333,16 +304,8 @@
       "freeAbove": 18,
       "minOrder": 7,
       "areas": [
-        {
-          "name": "PECHS",
-          "postalCode": "75400",
-          "fee": 2.0
-        },
-        {
-          "name": "Jamshed Town",
-          "postalCode": "74800",
-          "fee": 2.5
-        }
+        {"name": "PECHS", "postalCode": "75400", "fee": 2.0},
+        {"name": "Jamshed Town", "postalCode": "74800", "fee": 2.5}
       ]
     }
   },
@@ -356,7 +319,14 @@
     "image": "https://plus.unsplash.com/premium_photo-1669680785558-c189b49aed4e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 160,
     "rating": 4.3,
-    "special":false,
+    "special": false,
+    "variations": [
+      {"type": "flavor", "name": "Vanilla", "price_multiplier": 1.0},
+      {"type": "flavor", "name": "Chocolate", "price_multiplier": 1.0},
+      {"type": "flavor", "name": "Strawberry", "price_multiplier": 1.0},
+      {"type": "topping", "name": "Sprinkles", "price_extra": 0.25},
+      {"type": "topping", "name": "Nuts", "price_extra": 0.5}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "15-25 mins",
@@ -364,12 +334,7 @@
       "freeAbove": 10,
       "minOrder": 5,
       "areas": [
-        {
-          "name": "DHA",
-          "postalCode": "75500",
-          "fee": 1.2
-        }
-       
+        {"name": "DHA", "postalCode": "75500", "fee": 1.2}
       ]
     }
   },
@@ -383,7 +348,13 @@
     "image": "https://plus.unsplash.com/premium_photo-1722194069219-16ec49c08625?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 140,
     "rating": 4.1,
-    "special":false,
+    "special": false,
+    "variations": [
+      {"type": "size", "name": "Regular", "price_multiplier": 1.0},
+      {"type": "size", "name": "Large", "price_multiplier": 1.3},
+      {"type": "flavor", "name": "Classic Lime", "price_multiplier": 1.0},
+      {"type": "flavor", "name": "Strawberry", "price_multiplier": 1.1}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "10-20 mins",
@@ -391,16 +362,8 @@
       "freeAbove": 8,
       "minOrder": 4,
       "areas": [
-        {
-          "name": "Clifton",
-          "postalCode": "75500",
-          "fee": 0.8
-        },
-        {
-          "name": "DHA",
-          "postalCode": "75530",
-          "fee": 1.0
-        }
+        {"name": "Clifton", "postalCode": "75500", "fee": 0.8},
+        {"name": "DHA", "postalCode": "75530", "fee": 1.0}
       ]
     }
   },
@@ -414,7 +377,13 @@
     "image": "https://images.unsplash.com/photo-1611928237590-087afc90c6fd?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 130,
     "rating": 4.4,
-    "special":true,
+    "special": true,
+    "variations": [
+      {"type": "size", "name": "Small", "price_multiplier": 0.85},
+      {"type": "size", "name": "Regular", "price_multiplier": 1.0},
+      {"type": "size", "name": "Large", "price_multiplier": 1.2},
+      {"type": "add-on", "name": "Protein Boost", "price_extra": 1.5}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "15-25 mins",
@@ -422,16 +391,8 @@
       "freeAbove": 10,
       "minOrder": 5,
       "areas": [
-        {
-          "name": "Gulshan-e-Iqbal",
-          "postalCode": "75300",
-          "fee": 1.0
-        },
-        {
-          "name": "Johar",
-          "postalCode": "75290",
-          "fee": 1.2
-        }
+        {"name": "Gulshan-e-Iqbal", "postalCode": "75300", "fee": 1.0},
+        {"name": "Johar", "postalCode": "75290", "fee": 1.2}
       ]
     }
   },
@@ -445,7 +406,14 @@
     "image": "https://images.unsplash.com/photo-1592663527359-cf6642f54cff?q=80&w=719&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "popularity": 170,
     "rating": 4.0,
-    "special":false,
+    "special": false,
+    "variations": [
+      {"type": "size", "name": "Small", "price_multiplier": 0.8},
+      {"type": "size", "name": "Regular", "price_multiplier": 1.0},
+      {"type": "size", "name": "Large", "price_multiplier": 1.2},
+      {"type": "milk", "name": "Almond Milk", "price_extra": 0.75},
+      {"type": "sweetener", "name": "Sugar-Free Syrup", "price_extra": 0.5}
+    ],
     "delivery": {
       "isDeliverable": true,
       "estimatedTime": "10-20 mins",
@@ -453,16 +421,8 @@
       "freeAbove": 7,
       "minOrder": 3,
       "areas": [
-        {
-          "name": "DHA",
-          "postalCode": "75500",
-          "fee": 0.7
-        },
-        {
-          "name": "Seaview",
-          "postalCode": "75500",
-          "fee": 0.9
-        }
+        {"name": "DHA", "postalCode": "75500", "fee": 0.7},
+        {"name": "Seaview", "postalCode": "75500", "fee": 0.9}
       ]
     }
   }

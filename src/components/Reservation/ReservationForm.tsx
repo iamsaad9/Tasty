@@ -17,7 +17,7 @@ import {
   Time,
   toTime,
 } from "@internationalized/date";
-import CustomModal from "../Modal";
+import CustomModal from "../Modals/Modal";
 import { z } from "zod";
 import { getLocalTimeZone, today } from "@internationalized/date";
 

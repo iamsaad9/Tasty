@@ -16,7 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, Button } from "@heroui/react";
 import type { User as NextAuthUser } from "next-auth";
 import { MdLocationPin } from "react-icons/md";
-import AuthModal from "./LoginModal";
+import AuthModal from "./Modals/LoginModal";
 import {
   Dropdown,
   DropdownItem,
@@ -25,7 +25,7 @@ import {
 } from "@heroui/react";
 import { MdSpaceDashboard,MdOutlineRestaurantMenu,MdInfoOutline,MdAdd,MdPhone   } from "react-icons/md";
 import { useLocationStore } from "@/lib/store/locationStore";
-import LocationModal from "./LocationModal";
+import LocationModal from "./Modals/LocationModal";
 
 // --- Type Definitions (Re-added as inline types) ---
 interface MenuItemType {
@@ -480,9 +480,11 @@ export function Nav() {
   const [showFixedNavbar, setShowFixedNavbar] = useState(false);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const [showLocationModal,setShowLocationModal] = useState(false);
+
+  
   useEffect(() => {
     const handleScroll = () => {
-      setShowFixedNavbar(window.scrollY > 150);
+      setShowFixedNavbar(window.scrollY > 80);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -520,6 +522,7 @@ export function Nav() {
    
   return (
     <>
+
       <LocationModal
         isOpen={showLocationModal}
         onClose={() => setShowLocationModal(false)}
@@ -590,7 +593,7 @@ export function Nav() {
       </AnimatePresence>
 
       <nav
-        className={` absolute py-2 top-0 w-full z-50 px-5  ${
+        className={`absolute py-2 top-0 w-full z-50 px-5  ${
           isMobileMenuOpen ? "bg-(--secondary-theme)" : "backdrop-blur-xs"
         }`}
       >

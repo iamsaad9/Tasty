@@ -14,7 +14,7 @@ import {
 import { Mail, Lock } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import SignInButton from "./SignInButton";
+import SignInButton from "./ui/SignInButton";
 import { usePathname } from "next/navigation";
 
 interface AuthModalProps {

@@ -9,8 +9,8 @@ function AboutChefs() {
   ];
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-3 my-5 gap-10 md:gap-5">
-      {chefData.map((item) => (
-        <div className="flex flex-col aspect-square">
+      {chefData.map((item,index) => (
+        <div key={index} className="flex flex-col aspect-square">
             <div className="flex flex-col gap-2 py-2">
                 <span className="text-xl text-accent font-semibold">{item.name}</span>
                 <span className="text-secondary font-medium text-sm">{item.designation}</span>
