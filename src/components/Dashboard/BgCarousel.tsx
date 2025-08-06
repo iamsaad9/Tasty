@@ -9,8 +9,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button"; 
-import { indie } from "@/components/utils/fonts"; 
+import { Button } from "@/components/ui/button";
+import { indie } from "@/components/utils/fonts";
 import FadeInSection from "../ui/scrollAnimated";
 import { Link } from "@heroui/react";
 
@@ -32,32 +32,43 @@ export function CarouselDemo() {
       id: 3,
       image: "/images/BgCarousel/bg_3.jpg",
       title: "Book a table for yourself at a time convenient for you",
-      showButton: true, 
+      showButton: true,
     },
   ];
 
   return (
-    <Carousel className="w-full mt-0" opts={{ loop: true }} plugins={[Fade(), Autoplay({ delay: 5000, stopOnInteraction: false })]}>
+    <Carousel
+      className="w-full mt-0"
+      opts={{ loop: true }}
+      plugins={[Fade(), Autoplay({ delay: 5000, stopOnInteraction: false })]}
+    >
       <CarouselContent>
         {slides.map((slide, index) => (
           <CarouselItem key={index}>
-            <div className="relative w-full h-96 md:h-[80vh] cursor-pointer">
-              <Card className="w-full h-full cursor-pointer">
+            <div className="relative w-full bg-red-500 h-96 md:h-[80vh] cursor-pointer ">
+              <Card className="w-full  h-full cursor-pointer rounded-none">
                 <div className="absolute inset-0 bg-black opacity-40 z-10" />
 
                 <CardContent
-                  className="h-full w-full bg-center bg-cover z-0 relative"
+                  className="h-full w-full bg-center bg-cover relative"
                   style={{
                     backgroundImage: `url('${slide.image}')`,
                   }}
                 />
-                <div className="absolute w-full h-full bg-[#404044] opacity-40"/>
+                <div className="absolute w-full h-full bg-[#404044] opacity-40" />
                 <FadeInSection className=" absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
-                  <h2 className={`${indie.className} w-[70%]  text-white text-2xl md:text-5xl lg:text-6xl xl:text-7xl mt-10 mb-4`}>
+                  <h2
+                    className={`${indie.className} w-[70%]  text-white text-2xl md:text-5xl lg:text-6xl xl:text-7xl mt-10 mb-4`}
+                  >
                     {slide.title}
                   </h2>
                   {slide.showButton && (
-                    <Link href="/menu" className="backdrop-blur-xs  border-2 rounded-none border-foreground text-foreground px-2 md:px-10 py-3 mt-5 md:mt-15 text-sm md:text-xl cursor-pointer hover:bg-white hover:text-background transition-colors duration-300">ORDER NOW</Link>
+                    <Link
+                      href="/menu"
+                      className="backdrop-blur-xs  border-2 rounded-none border-foreground text-foreground px-2 md:px-10 py-3 mt-5 md:mt-15 text-sm md:text-xl cursor-pointer hover:bg-white hover:text-background transition-colors duration-300"
+                    >
+                      ORDER NOW
+                    </Link>
                   )}
                 </FadeInSection>
               </Card>

@@ -20,13 +20,12 @@ import ImageGallery from "@/components/ImageGallery";
 import { useLocationStore } from "@/lib/store/locationStore";
 import LoadingScreen from "@/components/Loading";
 import LocationModal from "@/components/Modals/LocationModal";
-import LoginModal from "@/components/Modals/LoginModal";
 import MenuItemModal from "@/components/Modals/MenuItemModal";
-import MenuItemCard from "@/components/MenuItemCard";
+import { MenuItemCard } from "@/components/MenuItemCard";
 import { usePathname } from "next/navigation";
 import { useSelectedLayoutSegments } from "next/navigation";
 import { useMenuItemModalStore } from "@/lib/store/menuItemModalStore";
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface MenuItems {
   id: number;
@@ -39,12 +38,7 @@ interface MenuItems {
   popularity: number;
   rating: number;
   special: boolean;
-  variation:[
-    {type:string,
-      name:string,
-      price_mul:number
-    }
-  ]
+  itemVariation: [{ type: string; name: string; price_multiplier: number }];
   delivery: {
     isDeliverable: boolean;
     estimatedTime: string;
@@ -125,25 +119,53 @@ function MenuPage() {
   const itemName = segments[1]; // 'cheeseburger'
   const openModal = useMenuItemModalStore((state) => state.openModal);
   const pathname = usePathname();
-  const searchParams = useSearchParams()
- 
-  useEffect(() => {
-  const itemId = searchParams.get('item');
-  if (itemId) {
-    const item = menuItems.find(i => i.id === Number(itemId));
-    const MenuItem = {
-    id: item?.id,
-    name: item?.title,
-    price: item?.price,
-    image: item?.image,
-    description: item?.description,
-    itemVariation:item?.variation
-  };
-  const path = '/menu'
-   openModal(MenuItem,path);
-  }
-}, [searchParams, menuItems]);
+  const searchParams = useSearchParams();
 
+  const filterMenuItems = (data: MenuItems[]) => {
+    console.log("Data in Filter Function: ", data);
+    return data.filter((item) => {
+      return (
+        item.delivery.isDeliverable === true &&
+        item.delivery.areas.some((area) => area.name === selectedLocation)
+      );
+    });
+  };
+
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      setLoading(true);
+      const res = await fetch("/Data/menu.json");
+      const data = await res.json();
+      const filteredMenuItems = filterMenuItems(data);
+      setMenuItems(filteredMenuItems);
+      setLoading(false);
+    };
+    fetchMenuItems();
+  }, [selectedLocation]);
+
+  useEffect(() => {
+    console.log("menuItems", menuItems);
+  }, [menuItems]);
+
+  useEffect(() => {
+    const itemId = searchParams.get("item");
+    if (itemId) {
+      const item = menuItems.find((i) => i.id === Number(itemId));
+      const MenuItem = {
+        id: item?.id,
+        name: item?.title,
+        price: item?.price,
+        image: item?.image,
+        description: item?.description,
+        itemVariation: item?.itemVariation,
+        is_deliverable: item?.delivery.isDeliverable,
+        delivery_locations: item?.delivery.areas,
+      };
+      console.log("Opening Modal with variations:", MenuItem.itemVariation);
+      const path = "/menu";
+      openModal(MenuItem, path);
+    }
+  }, [searchParams, menuItems]);
 
   useEffect(() => {
     if (hasHydrated && selectedLocation === "") {
@@ -152,16 +174,10 @@ function MenuPage() {
   }, [hasHydrated, selectedLocation]);
 
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      console.log("fetchingMenu");
-      setLoading(true);
-      const res = await fetch("/Data/menu.json");
-      const data = await res.json();
-      setMenuItems(data);
-      setLoading(false);
-    };
-    fetchMenuItems();
-  }, []);
+    if (hasHydrated && selectedLocation !== "") {
+      setShowAddressModal(false);
+    }
+  }, [hasHydrated, selectedLocation]);
 
   const handleApplySearch = (searchText: { searchText: string }) => {
     console.log("Search applied:", searchText);
@@ -213,8 +229,7 @@ function MenuPage() {
 
   return (
     <div className="w-full">
-      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
-      <MenuItemModal></MenuItemModal>
+      <MenuItemModal />
       <LocationModal
         isOpen={showAddressModal}
         title="Select Your Location"
@@ -309,7 +324,9 @@ function MenuPage() {
                     itemDescription={item.description}
                     itemImage={item.image}
                     itemPrice={item.price}
-                    itemVariation={item.variation}
+                    itemVariation={item.itemVariation}
+                    is_deliverable={item.delivery.isDeliverable}
+                    delivery_locations={item.delivery.areas}
                   />
                 </motion.div>
               ))}

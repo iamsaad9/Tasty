@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -9,9 +9,9 @@ import {
   Button,
   Card,
   Tooltip,
-  addToast
+  addToast,
 } from "@heroui/react";
-import { Plus, Trash, PenIcon,CircleX,Ban } from "lucide-react";
+import { Plus, Trash, PenIcon, CircleX, Ban } from "lucide-react";
 import CustomModal from "../Modals/Modal";
 import FadeInSection from "@/components/ui/scrollAnimated";
 import clsx from "clsx";
@@ -27,7 +27,7 @@ interface Reservation {
   status: string;
   occasion: string;
   requests?: string;
-} 
+}
 
 interface Column {
   name: string;
@@ -66,28 +66,27 @@ export default function ViewReservations({
     direction: "ascending",
   });
   const [showModal, setShowModal] = useState({
-    open:false,
-    title:'',
-    description:'',
-    button:''
+    open: false,
+    title: "",
+    description: "",
+    button: "",
   });
-  const [reservations,setReservations] = useState<Reservation[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const handleEditReservation = (reservations: Reservation) => {
     console.log("Reservation Data", reservations);
     onEditReservation(reservations);
     onAddNew();
   };
-  
 
-  useEffect(()=>{
+  useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch("/Data/reservations.json")
+      const res = await fetch("/Data/reservations.json");
       const data = await res.json();
-      console.log('reservationdata',data)
+      console.log("reservationdata", data);
       setReservations(data);
-    }
+    };
     fetchData();
-  },[]);
+  }, []);
 
   const sortedItems = React.useMemo(() => {
     return [...reservations].sort((a, b) => {
@@ -122,10 +121,12 @@ export default function ViewReservations({
           return (
             <div className="flex flex-col min-w-40">
               <p className="text-bold  capitalize">{item.name}</p>
-              <p className="text-bold text-xs text-secondary capitalize">{item.email}</p>
+              <p className="text-bold text-xs text-secondary capitalize">
+                {item.email}
+              </p>
             </div>
           );
-       
+
         case "date":
           return (
             <div className="flex flex-col min-w-30">
@@ -187,22 +188,27 @@ export default function ViewReservations({
                 content="Edit user"
                 isDisabled={item.status === "confirmed"}
               >
-                <span className={`text-lg text-default-400 ${item.status !== 'confirmed'? 'cursor-pointer' : 'cursor-default'} `}>
+                <span
+                  className={`text-lg text-default-400 ${
+                    item.status !== "confirmed"
+                      ? "cursor-pointer"
+                      : "cursor-default"
+                  } `}
+                >
                   <PenIcon
                     size={20}
                     onClick={() => {
-                      
-                      {item.status!=='confirmed'? handleEditReservation(item):
-                        addToast({
-                          title: "Alert!",
-                          description:
-                            "Confirmed Reservation cannot be edited",
-                          color: "warning",
-                        });
+                      {
+                        item.status !== "confirmed"
+                          ? handleEditReservation(item)
+                          : addToast({
+                              title: "Alert!",
+                              description:
+                                "Confirmed Reservation cannot be edited",
+                              color: "warning",
+                            });
                       }
-                      
                     }}
-
                   />
                 </span>
               </Tooltip>
@@ -210,33 +216,38 @@ export default function ViewReservations({
                 color={item.status === "confirmed" ? "warning" : "danger"}
                 content={item.status === "confirmed" ? "Cancel" : "Delete"}
               >
-                <span className={`${item.status === 'confirmed' ? 'text-warning' : 'text-danger'} text-lg cursor-pointer `}>
-                  {item.status !== 'confirmed'? (
-                  <Trash
-                    size={20}
-                    onClick={() => {
+                <span
+                  className={`${
+                    item.status === "confirmed" ? "text-warning" : "text-danger"
+                  } text-lg cursor-pointer `}
+                >
+                  {item.status !== "confirmed" ? (
+                    <Trash
+                      size={20}
+                      onClick={() => {
                         setShowModal({
-                          open:true,
-                          title:'Delete Reservation?',
-                          description:'Are you sure you want to delete this Reservation?',
-                          button:'Delete'
+                          open: true,
+                          title: "Delete Reservation?",
+                          description:
+                            "Are you sure you want to delete this Reservation?",
+                          button: "Delete",
                         });
                       }}
-                  />
-                  ):(
+                    />
+                  ) : (
                     <CircleX
-                    size={20}
-                    onClick={() => {
-                       setShowModal({
-                          open:true,
-                          title:'Cancel Reservation?',
-                          description:'Are you sure you want to cancel this Reservation?',
-                          button:'Cancel'
+                      size={20}
+                      onClick={() => {
+                        setShowModal({
+                          open: true,
+                          title: "Cancel Reservation?",
+                          description:
+                            "Are you sure you want to cancel this Reservation?",
+                          button: "Cancel",
                         });
-                    }}
-                  />
+                      }}
+                    />
                   )}
-                 
                 </span>
               </Tooltip>
             </div>
@@ -259,23 +270,22 @@ export default function ViewReservations({
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-row justify-between py-5">
-         <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center">
           <span className="text-default-400 ">
             Total {reservations.length} Reservations
           </span>
         </div>
-        
-       
-            <Button
-              color={`${reservations.length === 5? 'danger' : 'success'}`}
-              size="sm"
-              className="text-sm shadow-md"
-              onPress={onAddNew}
-              isDisabled={reservations.length === 5}
-            >
-              {reservations.length===5? (<Ban size={20}/>) : (<Plus size={20} /> ) }
-               {reservations.length===5? 'Limit Reached' : 'Add New' }
-            </Button>
+
+        <Button
+          color={`${reservations.length === 5 ? "danger" : "success"}`}
+          size="sm"
+          className="text-sm shadow-md"
+          onPress={onAddNew}
+          isDisabled={reservations.length === 5}
+        >
+          {reservations.length === 5 ? <Ban size={20} /> : <Plus size={20} />}
+          {reservations.length === 5 ? "Limit Reached" : "Add New"}
+        </Button>
       </div>
     );
   }, [filterValue, , onSearchChange, reservations.length]);
@@ -308,9 +318,12 @@ export default function ViewReservations({
               </TableColumn>
             )}
           </TableHeader>
-          <TableBody emptyContent={"You dont have any Reservations"}   items={reservations}>
+          <TableBody
+            emptyContent={"You dont have any Reservations"}
+            items={reservations}
+          >
             {(item) => (
-              <TableRow key={item.id} >
+              <TableRow key={item.id}>
                 {columns
                   .filter((column) => renderCell(item, column.uid) !== null)
                   .map((column) => {
@@ -331,25 +344,32 @@ export default function ViewReservations({
       </Card>
       {showModal && (
         <CustomModal
-        onClose={() => setShowModal({
-            open:false,
-            title:'',
-            description:'',
-            button:''
-          })} 
+          onClose={() =>
+            setShowModal({
+              open: false,
+              title: "",
+              description: "",
+              button: "",
+            })
+          }
           isOpen={showModal.open}
           title={showModal.title}
           description={showModal.description}
         >
           <Button color="danger" variant="flat">
-           {showModal.button}
+            {showModal.button}
           </Button>
-          <Button color="default" onPress={() => setShowModal({
-            open:false,
-            title:'',
-            description:'',
-            button:''
-          })}>
+          <Button
+            color="default"
+            onPress={() =>
+              setShowModal({
+                open: false,
+                title: "",
+                description: "",
+                button: "",
+              })
+            }
+          >
             Close
           </Button>
         </CustomModal>

@@ -12,7 +12,7 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@heroui/react";
 import Heading from "../Heading";
-import MenuItemCard from "../MenuItemCard";
+import { MenuItemCard } from "../MenuItemCard";
 interface MenuItems {
   id: number;
   title: string;
@@ -24,6 +24,7 @@ interface MenuItems {
   popularity: number;
   rating: number;
   special: boolean;
+  itemVariation: [{ type: string; name: string; price_multiplier: number }];
   delivery: {
     isDeliverable: boolean;
     estimatedTime: string;
@@ -52,8 +53,10 @@ function SpecialsCorousel({ showLogin, addItemToCart }: SpecialsCorouselProps) {
     const fetchSpecial = async () => {
       const res = await fetch("/Data/menu.json");
       const data = await res.json();
-      const specialItems = data;
-      setSpecialItems(data);
+      const specialItems = data.filter(
+        (item: MenuItems) => item.special === true
+      );
+      setSpecialItems(specialItems);
     };
 
     fetchSpecial();
@@ -70,7 +73,6 @@ function SpecialsCorousel({ showLogin, addItemToCart }: SpecialsCorouselProps) {
           opts={{ loop: true }}
         >
           {/* Left Button */}
-          <CarouselPrevious className="z-10 backdrop-blur-lg bg-black/30 hover:bg-black/30 text-white hover:text-theme h-20 " />
 
           {/* Carousel Content */}
           <CarouselContent className="w-full mx-20 -ml-1 ">
@@ -88,6 +90,9 @@ function SpecialsCorousel({ showLogin, addItemToCart }: SpecialsCorouselProps) {
                       itemDescription={item.description}
                       itemImage={item.image}
                       itemPrice={item.price}
+                      itemVariation={item.itemVariation}
+                      is_deliverable={item.delivery.isDeliverable}
+                      delivery_locations={item.delivery.areas}
                     />
                   </div>
                 </CarouselItem>
@@ -95,7 +100,6 @@ function SpecialsCorousel({ showLogin, addItemToCart }: SpecialsCorouselProps) {
           </CarouselContent>
 
           {/* Right Button */}
-          <CarouselNext className=" z-10 backdrop-blur-lg bg-black/30 hover:bg-black/30 text-white hover:text-theme h-20 " />
         </Carousel>
       </FadeInSection>
     </div>

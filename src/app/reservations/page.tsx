@@ -1,12 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PageBanner from "@/components/PageBanner";
-import { Tabs, Tab, Card, CardBody } from "@heroui/react";
+import { Tabs, Tab } from "@heroui/react";
 import FadeInSection from "@/components/ui/scrollAnimated";
 import ReservationForm from "@/components/Reservation/ReservationForm";
 import ImageGallery from "@/components/ImageGallery";
 import ViewReservationsTable from "@/components/Reservation/ReservationTable";
 import Heading from "@/components/Heading";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Reservation {
   id: number;
@@ -17,13 +18,46 @@ interface Reservation {
   guests: number;
   email: string;
   status: string;
-  occasion:string;
+  occasion: string;
   requests?: string;
 }
 
 function ReservationPage() {
-  const [selectedTab, setSelectedTab] = useState<string>("newReservation");
-  const [editReservation, setEditReservation] = useState<Reservation | null>(null); // to hold data for editing
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Extract tab from URL or default to "new"
+  const initialTab =
+    searchParams.get("mode") === "view" ? "viewReservation" : "newReservation";
+  const [selectedTab, setSelectedTab] = useState<string>(initialTab);
+  const [editReservation, setEditReservation] = useState<Reservation | null>(
+    null
+  );
+
+  // Update URL when tab changes
+  const handleTabChange = (key: string) => {
+    const urlTab = key === "viewReservation" ? "view" : "new";
+    router.push(`?mode=${urlTab}`, { scroll: false });
+    setSelectedTab(key);
+  };
+
+  // Keep tab in sync with URL on first render or if URL manually changes
+  useEffect(() => {
+    const urlTab = searchParams.get("mode");
+
+    // If tab param is missing, default to newReservation and update URL
+    if (!urlTab) {
+      router.replace("?mode=new", { scroll: false });
+      return;
+    }
+
+    // Sync tab state from URL
+    if (urlTab === "view") {
+      setSelectedTab("viewReservation");
+    } else {
+      setSelectedTab("newReservation");
+    }
+  }, [searchParams]);
 
   return (
     <div>
@@ -36,32 +70,33 @@ function ReservationPage() {
         <div className="flex w-full flex-col">
           <Tabs
             selectedKey={selectedTab}
-            onSelectionChange={(key) => setSelectedTab(String(key))}
+            onSelectionChange={(key) => handleTabChange(String(key))}
             aria-label="Options"
             size="md"
             color="warning"
             classNames={{ tabList: "bg-secondary/30" }}
           >
             <Tab key="newReservation" title="New Reservation">
-              <Heading title="RESERVATIONS" subheading="New Reservation"/>
+              <Heading title="RESERVATIONS" subheading="New Reservation" />
 
               <FadeInSection>
                 <ReservationForm
                   reservationDataProp={editReservation}
-                  resetData = {() => setEditReservation(null)}
-                  // clearReservationData={() => setEditReservation(null)}
+                  resetData={() => setEditReservation(null)}
                 />
               </FadeInSection>
-              
             </Tab>
 
-            <Tab isDisabled={editReservation!==null} key="viewReservation" title="View Reservation">
-              
-              <Heading title="RESERVATIONS" subheading="View Reservation"/>
+            <Tab
+              isDisabled={editReservation !== null}
+              key="viewReservation"
+              title="View Reservation"
+            >
+              <Heading title="RESERVATIONS" subheading="View Reservation" />
 
               <ViewReservationsTable
-                onAddNew={() => setSelectedTab("newReservation")}
-                onEditReservation={(reservation:Reservation) => {
+                onAddNew={() => handleTabChange("newReservation")}
+                onEditReservation={(reservation: Reservation) => {
                   setEditReservation(reservation);
                 }}
               />

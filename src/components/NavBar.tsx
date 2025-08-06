@@ -23,7 +23,13 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@heroui/react";
-import { MdSpaceDashboard,MdOutlineRestaurantMenu,MdInfoOutline,MdAdd,MdPhone   } from "react-icons/md";
+import {
+  MdSpaceDashboard,
+  MdOutlineRestaurantMenu,
+  MdInfoOutline,
+  MdAdd,
+  MdPhone,
+} from "react-icons/md";
 import { useLocationStore } from "@/lib/store/locationStore";
 import LocationModal from "./Modals/LocationModal";
 
@@ -33,7 +39,7 @@ interface MenuItemType {
   name: string;
   href: string;
   order: number;
-  icon:React.ReactNode;
+  icon: React.ReactNode;
 }
 
 interface MenuTabType {
@@ -46,7 +52,7 @@ interface MenuTabType {
 interface ProcessedMobileNavItem {
   href: string;
   title: string;
-  icon:React.ReactNode
+  icon: React.ReactNode;
 }
 
 type VisibleTabType = MenuTabType & { items: MenuItemType[] };
@@ -63,7 +69,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "dashboard",
         name: "Dashboard",
         href: "/",
-        icon: <MdSpaceDashboard size={20}/>,
+        icon: <MdSpaceDashboard size={20} />,
         order: 1,
       },
     ],
@@ -78,7 +84,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "menu",
         name: "Menu",
         href: "/menu",
-        icon: <MdOutlineRestaurantMenu size={20}/>,
+        icon: <MdOutlineRestaurantMenu size={20} />,
         order: 1,
       },
     ],
@@ -93,7 +99,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "reservations",
         name: "Reservations",
         href: "/reservations",
-        icon: <MdAdd size={20}/>,
+        icon: <MdAdd size={20} />,
         order: 1,
       },
     ],
@@ -108,7 +114,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "about",
         name: "About",
         href: "/about",
-        icon: <MdInfoOutline size={20}/>,
+        icon: <MdInfoOutline size={20} />,
         order: 1,
       },
     ],
@@ -123,7 +129,7 @@ const staticMenuTabsData: VisibleTabType[] = [
         id: "contact",
         name: "Contact",
         href: "/contact",
-        icon: <MdPhone size={20}/>,
+        icon: <MdPhone size={20} />,
         order: 1,
       },
     ],
@@ -479,9 +485,8 @@ export function Nav() {
   );
   const [showFixedNavbar, setShowFixedNavbar] = useState(false);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const [showLocationModal,setShowLocationModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
-  
   useEffect(() => {
     const handleScroll = () => {
       setShowFixedNavbar(window.scrollY > 80);
@@ -498,13 +503,12 @@ export function Nav() {
         links.push({
           href: item.href,
           title: item.name,
-          icon:item.icon,
+          icon: item.icon,
         });
       });
     });
     return links;
   }, [visibleMenuTabs]);
-
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -519,10 +523,8 @@ export function Nav() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-   
   return (
     <>
-
       <LocationModal
         isOpen={showLocationModal}
         onClose={() => setShowLocationModal(false)}
@@ -534,7 +536,7 @@ export function Nav() {
           <motion.div
             initial={{ y: -80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -80, opacity: 0 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }} // slightly slower, smoother
             className="fixed py-2 top-0 w-full z-50 px-5  bg-[var(--secondary-theme)]"
             style={{ willChange: "transform, opacity" }}
@@ -554,26 +556,31 @@ export function Nav() {
                   visibleMenuTabs={visibleMenuTabs}
                   pathname={pathname}
                 />
-                <Button className="border-1 border-white bg-transparent" onPress={()=>setShowLocationModal(true)}>
+                <Button
+                  className="border-1 border-white bg-transparent"
+                  onPress={() => setShowLocationModal(true)}
+                >
                   <MdLocationPin size={20} color="white" />
 
                   <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                                        {selectedLocation || 'Select'}
-
+                    {selectedLocation || "Select"}
                   </span>
                 </Button>
               </div>
 
               <div className="flex lg:hidden gap-2 items-center">
-                <Button className="bg-transparent"  onPress={()=>setShowLocationModal(true)}>
+                <Button
+                  className="bg-transparent"
+                  onPress={() => setShowLocationModal(true)}
+                >
                   <MdLocationPin size={15} color="white" />
 
                   <span className="text-xs md:text-base lg:text-base 2xl:text-lg font-medium text-white">
-                    {selectedLocation || 'Select'}
+                    {selectedLocation || "Select"}
                   </span>
                 </Button>
 
-              {/* Mobile Hamburger */}
+                {/* Mobile Hamburger */}
                 <button
                   onClick={toggleMobileMenu}
                   className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground cursor-pointer"
@@ -612,24 +619,28 @@ export function Nav() {
               visibleMenuTabs={visibleMenuTabs}
               pathname={pathname}
             />
-            <Button className="border-1 border-white bg-transparent"  onPress={()=>setShowLocationModal(true)}>
+            <Button
+              className="border-1 border-white bg-transparent"
+              onPress={() => setShowLocationModal(true)}
+            >
               <MdLocationPin size={20} color="white" />
 
               <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                                    {selectedLocation || 'Select'}
-
+                {selectedLocation || "Select"}
               </span>
             </Button>
           </div>
 
           {/* Mobile Hamburger */}
           <div className="flex lg:hidden gap-2 items-center">
-            <Button className="bg-transparent"  onPress={()=>setShowLocationModal(true)}>
+            <Button
+              className="bg-transparent"
+              onPress={() => setShowLocationModal(true)}
+            >
               <MdLocationPin size={15} color="white" />
 
               <span className="text-xs md:text-base lg:text-base 2xl:text-lg font-medium text-white">
-                                    {selectedLocation || 'Select'}
-
+                {selectedLocation || "Select"}
               </span>
             </Button>
 

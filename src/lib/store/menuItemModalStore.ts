@@ -2,18 +2,26 @@
 import { create } from "zustand";
 
 interface Variations {
-  type:string,
-  name:string,
-  price_mul:number,
+  type: string;
+  name: string;
+  price_multiplier: number;
 }
 
- interface MenuItem {
+interface DeliveryAreas {
+  name: string;
+  postalCode: string;
+  fee: number;
+}
+
+interface MenuItem {
   id: number | undefined;
   name: string | undefined;
   price: number | undefined;
   image: string | undefined;
   description: string | undefined;
-  itemVariation: Variations[] | undefined
+  itemVariation: Variations[] | undefined;
+  is_deliverable: boolean | undefined;
+  delivery_locations: DeliveryAreas[] | undefined;
 }
 
 interface MenuItemModalStore {

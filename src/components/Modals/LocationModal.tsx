@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -36,7 +36,8 @@ function LocationModal({
 }: ModalProps) {
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [locationData, setLocationData] = useState<Location[]>([]);
-  const { selectedLocation, setSelectedLocation, hasHydrated } = useLocationStore();
+  const { selectedLocation, setSelectedLocation, hasHydrated } =
+    useLocationStore();
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -48,19 +49,18 @@ function LocationModal({
     fetchLocation();
   }, []);
 
-  useEffect(()=>{
-    if(hasHydrated){
-      setCurrentLocation(selectedLocation)
+  useEffect(() => {
+    if (hasHydrated) {
+      setCurrentLocation(selectedLocation);
     }
-  },[hasHydrated])
-
+  }, [hasHydrated]);
 
   return (
     <>
       <Modal
         backdrop="blur"
         isOpen={isOpen}
-         onClose={onClose}
+        onClose={onClose}
         classNames={{ closeButton: "hidden" }}
       >
         <ModalContent>
@@ -104,8 +104,10 @@ function LocationModal({
               </ModalBody>
               <ModalFooter className="justify-center">
                 <Button
-                    className="bg-theme"
-                  onPress={() => {setSelectedLocation(currentLocation), onClose()}}
+                  className="bg-theme"
+                  onPress={() => {
+                    setSelectedLocation(currentLocation), onClose();
+                  }}
                   isDisabled={
                     currentLocation === "" ||
                     currentLocation === selectedLocation

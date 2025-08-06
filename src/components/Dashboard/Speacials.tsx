@@ -64,13 +64,13 @@ function Speacials() {
         </FadeInSection>
       </div>
 
-      <div className="h-auto w-full bg-[var(--body-bg)] flex justify-center items-center pb-20">
-        <Card className="h-auto w-[80%] 2xl:w-[60%] grid grid-cols-1 lg:grid-cols-2 -mt-20 z-1 rounded-none bg-transparent">
+      <div className="h-auto w-full  flex justify-center items-center pb-20">
+        <Card className="h-auto w-[80%] 2xl:w-[60%] grid grid-cols-1 lg:grid-cols-2 -mt-20 z-1 rounded-none bg-transparent shadow-none">
           {specialItems.map((items) => (
             <FadeInSection
               key={items.id}
               delay={items.id * 0.1}
-              className="flex flex-col-reverse md:grid md:grid-cols-2 w-full bg-foreground"
+              className="flex flex-col-reverse md:grid md:grid-cols-2 w-full bg-foreground "
             >
               {/* Text Content */}
               <div className="h-60 md:h-auto w-full flex flex-col items-center justify-around p-5 lg:p-10 gap-4">

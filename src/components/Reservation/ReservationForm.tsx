@@ -220,11 +220,10 @@ function ReservationForm({
   };
   return (
     <div className="flex flex-col items-center ">
-      
       <FadeInSection className="w-full flex justify-center ">
-        <div className="flex flex-col md:flex-row justify-around  h-auto w-full lg:w-[80%] xl:w-[60%] my-10 bg-foreground">
+        <div className="flex flex-col md:flex-row justify-around  h-auto w-full lg:w-[80%] xl:w-[60%] my-10 bg-foreground shadow-md  rounded-lg">
           {/* Left Image */}
-          <div className="  md:w-[30%] ">
+          <div className="  md:w-[30%] overflow-hidden">
             <img
               src="/images/BgCarousel/bg_1.jpg" // Replace with your image path
               alt="Bar Interior"

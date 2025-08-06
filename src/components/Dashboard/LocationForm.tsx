@@ -16,19 +16,16 @@ interface Location {
 function LocationForm() {
   const [action, setAction] = useState<string>("");
   const [locationData, setLocationData] = useState<Location[]>([]);
-  const {
-  selectedLocation,
-  setSelectedLocation,
-  hasHydrated,
-} = useLocationStore();
-  const [ currentLocation, setCurrentLocation ] = useState<string>('');
+  const { selectedLocation, setSelectedLocation, hasHydrated } =
+    useLocationStore();
+  const [currentLocation, setCurrentLocation] = useState<string>("");
 
   useEffect(() => {
-  if (hasHydrated) {
-    console.log("Hydrated selectedLocation", selectedLocation);
-    setCurrentLocation(selectedLocation);
-  }
-}, [hasHydrated, selectedLocation]);
+    if (hasHydrated) {
+      console.log("Hydrated selectedLocation", selectedLocation);
+      setCurrentLocation(selectedLocation);
+    }
+  }, [hasHydrated, selectedLocation]);
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -47,13 +44,13 @@ function LocationForm() {
           onReset={() => setAction("reset")}
           onSubmit={(e) => {
             e.preventDefault();
-            let data = Object.fromEntries(new FormData(e.currentTarget));
+            const data = Object.fromEntries(new FormData(e.currentTarget));
 
             setAction(`submit ${JSON.stringify(data)}`);
           }}
         >
           <Autocomplete
-          isClearable={false}
+            isClearable={false}
             className="border-1 !text-accent border-black "
             classNames={{
               listboxWrapper: "!text-accent ",
@@ -89,8 +86,10 @@ function LocationForm() {
             variant="bordered"
             radius="none"
             size="md"
-            onPress={()=>setSelectedLocation(currentLocation)}
-            isDisabled={currentLocation==='' || currentLocation===selectedLocation}
+            onPress={() => setSelectedLocation(currentLocation)}
+            isDisabled={
+              currentLocation === "" || currentLocation === selectedLocation
+            }
           >
             Select
           </Button>

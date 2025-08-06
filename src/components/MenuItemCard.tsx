@@ -1,45 +1,65 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "@heroui/react";
 import { CardContent } from "./ui/card";
 import { useMenuItemModalStore } from "@/lib/store/menuItemModalStore";
 import { useRouter } from "next/navigation";
-
+import { Button } from "@heroui/react";
+import LoginModal from "./Modals/LoginModal";
+import { useSession } from "next-auth/react";
 interface Variations {
-  type:string,
-  name:string,
-  price_mul:number,
+  type: string;
+  name: string;
+  price_multiplier: number;
 }
+
+interface DeliveryAreas {
+  name: string;
+  postalCode: string;
+  fee: number;
+}
+
 interface MenuItemCardProps {
   itemId: number;
   itemName: string;
   itemImage: string;
   itemDescription: string;
   itemPrice: number;
-  itemVariation?: Variations[]
+  itemVariation?: Variations[];
+  is_deliverable: boolean;
+  delivery_locations: DeliveryAreas[];
 }
 
-function MenuItemCard({
+export function MenuItemCard({
   itemId,
   itemName,
   itemImage,
   itemDescription,
   itemPrice,
-  itemVariation
+  itemVariation,
+  is_deliverable,
+  delivery_locations,
 }: MenuItemCardProps) {
-    const { openModal } = useMenuItemModalStore();
-
+  const { openModal } = useMenuItemModalStore();
+  const session = useSession();
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const MenuItem = {
     id: itemId,
     name: itemName,
     price: itemPrice,
     image: itemImage,
     description: itemDescription,
-    itemVariation:itemVariation
+    itemVariation: itemVariation,
+    is_deliverable: is_deliverable,
+    delivery_locations: delivery_locations,
   };
 
   const router = useRouter();
-const handleClick = () => {
+  const handleClick = () => {
+    if (!session.data) {
+      setShowLoginModal(true);
+      return null;
+    }
     const currentPath = window.location.pathname + window.location.search;
     openModal(MenuItem, currentPath); // Save previous location
 
@@ -50,6 +70,12 @@ const handleClick = () => {
 
   return (
     <Card className="h-full rounded-2xl  md:max-w-xs border-2 md:border-3 border-theme overflow-hidden transition-shadow duration-300 group cursor-pointer">
+      {showLoginModal && (
+        <LoginModal
+          open={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+        />
+      )}
       <CardContent
         className="h-full flex flex-col justify-between"
         onClick={handleClick}
@@ -73,12 +99,12 @@ const handleClick = () => {
               {itemPrice.toFixed(2)}$
             </span>
             <div className="flex gap-2 items-center">
-              {/* <Button
+              <Button
                 className="bg-theme text-white text-sm px-3 py-1 rounded-full hover:bg-theme-dark transition"
-                onPress={() => handleAddtoCart(item.id)}
+                onPress={handleClick}
               >
                 Add to Cart
-              </Button> */}
+              </Button>
             </div>
           </div>
         </div>
@@ -87,4 +113,69 @@ const handleClick = () => {
   );
 }
 
-export default MenuItemCard;
+export function DashboardMenuItemCard({
+  itemId,
+  itemName,
+  itemImage,
+  itemDescription,
+  itemPrice,
+  itemVariation,
+  is_deliverable,
+  delivery_locations,
+}: MenuItemCardProps) {
+  const { openModal } = useMenuItemModalStore();
+
+  const MenuItem = {
+    id: itemId,
+    name: itemName,
+    price: itemPrice,
+    image: itemImage,
+    description: itemDescription,
+    itemVariation: itemVariation,
+    is_deliverable: is_deliverable,
+    delivery_locations: delivery_locations,
+  };
+
+  const router = useRouter();
+  const handleClick = () => {
+    console.log("Handle Click");
+    const currentPath = window.location.pathname + window.location.search;
+    openModal(MenuItem, currentPath);
+  };
+
+  return (
+    <Card className="bg-foreground p-4 rounded-sm hover:bg-theme cursor-pointer">
+      <div
+        className="flex flex-row sm:items-center sm:justify-between sm:gap-4"
+        onClick={handleClick}
+      >
+        <div className="flex items-center sm:items-center gap-4 flex-1">
+          <div
+            className="min-w-[70px] min-h-[70px] w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-red-500 flex items-center justify-center text-white font-bold"
+            style={{
+              backgroundImage: `url(${itemImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+
+          <div className="flex flex-col">
+            <h2 className="text-base sm:text-lg font-semibold text-accent line-clamp-1">
+              {itemName}
+            </h2>
+            <p className="text-xs md:text-sm text-accent/60 mt-1 sm:mt-2 line-clamp-3">
+              {itemDescription}
+            </p>
+          </div>
+        </div>
+
+        {/* Right: Price */}
+        <div className="text-right flex items-center">
+          <h1 className="text-lg md:text-2xl font-semibold text-accent">
+            ${itemPrice}
+          </h1>
+        </div>
+      </div>
+    </Card>
+  );
+}
