@@ -68,6 +68,9 @@ export function MenuItemCard({
     router.push(`/menu?${params.toString()}`, { scroll: false });
   };
 
+  useEffect(() => {
+    console.log("MenuItemCard rendered with item:", MenuItem);
+  });
   return (
     <Card className="h-full rounded-2xl  md:max-w-xs border-2 md:border-3 border-theme overflow-hidden transition-shadow duration-300 group cursor-pointer">
       {showLoginModal && (
