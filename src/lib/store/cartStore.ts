@@ -16,7 +16,7 @@ interface CartState {
   items: CartItem[];
   isOpen: boolean;
   addItem: (item: CartItem) => void;
-  removeItem: (id: number | undefined) => void;
+  removeItem: (index: number) => void; // index-based removal
   clearCart: () => void;
   toggleCart: (state?: boolean) => void;
 }
@@ -28,27 +28,32 @@ export const useCartStore = create(
       isOpen: false,
       addItem: (item) =>
         set((state) => {
-          console.log(item);
-          const existing = state.items.find((i) => i === item);
-          if (existing) {
-            return {
-              items: state.items.map((i) =>
-                i.itemId === item.itemId
-                  ? {
-                      ...i,
-                      itemQuantity:
-                        (i.itemQuantity ?? 0) + (item.itemQuantity ?? 0),
-                    }
-                  : i
-              ),
+          const existingIndex = state.items.findIndex(
+            (i) =>
+              i.itemId === item.itemId &&
+              i.itemVariation === item.itemVariation &&
+              i.itemInstructions === item.itemInstructions
+          );
+
+          if (existingIndex !== -1) {
+            const updatedItems = [...state.items];
+            updatedItems[existingIndex] = {
+              ...updatedItems[existingIndex],
+              itemQuantity:
+                (updatedItems[existingIndex].itemQuantity ?? 0) +
+                (item.itemQuantity ?? 0),
             };
+            return { items: updatedItems };
           }
+
           return { items: [...state.items, item] };
         }),
-      removeItem: (id) =>
-        set((state) => ({
-          items: state.items.filter((i) => i.itemId !== id),
-        })),
+      removeItem: (index) =>
+        set((state) => {
+          const newItems = [...state.items];
+          newItems.splice(index, 1);
+          return { items: newItems };
+        }),
       clearCart: () => set({ items: [] }),
       toggleCart: (state) =>
         set((s) => ({ isOpen: state !== undefined ? state : !s.isOpen })),

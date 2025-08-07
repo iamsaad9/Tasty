@@ -56,7 +56,7 @@ export default function CartDrawer() {
 
   useEffect(() => {
     const total = cartItem.reduce((acc, item) => {
-      const price = item.itemPrice ?? 0;
+      const price = item.itemBasePrice ?? 0;
       const qty = item.itemQuantity ?? 1;
       return acc + price * qty;
     }, 0);
@@ -92,7 +92,7 @@ export default function CartDrawer() {
                 {/* Cart Items */}
                 {cartItem.length > 0 ? (
                   <div className="space-y-4">
-                    {cartItem.map((i) => (
+                    {cartItem.map((i, index) => (
                       <Card
                         key={i.itemId}
                         className="flex flex-row gap-2 items-center p-2 text-accent"
@@ -110,14 +110,17 @@ export default function CartDrawer() {
                             <p className="text-xs text-default-500 line-clamp-2">
                               {i.itemInstructions}
                             </p>
+                            <p className="text-xs text-default-500 line-clamp-2">
+                              {i.itemVariation}
+                            </p>
                           </div>
                           <div className="flex items-center justify-between gap-5 ">
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => {
                                   setCartItem((prevItems) =>
-                                    prevItems.map((item) =>
-                                      item.itemId === i.itemId
+                                    prevItems.map((item, idx) =>
+                                      idx === index
                                         ? {
                                             ...item,
                                             itemQuantity: Math.max(
@@ -141,8 +144,8 @@ export default function CartDrawer() {
                               <button
                                 onClick={() => {
                                   setCartItem((prevItems) =>
-                                    prevItems.map((item) =>
-                                      item.itemId === i.itemId
+                                    prevItems.map((item, idx) =>
+                                      idx === index
                                         ? {
                                             ...item,
                                             itemQuantity:
@@ -177,7 +180,7 @@ export default function CartDrawer() {
                                     title: "Remove Item?",
                                     description: `Are you sure you want to remove ${i.itemName} from the cart?`,
                                     button: "Remove",
-                                    onclose: () => removeItem(i.itemId),
+                                    onclose: () => removeItem(index),
                                   });
                                 }}
                               />
@@ -203,7 +206,7 @@ export default function CartDrawer() {
                               color="danger"
                               variant="flat"
                               onPress={() => {
-                                removeItem(i.itemId),
+                                removeItem(index),
                                   setShowModal({
                                     open: false,
                                     title: "",
