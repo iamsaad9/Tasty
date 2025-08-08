@@ -83,7 +83,7 @@ function SpecialsCorousel({ showLogin, addItemToCart }: SpecialsCorouselProps) {
                   key={item.id}
                   className="pl-1 basis-1/1 sm:basis-1/3 lg:basis-1/5"
                 >
-                  <div className="p-1 flex justify-center">
+                  <div className="p-5 md:p-1 flex justify-center">
                     <MenuItemCard
                       itemId={item.id}
                       itemName={item.title}

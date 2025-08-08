@@ -1,12 +1,16 @@
 import { ArrowRight } from "lucide-react";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "@/lib/store/cartStore";
 
 const CheckoutButton = () => {
+  const { toggleCart } = useCartStore();
   const router = useRouter();
   return (
     <button
-      onClick={() => router.push("/checkout")}
+      onClick={() => {
+        router.push("/checkout"), toggleCart(false);
+      }}
       className="relative bg-theme text-white font-medium text-[17px] px-4 py-[0.35em] pl-5 h-[2.8em] rounded-[0.9em] flex items-center overflow-hidden cursor-pointer shadow-[inset_0_0_1.6em_-0.6em_#714da6] group"
     >
       <span className="mr-10 text-black">Checkout</span>

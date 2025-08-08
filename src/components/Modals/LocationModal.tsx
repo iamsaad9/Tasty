@@ -58,6 +58,7 @@ function LocationModal({
   return (
     <>
       <Modal
+        placement="center"
         backdrop="blur"
         isOpen={isOpen}
         onClose={onClose}

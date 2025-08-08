@@ -99,7 +99,7 @@ function MenuPage() {
       ),
     },
   ];
-  const { selectedLocation, hasHydrated } = useLocationStore();
+  const { selectedLocation, hasHydrated, deliveryMode } = useLocationStore();
   const [searchText, setSearchText] = React.useState("");
   const [activeMenu, setActiveMenu] = React.useState("Main Course");
   const [filters, setFilters] = React.useState({
@@ -122,7 +122,8 @@ function MenuPage() {
   const searchParams = useSearchParams();
 
   const filterMenuItems = (data: MenuItems[]) => {
-    console.log("Data in Filter Function: ", data);
+    if (deliveryMode !== "delivery") return data;
+
     return data.filter((item) => {
       return (
         item.delivery.isDeliverable === true &&
@@ -138,14 +139,11 @@ function MenuPage() {
       const data = await res.json();
       const filteredMenuItems = filterMenuItems(data);
       setMenuItems(filteredMenuItems);
+
       setLoading(false);
     };
     fetchMenuItems();
-  }, [selectedLocation]);
-
-  useEffect(() => {
-    console.log("menuItems", menuItems);
-  }, [menuItems]);
+  }, [selectedLocation, deliveryMode]);
 
   useEffect(() => {
     const itemId = searchParams.get("item");
@@ -168,16 +166,10 @@ function MenuPage() {
   }, [searchParams, menuItems]);
 
   useEffect(() => {
-    if (hasHydrated && selectedLocation === "") {
+    if (hasHydrated && deliveryMode === "delivery" && selectedLocation === "") {
       setShowAddressModal(true);
     }
-  }, [hasHydrated, selectedLocation]);
-
-  useEffect(() => {
-    if (hasHydrated && selectedLocation !== "") {
-      setShowAddressModal(false);
-    }
-  }, [hasHydrated, selectedLocation]);
+  }, [hasHydrated, selectedLocation, deliveryMode]);
 
   const handleApplySearch = (searchText: { searchText: string }) => {
     console.log("Search applied:", searchText);
@@ -234,6 +226,7 @@ function MenuPage() {
         isOpen={showAddressModal}
         title="Select Your Location"
         description="Please select your location"
+        onClose={() => setShowAddressModal(false)}
       />
       <LoadingScreen showLoading={loading} />
       {/* Background Section */}

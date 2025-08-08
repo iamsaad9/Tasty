@@ -33,36 +33,53 @@ interface CartItem {
 }
 
 export default function CartDrawer() {
-  const { isOpen, items, toggleCart, removeItem, clearCart } = useCartStore();
-  const [cartItem, setCartItem] = useState<CartItem[]>([]);
-  const [subTotalPrice, setSubTotalPrice] = useState(0);
-  const [deliveryCharges, setDeliveryCharges] = useState(2);
-  const [taxPrice, setTaxPrice] = useState(0);
+  const {
+    isOpen,
+    items,
+    toggleCart,
+    removeItem,
+    clearCart,
+    updateItemQuantity,
+  } = useCartStore();
   const [showModal, setShowModal] = useState({
     open: false,
     title: "",
     description: "",
     button: "",
     onclose: () => {},
+    itemIndex: -1,
   });
 
-  useEffect(() => {
-    setCartItem(items);
-  }, [items]);
+  // Handle quantity decrease
+  const handleDecreaseQuantity = (index: number) => {
+    const currentItem = items[index];
+    const newQuantity = Math.max(1, (currentItem.itemQuantity || 1) - 1);
 
-  useEffect(() => {
-    console.log("cartItem", cartItem);
-  }, [cartItem]);
+    // Update the cart store directly
+    updateItemQuantity(index, newQuantity);
+  };
 
-  useEffect(() => {
-    const total = cartItem.reduce((acc, item) => {
-      const price = item.itemBasePrice ?? 0;
-      const qty = item.itemQuantity ?? 1;
-      return acc + price * qty;
-    }, 0);
-    setSubTotalPrice(total);
-    setTaxPrice(total * 0.1);
-  }, [cartItem]);
+  // Handle quantity increase
+  const handleIncreaseQuantity = (index: number) => {
+    const currentItem = items[index];
+    const newQuantity = (currentItem.itemQuantity || 1) + 1;
+
+    // Update the cart store directly
+    updateItemQuantity(index, newQuantity);
+  };
+
+  // Handle item removal
+  const handleRemoveItem = (index: number) => {
+    removeItem(index);
+    setShowModal({
+      open: false,
+      title: "",
+      description: "",
+      button: "",
+      onclose: () => {},
+      itemIndex: -1,
+    });
+  };
 
   return (
     <>
@@ -90,71 +107,45 @@ export default function CartDrawer() {
               {/* Body */}
               <DrawerBody className="pt-4 px-4 pb-0 space-y-6">
                 {/* Cart Items */}
-                {cartItem.length > 0 ? (
+                {items.length > 0 ? (
                   <div className="space-y-4">
-                    {cartItem.map((i, index) => (
+                    {items.map((item, index) => (
                       <Card
-                        key={i.itemId}
+                        key={`${item.itemId}-${index}`}
                         className="flex flex-row gap-2 items-center p-2 text-accent"
                       >
                         <img
-                          src={i.itemImage}
+                          src={item.itemImage}
                           alt="Dish"
                           className="w-16 h-16 rounded-md object-cover"
                         />
                         <div className="flex flex-row justify-between items-center w-full ">
                           <div>
                             <h3 className="font-medium text-base line-clamp-1">
-                              {i.itemName}
+                              {item.itemName}
                             </h3>
                             <p className="text-xs text-default-500 line-clamp-2">
-                              {i.itemInstructions}
+                              {item.itemInstructions}
                             </p>
                             <p className="text-xs text-default-500 line-clamp-2">
-                              {i.itemVariation}
+                              {item.itemVariation}
                             </p>
                           </div>
                           <div className="flex items-center justify-between gap-5 ">
                             <div className="flex items-center gap-2">
                               <button
-                                onClick={() => {
-                                  setCartItem((prevItems) =>
-                                    prevItems.map((item, idx) =>
-                                      idx === index
-                                        ? {
-                                            ...item,
-                                            itemQuantity: Math.max(
-                                              1,
-                                              (item.itemQuantity || 1) - 1
-                                            ),
-                                          }
-                                        : item
-                                    )
-                                  );
-                                }}
+                                onClick={() => handleDecreaseQuantity(index)}
                                 className="border rounded-full p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
                               >
                                 <Minus size={10} />
                               </button>
 
                               <span className="font-medium text-base">
-                                {i.itemQuantity}
+                                {item.itemQuantity}
                               </span>
 
                               <button
-                                onClick={() => {
-                                  setCartItem((prevItems) =>
-                                    prevItems.map((item, idx) =>
-                                      idx === index
-                                        ? {
-                                            ...item,
-                                            itemQuantity:
-                                              (item.itemQuantity || 1) + 1,
-                                          }
-                                        : item
-                                    )
-                                  );
-                                }}
+                                onClick={() => handleIncreaseQuantity(index)}
                                 className="border rounded-full p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
                               >
                                 <Plus size={10} />
@@ -163,7 +154,8 @@ export default function CartDrawer() {
                             <span className="min-w-14 text-sm font-semibold">
                               ${" "}
                               {(
-                                (i.itemBasePrice || 0) * (i.itemQuantity || 1)
+                                (item.itemBasePrice || 0) *
+                                (item.itemQuantity || 1)
                               ).toFixed(2)}
                             </span>
                             <Button
@@ -171,74 +163,23 @@ export default function CartDrawer() {
                               size="sm"
                               variant="light"
                               className="hover:!bg-red-200"
+                              onPress={() => {
+                                setShowModal({
+                                  open: true,
+                                  title: "Remove Item?",
+                                  description: `Are you sure you want to remove ${item.itemName} from the cart?`,
+                                  button: "Remove",
+                                  onclose: () => {},
+                                  itemIndex: index,
+                                });
+                              }}
                             >
-                              <Trash
-                                size={15}
-                                onClick={() => {
-                                  setShowModal({
-                                    open: true,
-                                    title: "Remove Item?",
-                                    description: `Are you sure you want to remove ${i.itemName} from the cart?`,
-                                    button: "Remove",
-                                    onclose: () => removeItem(index),
-                                  });
-                                }}
-                              />
+                              <Trash size={15} />
                             </Button>
                           </div>
                         </div>
-                        {showModal && (
-                          <CustomModal
-                            onClose={() =>
-                              setShowModal({
-                                open: false,
-                                title: "",
-                                description: "",
-                                button: "",
-                                onclose: () => {},
-                              })
-                            }
-                            isOpen={showModal.open}
-                            title={showModal.title}
-                            description={showModal.description}
-                          >
-                            <Button
-                              color="danger"
-                              variant="flat"
-                              onPress={() => {
-                                removeItem(index),
-                                  setShowModal({
-                                    open: false,
-                                    title: "",
-                                    description: "",
-                                    button: "",
-                                    onclose: () => {},
-                                  });
-                              }}
-                            >
-                              {showModal.button}
-                            </Button>
-                            <Button
-                              color="default"
-                              onPress={() =>
-                                setShowModal({
-                                  open: false,
-                                  title: "",
-                                  description: "",
-                                  button: "",
-                                  onclose: () => {},
-                                })
-                              }
-                            >
-                              Close
-                            </Button>
-                          </CustomModal>
-                        )}
                       </Card>
                     ))}
-                    {/* <Button className="w-full bg-theme mt-5" >
-                    <span className="font-medium t.ext-base">Continue Shopping</span>
-                </Button> */}
                     <div className="flex w-full justify-end mt-5">
                       <AddItemButton />
                     </div>
@@ -256,33 +197,23 @@ export default function CartDrawer() {
               </DrawerBody>
 
               {/* Footer */}
-              {cartItem.length > 0 && (
+              {items.length > 0 && (
                 <DrawerFooter className="border-t p-4 bg-white flex-col">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm text-default-500">Subtotal</span>
-                    <span className="text-sm font-semibold">
-                      $ {subTotalPrice.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm text-default-500">Delivery</span>
-                    <span className="text-sm font-semibold">
-                      $ {deliveryCharges}
-                    </span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm text-default-500">Tax</span>
-                    <span className="text-sm font-semibold">
-                      $ {taxPrice.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between mb-2 border-t py-2">
+                  <div className="flex justify-between mb-2  py-2">
                     <span className="text-md text-accent font-medium">
                       Total
                     </span>
                     <span className="text-md font-semibold">
                       ${" "}
-                      {(subTotalPrice + taxPrice + deliveryCharges).toFixed(2)}
+                      {items
+                        .reduce(
+                          (acc, item) =>
+                            acc +
+                            (item.itemBasePrice ?? 0) *
+                              (item.itemQuantity ?? 1),
+                          0
+                        )
+                        .toFixed(2)}
                     </span>
                   </div>
                   <CheckoutButton />
@@ -292,6 +223,48 @@ export default function CartDrawer() {
           )}
         </DrawerContent>
       </Drawer>
+
+      {/* Modal */}
+      {showModal.open && (
+        <CustomModal
+          onClose={() =>
+            setShowModal({
+              open: false,
+              title: "",
+              description: "",
+              button: "",
+              onclose: () => {},
+              itemIndex: -1,
+            })
+          }
+          isOpen={showModal.open}
+          title={showModal.title}
+          description={showModal.description}
+        >
+          <Button
+            color="danger"
+            variant="flat"
+            onPress={() => handleRemoveItem(showModal.itemIndex)}
+          >
+            {showModal.button}
+          </Button>
+          <Button
+            color="default"
+            onPress={() =>
+              setShowModal({
+                open: false,
+                title: "",
+                description: "",
+                button: "",
+                onclose: () => {},
+                itemIndex: -1,
+              })
+            }
+          >
+            Close
+          </Button>
+        </CustomModal>
+      )}
     </>
   );
 }

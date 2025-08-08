@@ -16,7 +16,7 @@ interface Location {
 function LocationForm() {
   const [action, setAction] = useState<string>("");
   const [locationData, setLocationData] = useState<Location[]>([]);
-  const { selectedLocation, setSelectedLocation, hasHydrated } =
+  const { selectedLocation, setSelectedLocation, hasHydrated, deliveryMode } =
     useLocationStore();
   const [currentLocation, setCurrentLocation] = useState<string>("");
 
@@ -50,6 +50,7 @@ function LocationForm() {
           }}
         >
           <Autocomplete
+            isDisabled={deliveryMode === "pickup"}
             isClearable={false}
             className="border-1 !text-accent border-black "
             classNames={{

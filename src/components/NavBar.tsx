@@ -32,7 +32,11 @@ import {
 } from "react-icons/md";
 import { useLocationStore } from "@/lib/store/locationStore";
 import LocationModal from "./Modals/LocationModal";
-
+import { Truck, Store } from "lucide-react";
+import { addToast } from "@heroui/react";
+import { useCartStore } from "@/lib/store/cartStore";
+import CustomModal from "./Modals/Modal";
+import LoadingScreen from "./Loading";
 // --- Type Definitions (Re-added as inline types) ---
 interface MenuItemType {
   id: string;
@@ -475,8 +479,8 @@ const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
 // --- Main Nav Component ---
 export function Nav() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { selectedLocation, hasHydrated } = useLocationStore();
+  const { selectedLocation, deliveryMode, setDeliveryMode, hasHydrated } =
+    useLocationStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const visibleMenuTabs = useMemo(
@@ -486,6 +490,14 @@ export function Nav() {
   const [showFixedNavbar, setShowFixedNavbar] = useState(false);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showModal, setShowModal] = useState({
+    open: false,
+    title: "",
+    description: "",
+    button: "",
+    onclose: () => {},
+  });
+  const { items, clearCart } = useCartStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -509,6 +521,36 @@ export function Nav() {
     });
     return links;
   }, [visibleMenuTabs]);
+
+  const handleResetCart = (mode: "delivery" | "pickup") => {
+    setDeliveryMode(mode);
+    clearCart();
+    setShowModal({
+      open: false,
+      title: "",
+      description: "",
+      button: "",
+      onclose: () => {},
+    });
+    addToast({
+      title: `Switched to ${mode === "delivery" ? "Delivery" : "Pickup"} Mode`,
+      color: "success",
+    });
+  };
+
+  const handleDeliveryToggle = (mode: "delivery" | "pickup") => {
+    setShowModal({
+      open: true,
+      title: `Switch to ${mode === "delivery" ? "Delivery" : "Pickup"} Mode?`,
+      description: `${
+        items.length > 0 ? "Your Cart will be reset. " : ""
+      }Are you sure you want to switch to ${
+        mode === "delivery" ? "Delivery" : "Pickup"
+      } Mode?`,
+      button: "Switch Mode",
+      onclose: () => {},
+    });
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -556,29 +598,75 @@ export function Nav() {
                   visibleMenuTabs={visibleMenuTabs}
                   pathname={pathname}
                 />
-                <Button
-                  className="border-1 border-white bg-transparent"
-                  onPress={() => setShowLocationModal(true)}
-                >
-                  <MdLocationPin size={20} color="white" />
-
-                  <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                    {selectedLocation || "Select"}
-                  </span>
-                </Button>
+                {deliveryMode === "delivery" && (
+                  <Button
+                    className="border-1 border-white bg-transparent"
+                    onPress={() => setShowLocationModal(true)}
+                  >
+                    <MdLocationPin size={20} color="white" />
+                    <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                      {selectedLocation || "Select"}
+                    </span>
+                  </Button>
+                )}
+                <div className="flex items-center gap-2">
+                  <div
+                    onClick={() => handleDeliveryToggle("delivery")}
+                    className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                      deliveryMode === "delivery"
+                        ? "bg-theme text-white border-theme"
+                        : "bg-transparent text-white border-gray-300"
+                    }`}
+                  >
+                    <Truck className="w-4 h-4" />
+                  </div>
+                  <div
+                    onClick={() => handleDeliveryToggle("pickup")}
+                    className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                      deliveryMode === "pickup"
+                        ? "bg-theme text-white border-theme"
+                        : "bg-transparent text-white border-gray-300"
+                    }`}
+                  >
+                    <Store className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
 
               <div className="flex lg:hidden gap-2 items-center">
-                <Button
-                  className="bg-transparent"
-                  onPress={() => setShowLocationModal(true)}
-                >
-                  <MdLocationPin size={15} color="white" />
-
-                  <span className="text-xs md:text-base lg:text-base 2xl:text-lg font-medium text-white">
-                    {selectedLocation || "Select"}
-                  </span>
-                </Button>
+                {deliveryMode === "delivery" && (
+                  <Button
+                    className="border-1 border-white bg-transparent"
+                    onPress={() => setShowLocationModal(true)}
+                  >
+                    <MdLocationPin size={20} color="white" />
+                    <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                      {selectedLocation || "Select"}
+                    </span>
+                  </Button>
+                )}
+                <div className="flex items-center gap-2">
+                  <div
+                    onClick={() => handleDeliveryToggle("delivery")}
+                    className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                      deliveryMode === "delivery"
+                        ? "bg-theme text-white border-theme"
+                        : "bg-transparent text-white border-gray-300"
+                    }`}
+                  >
+                    <Truck className="w-4 h-4" />
+                  </div>
+                  <div
+                    onClick={() => handleDeliveryToggle("pickup")}
+                    className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                      deliveryMode === "pickup"
+                        ? "bg-theme text-white border-theme"
+                        : "bg-transparent text-white border-gray-300"
+                    }`}
+                  >
+                    <Store className="w-4 h-4" />
+                  </div>
+                </div>
 
                 {/* Mobile Hamburger */}
                 <button
@@ -619,30 +707,76 @@ export function Nav() {
               visibleMenuTabs={visibleMenuTabs}
               pathname={pathname}
             />
-            <Button
-              className="border-1 border-white bg-transparent"
-              onPress={() => setShowLocationModal(true)}
-            >
-              <MdLocationPin size={20} color="white" />
-
-              <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                {selectedLocation || "Select"}
-              </span>
-            </Button>
+            {deliveryMode === "delivery" && (
+              <Button
+                className="border-1 border-white bg-transparent"
+                onPress={() => setShowLocationModal(true)}
+              >
+                <MdLocationPin size={20} color="white" />
+                <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                  {selectedLocation || "Select"}
+                </span>
+              </Button>
+            )}
+            <div className="flex items-center gap-2">
+              <div
+                onClick={() => handleDeliveryToggle("delivery")}
+                className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                  deliveryMode === "delivery"
+                    ? "bg-theme text-white border-theme"
+                    : "bg-transparent text-white border-gray-300"
+                }`}
+              >
+                <Truck className="w-4 h-4" />
+              </div>
+              <div
+                onClick={() => handleDeliveryToggle("pickup")}
+                className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                  deliveryMode === "pickup"
+                    ? "bg-theme text-white border-theme"
+                    : "bg-transparent text-white border-gray-300"
+                }`}
+              >
+                <Store className="w-4 h-4" />
+              </div>
+            </div>
           </div>
 
           {/* Mobile Hamburger */}
           <div className="flex lg:hidden gap-2 items-center">
-            <Button
-              className="bg-transparent"
-              onPress={() => setShowLocationModal(true)}
-            >
-              <MdLocationPin size={15} color="white" />
-
-              <span className="text-xs md:text-base lg:text-base 2xl:text-lg font-medium text-white">
-                {selectedLocation || "Select"}
-              </span>
-            </Button>
+            {deliveryMode === "delivery" && (
+              <Button
+                className="border-1 border-white bg-transparent"
+                onPress={() => setShowLocationModal(true)}
+              >
+                <MdLocationPin size={20} color="white" />
+                <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                  {selectedLocation || "Select"}
+                </span>
+              </Button>
+            )}
+            <div className="flex items-center gap-2">
+              <div
+                onClick={() => handleDeliveryToggle("delivery")}
+                className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                  deliveryMode === "delivery"
+                    ? "bg-theme text-white border-theme"
+                    : "bg-transparent text-white border-gray-300"
+                }`}
+              >
+                <Truck className="w-4 h-4" />
+              </div>
+              <div
+                onClick={() => handleDeliveryToggle("pickup")}
+                className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                  deliveryMode === "pickup"
+                    ? "bg-theme text-white border-theme"
+                    : "bg-transparent text-white border-gray-300"
+                }`}
+              >
+                <Store className="w-4 h-4" />
+              </div>
+            </div>
 
             <button
               onClick={toggleMobileMenu}
@@ -659,7 +793,6 @@ export function Nav() {
           </div>
         </div>
       </nav>
-      {/* {session?.user && ( */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -681,6 +814,48 @@ export function Nav() {
               onCloseMenu={toggleMobileMenu}
             />
           </motion.div>
+        )}
+        {showModal.open && (
+          <CustomModal
+            onClose={() =>
+              setShowModal({
+                open: false,
+                title: "",
+                description: "",
+                button: "",
+                onclose: () => {},
+              })
+            }
+            isOpen={showModal.open}
+            title={showModal.title}
+            description={showModal.description}
+          >
+            <Button
+              color="warning"
+              variant="flat"
+              onPress={() =>
+                handleResetCart(
+                  deliveryMode === "delivery" ? "pickup" : "delivery"
+                )
+              }
+            >
+              {showModal.button}
+            </Button>
+            <Button
+              color="default"
+              onPress={() =>
+                setShowModal({
+                  open: false,
+                  title: "",
+                  description: "",
+                  button: "",
+                  onclose: () => {},
+                })
+              }
+            >
+              Close
+            </Button>
+          </CustomModal>
         )}
       </AnimatePresence>
       {/* )}  */}

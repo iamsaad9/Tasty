@@ -1,11 +1,15 @@
 import { Plus } from "lucide-react";
-import React from "react";
+import React, { use } from "react";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "@/lib/store/cartStore";
 const AddItemButton = () => {
   const router = useRouter();
+  const { toggleCart } = useCartStore();
   return (
     <button
-      onClick={() => router.push("/menu")}
+      onClick={() => {
+        router.push("/menu"), toggleCart();
+      }}
       className="rounded-lg relative w-36 h-10 cursor-pointer flex items-center border border-green-500 bg-green-500 group hover:bg-green-500 active:bg-green-500 active:border-green-500"
     >
       <span className="text-gray-200 font-semibold ml-8 transform group-hover:opacity-0 transition-all duration-300">

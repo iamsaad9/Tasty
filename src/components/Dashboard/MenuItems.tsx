@@ -42,7 +42,7 @@ interface MenuItemProps {
 
 function MenuItems({ showLoading }: MenuItemProps) {
   const [activeMenu, setActiveMenu] = useState<string>("Main");
-  const { selectedLocation } = useLocationStore();
+  const { selectedLocation, deliveryMode } = useLocationStore();
   const menuType = [
     {
       id: 1,
@@ -67,7 +67,8 @@ function MenuItems({ showLoading }: MenuItemProps) {
   const [menuItems, setMenuItems] = useState<MenuItems[]>([]);
 
   const filterMenuItems = (data: MenuItems[]) => {
-    console.log("Data in Filter Function: ", data);
+    if (deliveryMode !== "delivery") return data;
+
     return data.filter((item) => {
       return (
         item.delivery.isDeliverable === true &&
@@ -83,10 +84,11 @@ function MenuItems({ showLoading }: MenuItemProps) {
       const data = await res.json();
       const filteredMenuItems = filterMenuItems(data);
       setMenuItems(filteredMenuItems);
+
       showLoading(false);
     };
     fetchMenuItems();
-  }, [selectedLocation]);
+  }, [selectedLocation, deliveryMode]);
 
   const handleMenuClick = (id: number) => {
     console.log("Menu clicked:", id);

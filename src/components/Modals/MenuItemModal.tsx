@@ -86,7 +86,7 @@ function MenuItemModal() {
   const [quantity, setQuantity] = useState(1);
   const [selectedVariation, setSelectedVariation] = useState(0);
   const [instructions, setInstructions] = useState("");
-  const { selectedLocation, hasHydrated } = useLocationStore();
+  const { selectedLocation, deliveryMode } = useLocationStore();
   const [showAddressModal, setShowAddressModal] = useState(false);
   const session = useSession();
 
@@ -139,9 +139,10 @@ function MenuItemModal() {
         <ModalContent>
           <div className="flex flex-col md:flex-row h-[80vh]">
             {selectedItem?.id === undefined ||
-            selectedItem?.delivery_locations?.every(
+            (selectedItem?.delivery_locations?.every(
               (i) => i.name !== selectedLocation
-            ) ? (
+            ) &&
+              deliveryMode === "delivery") ? (
               <div className="w-full h-full flex justify-center items-center">
                 <img
                   src="/images/Miscellaneous/not_available.png"

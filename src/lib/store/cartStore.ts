@@ -6,6 +6,7 @@ interface CartItem {
   itemId?: number;
   itemName?: string;
   itemImage?: string;
+  itemBasePrice?: number;
   itemPrice?: number;
   itemQuantity?: number;
   itemVariation?: string;
@@ -17,6 +18,7 @@ interface CartState {
   isOpen: boolean;
   addItem: (item: CartItem) => void;
   removeItem: (index: number) => void; // index-based removal
+  updateItemQuantity: (index: number, quantity: number) => void; // Add this method
   clearCart: () => void;
   toggleCart: (state?: boolean) => void;
 }
@@ -53,6 +55,17 @@ export const useCartStore = create(
           const newItems = [...state.items];
           newItems.splice(index, 1);
           return { items: newItems };
+        }),
+      updateItemQuantity: (index, quantity) =>
+        set((state) => {
+          // Ensure quantity is at least 1
+          const newQuantity = Math.max(1, quantity);
+
+          const updatedItems = state.items.map((item, i) =>
+            i === index ? { ...item, itemQuantity: newQuantity } : item
+          );
+
+          return { items: updatedItems };
         }),
       clearCart: () => set({ items: [] }),
       toggleCart: (state) =>

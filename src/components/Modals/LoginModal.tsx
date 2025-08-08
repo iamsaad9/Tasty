@@ -23,6 +23,7 @@ export default function LoginModal({ open, onClose }: AuthModalProps) {
       classNames={{
         closeButton: "m-2 cursor-pointer",
       }}
+      placement="center"
       // Converted inline styles to Tailwind classes
       className=" bg-gradient-to-t from-white to-orange-50 rounded-[40px] p-5 max-w-sm border-[5px] border-white shadow-xl shadow-theme/50 m-5"
     >
@@ -41,7 +42,7 @@ export default function LoginModal({ open, onClose }: AuthModalProps) {
                 id="email"
                 placeholder="E-mail"
               />
-              
+
               <input
                 required
                 className="text-accent w-full bg-white border-none py-[15px] px-[20px] rounded-[20px] mt-[15px] shadow-md shadow-theme/50 border-x-2 border-transparent box-border placeholder-secondary focus:outline-none focus:border-x-2"
@@ -72,11 +73,19 @@ export default function LoginModal({ open, onClose }: AuthModalProps) {
                   Or Sign in with
                 </span>
                 <div className="social-accounts w-full flex justify-center gap-[15px] mt-[5px]">
-                  <button onClick={() => signIn("google",{callbackUrl:pathname})} className="social-button google bg-gradient-to-br from-black to-gray-600 border-[5px] border-white p-[5px] rounded-full w-[40px] aspect-square grid place-content-center shadow-md shadow-theme transition-all duration-200 ease-in-out cursor-pointer hover:scale-[1.2] active:scale-[0.9]">
-                    <FcGoogle/>
+                  <button
+                    onClick={() => signIn("google", { callbackUrl: pathname })}
+                    className="social-button google bg-gradient-to-br from-black to-gray-600 border-[5px] border-white p-[5px] rounded-full w-[40px] aspect-square grid place-content-center shadow-md shadow-theme transition-all duration-200 ease-in-out cursor-pointer hover:scale-[1.2] active:scale-[0.9]"
+                  >
+                    <FcGoogle />
                   </button>
-                  <button onClick={() => signIn("facebook",{callbackUrl:pathname})} className="social-button apple bg-gradient-to-br from-black to-gray-600 border-[5px] border-white p-[5px] rounded-full w-[40px] aspect-square grid place-content-center shadow-md shadow-theme transition-all duration-200 ease-in-out cursor-pointer hover:scale-[1.2] active:scale-[0.9]">
-                    <FaFacebook/>
+                  <button
+                    onClick={() =>
+                      signIn("facebook", { callbackUrl: pathname })
+                    }
+                    className="social-button apple bg-gradient-to-br from-black to-gray-600 border-[5px] border-white p-[5px] rounded-full w-[40px] aspect-square grid place-content-center shadow-md shadow-theme transition-all duration-200 ease-in-out cursor-pointer hover:scale-[1.2] active:scale-[0.9]"
+                  >
+                    <FaFacebook />
                   </button>
                   <button className="social-button twitter bg-gradient-to-br from-black to-gray-600 border-[5px] border-white p-[5px] rounded-full w-[40px] aspect-square grid place-content-center shadow-md shadow-theme transition-all duration-200 ease-in-out cursor-pointer hover:scale-[1.2] active:scale-[0.9]">
                     <svg
