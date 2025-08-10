@@ -2,33 +2,20 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
-import {
-  Menu,
-  X,
-  ChevronDown,
-  User as UserIconLucide,
-  LogOut,
-} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { Menu, X } from "lucide-react";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Avatar, Button } from "@heroui/react";
-import type { User as NextAuthUser } from "next-auth";
-import { MdLocationPin } from "react-icons/md";
-import AuthModal from "./Modals/LoginModal";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/react";
+import { Button } from "@heroui/react";
 import {
   MdSpaceDashboard,
   MdOutlineRestaurantMenu,
-  MdInfoOutline,
   MdAdd,
+  MdInfoOutline,
   MdPhone,
+  MdAdminPanelSettings,
+  MdLocationPin,
 } from "react-icons/md";
 import { useLocationStore } from "@/lib/store/locationStore";
 import LocationModal from "./Modals/LocationModal";
@@ -36,457 +23,150 @@ import { Truck, Store } from "lucide-react";
 import { addToast } from "@heroui/react";
 import { useCartStore } from "@/lib/store/cartStore";
 import CustomModal from "./Modals/Modal";
+import MenuLink from "@/../models/menuLinks";
+import { DesktopNavLinks } from "./DesktopNavLinks";
+import { MobileNavLinks } from "./MobileNavLinks";
 import LoadingScreen from "./Loading";
+
 // --- Type Definitions (Re-added as inline types) ---
-interface MenuItemType {
+// Icon mapping
+const Icons: Record<string, React.ComponentType<{ size?: number }>> = {
+  MdSpaceDashboard,
+  MdOutlineRestaurantMenu,
+  MdAdd,
+  MdInfoOutline,
+  MdPhone,
+  MdAdminPanelSettings,
+};
+
+interface MenuLinkType {
   id: string;
   name: string;
   href: string;
+  icon: string;
   order: number;
-  icon: React.ReactNode;
+  roles: string[];
 }
 
-interface MenuTabType {
-  id: string;
-  name: string;
-  order: number;
-}
-
-// Helper Types
 interface ProcessedMobileNavItem {
   href: string;
   title: string;
   icon: React.ReactNode;
 }
 
-type VisibleTabType = MenuTabType & { items: MenuItemType[] };
+// Mock function - replace with your actual API call
+// export async function getMenuLinksForRole(
+//   role: string
+// ): Promise<MenuLinkType[]> {
+//   // This should be your actual API call to fetch menu links
+//   // For now, returning the structure that matches your database
+//   const mockData: MenuLinkType[] = [
+//     {
+//       id: "dashboard",9
+//       name: "Dashboard",
+//       href: "/",
+//       icon: "MdSpaceDashboard",
+//       order: 1,
+//       roles: ["user", "admin"],
+//     },
+//     {
+//       id: "menu",
+//       name: "Menu",
+//       href: "/menu",
+//       icon: "MdOutlineRestaurantMenu",
+//       order: 2,
+//       roles: ["user", "admin"],
+//     },
+//     {
+//       id: "reservations",
+//       name: "Reservations",
+//       href: "/reservations",
+//       icon: "MdAdd",
+//       order: 4,
+//       roles: ["user", "admin"],
+//     },
+//     {
+//       id: "about",
+//       name: "About",
+//       href: "/about",
+//       icon: "MdInfoOutline",
+//       order: 5,
+//       roles: ["user", "admin"],
+//     },
+//     {
+//       id: "contact",
+//       name: "Contact",
+//       href: "/contact",
+//       icon: "MdPhone",
+//       order: 6,
+//       roles: ["user", "admin"],
+//     },
+//     {
+//       id: "admin",
+//       name: "Admin",
+//       href: "/admin",
+//       icon: "MdAdminPanelSettings",
+//       order: 7,
+//       roles: ["admin"],
+//     },
+//   ];
 
-// --- Mock Data for Static Links ---
-const staticMenuTabsData: VisibleTabType[] = [
-  {
-    id: "dashboard",
-    name: "Dashboard",
-    // icon: "Settings",
-    order: 1,
-    items: [
-      {
-        id: "dashboard",
-        name: "Dashboard",
-        href: "/",
-        icon: <MdSpaceDashboard size={20} />,
-        order: 1,
-      },
-    ],
-  },
-  {
-    id: "menu",
-    name: "Menu",
-    // icon: "Settings",
-    order: 2,
-    items: [
-      {
-        id: "menu",
-        name: "Menu",
-        href: "/menu",
-        icon: <MdOutlineRestaurantMenu size={20} />,
-        order: 1,
-      },
-    ],
-  },
-  {
-    id: "reservations",
-    name: "Reservations",
-    // icon: "HelpCircle",
-    order: 4,
-    items: [
-      {
-        id: "reservations",
-        name: "Reservations",
-        href: "/reservations",
-        icon: <MdAdd size={20} />,
-        order: 1,
-      },
-    ],
-  },
-  {
-    id: "about",
-    name: "About",
-    // icon: "HelpCircle",
-    order: 5,
-    items: [
-      {
-        id: "about",
-        name: "About",
-        href: "/about",
-        icon: <MdInfoOutline size={20} />,
-        order: 1,
-      },
-    ],
-  },
-  {
-    id: "contact",
-    name: "Contact",
-    // icon: "HelpCircle",
-    order: 5,
-    items: [
-      {
-        id: "contact",
-        name: "Contact",
-        href: "/contact",
-        icon: <MdPhone size={20} />,
-        order: 1,
-      },
-    ],
-  },
-];
+//   return mockData
+//     .filter((link) => !link.roles || link.roles.includes(role))
+//     .sort((a, b) => a.order - b.order)
+//     .map((link) => ({
+//       ...link,
+//       icon: link.icon, // Keep as string for now, we'll convert to component later
+//     }));
+// }\
 
-// --- Sub-component: UserProfile ---
-interface UserProfileProps {
-  user: NextAuthUser & { role: string };
+export async function getMenuLinksForRole(
+  role: string
+): Promise<MenuLinkType[]> {
+  try {
+    console.log("Fetching menu links for role:", role);
+    const response = await fetch(`/api/menu-links?role=${role}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch menu links");
+    }
+    const data = await response.json();
+    console.log("Fetched menu links:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching menu links:", error);
+    return [];
+  }
 }
-
-const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onMouseEnter={() => setIsOpen(!isOpen)}
-        className="h-full flex items-center space-x-2 focus:outline-none p-1 rounded-full hover:bg-accent cursor-pointer"
-        aria-label="User menu"
-      >
-        <Avatar
-          src={user?.image || undefined}
-          fallback={
-            user?.name?.charAt(0).toUpperCase() || (
-              <UserIconLucide className="h-5 w-5" />
-            )
-          }
-          size="sm"
-        />
-        <ChevronDown
-          className={`h-4 w-4 text-muted-foreground transition-transform ${
-            isOpen ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="card absolute right-0 mt-2 w-56 rounded-md shadow-lg ring-1 ring-border py-1 z-50"
-            onMouseLeave={() => setIsOpen(false)}
-          >
-            {user?.name && (
-              <div className="px-3 py-2 text-sm border-b border-border">
-                <div className="font-semibold truncate text-card-foreground">
-                  {user.name}
-                </div>
-                {user.email && (
-                  <div className="text-xs text-muted-foreground truncate">
-                    {user.email}
-                  </div>
-                )}
-                {user.role && (
-                  <div className="text-xs text-muted-foreground capitalize">
-                    {user.role.toLowerCase()}
-                  </div>
-                )}
-              </div>
-            )}
-            <div className="p-1 ">
-              {/* <ThemeSwitcher /> */}
-              <button
-                onClick={() => signOut({ callbackUrl: "/login" })}
-                className=" flex w-full items-center px-3 py-2 text-sm text-destructive hover:bg-destructive/10 cursor-pointer "
-              >
-                <LogOut className="h-4 w-4 mr-2" /> Sign Out
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-// --- Sub-component: DesktopNavLinks ---
-interface DesktopNavLinksProps {
-  visibleMenuTabs: VisibleTabType[];
-  pathname: string;
-  fixedHeader?: boolean;
-}
-
-const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
-  visibleMenuTabs,
-  fixedHeader,
-  pathname,
-}) => {
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const [showLogin, setShowLogin] = useState(false);
-  const isTabActive = (tab: VisibleTabType) =>
-    tab.items.some(
-      (item) =>
-        pathname === item.href ||
-        (item.href !== "/" && pathname.startsWith(item.href))
-    );
-  const { data: session } = useSession();
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        openDropdownId &&
-        dropdownRefs.current[openDropdownId] &&
-        !dropdownRefs.current[openDropdownId]?.contains(event.target as Node)
-      ) {
-        const clickedOnTrigger = Object.values(dropdownRefs.current).some(
-          (ref) =>
-            ref?.parentElement
-              ?.querySelector("button")
-              ?.contains(event.target as Node)
-        );
-        if (
-          !clickedOnTrigger ||
-          !dropdownRefs.current[openDropdownId]?.parentElement
-            ?.querySelector("button")
-            ?.contains(event.target as Node)
-        ) {
-          setOpenDropdownId(null);
-        }
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [openDropdownId]);
-
-  return (
-    <div className="hidden md:flex items-center gap-5">
-      {showLogin && (
-        <AuthModal open={showLogin} onClose={() => setShowLogin(false)} />
-      )}
-      {visibleMenuTabs.map((tab) => {
-        const active = isTabActive(tab);
-        const hasMultipleItems = tab.items.length > 1;
-        const singleItemHref = tab.items.length === 1 ? tab.items[0].href : "#";
-
-        return (
-          <div
-            key={tab.id}
-            className="relative"
-            ref={(el) => {
-              dropdownRefs.current[tab.id] = el;
-            }}
-          >
-            <Link
-              href={singleItemHref}
-              title={tab.name}
-              className={`flex items-center xl:px-3 py-2 rounded-lg transition-colors lg:text-base 2xl:text-lg
-                 ${
-                   active && fixedHeader
-                     ? "text-theme  lg:text-base 2xl:text-lg"
-                     : active
-                     ? "text-gray-300 lg:text-base 2xl:text-lg"
-                     : "text-white hover:text-gray-300"
-                 }`}
-            >
-              {/* {getIcon(tab.icon, "h-4 w-4 mr-1.5")} */}
-              {tab.name}
-            </Link>
-
-            {hasMultipleItems && (
-              <AnimatePresence>
-                {openDropdownId === tab.id && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    onMouseLeave={() => setOpenDropdownId(null)}
-                    className=" card absolute left-0 mt-2 origin-top-left rounded-md shadow-lg bg-card ring-1 ring-border py-1 z-50"
-                  >
-                    {tab.items.map((item) => (
-                      <Link
-                        key={item.id}
-                        href={item.href}
-                        title={item.name}
-                        className={`flex items-center  w-full px-3 py-2 text-sm 
-                          ${
-                            pathname === item.href ||
-                            (item.href !== "/" &&
-                              pathname.startsWith(item.href))
-                              ? "bg-accent text-accent-foreground font-medium"
-                              : "text-card-foreground hover:bg-accent/50"
-                          }`}
-                        onClick={() => setOpenDropdownId(null)}
-                      >
-                        {/* {getIcon(item.icon)} */}
-                        {item.name}
-                      </Link>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            )}
-          </div>
-        );
-      })}
-      {!session ? (
-        <Button
-          className="bg-theme text-background text-base 2xl:text-lg"
-          onPress={() => setShowLogin(true)}
-        >
-          Login
-        </Button>
-      ) : (
-        <Dropdown placement="bottom-end">
-          <DropdownTrigger>
-            <Avatar
-              isBordered
-              color="warning"
-              as="button"
-              className="transition-transform cursor-pointer"
-              src={session.user.image || ""}
-            />
-          </DropdownTrigger>
-          <DropdownMenu
-            aria-label="Profile Actions"
-            className="text-secondary"
-            variant="flat"
-          >
-            <DropdownItem key="profile" className="h-14 gap-2 ">
-              <p className="font-semibold text-accent text-md">
-                {session.user.name}
-              </p>
-              <p className="font-semibold text-xs">{session.user.email}</p>
-            </DropdownItem>
-            <DropdownItem
-              key="logout"
-              onPress={() => signOut()}
-              className="bg-red-300 text-accent hover:!bg-red-400 hover:!text-white transition-all duration-300"
-            >
-              Log Out
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-      )}
-    </div>
-  );
-};
-
-// --- Sub-component: MobileNavMenu ---
-interface MobileNavMenuProps {
-  navLinks: ProcessedMobileNavItem[];
-  user: NextAuthUser & { role: string };
-  onCloseMenu: () => void;
-}
-
-const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
-  navLinks,
-  onCloseMenu,
-}) => {
-  const pathname = usePathname();
-  const [showLogin, setShowLogin] = useState(false);
-  const { data: session } = useSession();
-  return (
-    <div className="px-2 pt-2 pb-4 space-y-1 bg-transparent">
-      {showLogin && (
-        <AuthModal open={showLogin} onClose={() => setShowLogin(false)} />
-      )}
-      {navLinks.map((link) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          className={`flex items-center px-3 gap-2 py-3 rounded-lg mx-2 text-white
-            ${
-              pathname === link.href ||
-              (link.href !== "/" && pathname.startsWith(link.href))
-                ? "bg-background/50 text-primary dark:bg-primary/20  text-md"
-                : "text-muted-foreground hover:bg-background/30 hover:text-foreground text-sm"
-            }`}
-          onClick={onCloseMenu}
-        >
-          {link.icon}
-          {link.title}
-        </Link>
-      ))}
-      <div className="border-t border-border mt-3 pt-3 ">
-        {!session ? (
-          <div className="flex items-center justify-center">
-            <Button
-              className="bg-theme text-background text-base 2xl:text-lg w-full sm:w-[50%]"
-              onPress={() => setShowLogin(true)}
-            >
-              Login
-            </Button>
-          </div>
-        ) : (
-          <div className="flex flex-col w-full">
-            <div className="flex items-center px-3 py-2 mb-2">
-              <Avatar
-                src={session.user.image || undefined}
-                fallback={
-                  session.user?.name?.charAt(0).toUpperCase() || (
-                    <UserIconLucide className="h-5 w-5" />
-                  )
-                }
-                size="md"
-                className="mr-3"
-              />
-              <div>
-                <div className="text-base font-semibold text-foreground">
-                  {session.user.name}
-                </div>
-                <div className="text-sm text-foreground/70">
-                  {session.user.email}
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                onCloseMenu();
-                signOut({ callbackUrl: "/" });
-              }}
-              className="flex items-center w-full px-3 py-2 mt-1 text-sm  bg-destructive/30 hover:bg-destructive/50 rounded-lg cursor-pointer"
-            >
-              <LogOut className="h-4 w-4 mr-2 " /> Sign Out
-            </button>
-          </div>
-        )}
-
-        {/* <ThemeSwitcher /> */}
-      </div>
-    </div>
-  );
-};
 
 // --- Main Nav Component ---
 export function Nav() {
   const pathname = usePathname();
-  const { selectedLocation, deliveryMode, setDeliveryMode, hasHydrated } =
+  const { selectedLocation, deliveryMode, setDeliveryMode } =
     useLocationStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const visibleMenuTabs = useMemo(
-    () => staticMenuTabsData.filter((tab) => tab.items && tab.items.length > 0),
-    []
-  );
+  const { data: session } = useSession();
+  const [menuLinks, setMenuLinks] = useState<MenuLinkType[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchMenuLinks() {
+      setLoading(true); // start loading
+      try {
+        const role = session?.user?.role || "user";
+        const links = await getMenuLinksForRole(role);
+        setMenuLinks(links);
+      } catch (error) {
+        // handle error if needed
+        setMenuLinks([]);
+      } finally {
+        setLoading(false); // stop loading
+      }
+    }
+
+    fetchMenuLinks();
+  }, [session?.user?.role]);
+
   const [showFixedNavbar, setShowFixedNavbar] = useState(false);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const [showLocationModal, setShowLocationModal] = useState(false);
@@ -508,19 +188,26 @@ export function Nav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Convert menu links to the format expected by components
+
+  const processedMenuLinks = useMemo(() => {
+    return menuLinks.map((link) => ({
+      ...link,
+      icon: Icons[link.icon] ? Icons[link.icon]({ size: 20 }) : null,
+    }));
+  }, [menuLinks]);
+
   const processedMobileNavLinks = useMemo(() => {
     const links: ProcessedMobileNavItem[] = [];
-    visibleMenuTabs.forEach((tab) => {
-      tab.items.forEach((item) => {
-        links.push({
-          href: item.href,
-          title: item.name,
-          icon: item.icon,
-        });
+    processedMenuLinks.forEach((link) => {
+      links.push({
+        href: link.href,
+        title: link.name,
+        icon: link.icon,
       });
     });
     return links;
-  }, [visibleMenuTabs]);
+  }, [processedMenuLinks]);
 
   const handleResetCart = (mode: "delivery" | "pickup") => {
     setDeliveryMode(mode);
@@ -567,21 +254,134 @@ export function Nav() {
 
   return (
     <>
-      <LocationModal
-        isOpen={showLocationModal}
-        onClose={() => setShowLocationModal(false)}
-        title="Select Your Location"
-        description="Please select your location"
-      />
-      <AnimatePresence>
-        {showFixedNavbar && (
-          <motion.div
-            initial={{ y: -80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }} // slightly slower, smoother
-            className="fixed py-2 top-0 w-full z-50 px-5  bg-[var(--secondary-theme)]"
-            style={{ willChange: "transform, opacity" }}
+      {loading ? (
+        <LoadingScreen showLoading={loading} />
+      ) : (
+        <>
+          <LocationModal
+            isOpen={showLocationModal}
+            onClose={() => setShowLocationModal(false)}
+            title="Select Your Location"
+            description="Please select your location"
+          />
+          <AnimatePresence>
+            {showFixedNavbar && (
+              <motion.div
+                initial={{ y: -80, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="fixed py-2 top-0 w-full z-50 px-5 bg-[var(--secondary-theme)]"
+                style={{ willChange: "transform, opacity" }}
+              >
+                <div className="flex justify-between py-2 items-center ">
+                  <Link
+                    href="/"
+                    className="text-base md:text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
+                  >
+                    Tasty
+                  </Link>
+
+                  {/* Desktop Nav */}
+                  <div className="hidden lg:flex gap-5 items-center">
+                    <DesktopNavLinks
+                      fixedHeader={showFixedNavbar}
+                      menuLinks={processedMenuLinks}
+                      pathname={pathname}
+                    />
+                    {deliveryMode === "delivery" && (
+                      <Button
+                        className="border-1 border-white bg-transparent"
+                        onPress={() => setShowLocationModal(true)}
+                      >
+                        <MdLocationPin size={20} color="white" />
+                        <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                          {selectedLocation || "Select"}
+                        </span>
+                      </Button>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <div
+                        onClick={() => handleDeliveryToggle("delivery")}
+                        className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                          deliveryMode === "delivery"
+                            ? "bg-theme text-white border-theme"
+                            : "bg-transparent text-white border-gray-300"
+                        }`}
+                      >
+                        <Truck className="w-4 h-4" />
+                      </div>
+                      <div
+                        onClick={() => handleDeliveryToggle("pickup")}
+                        className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                          deliveryMode === "pickup"
+                            ? "bg-theme text-white border-theme"
+                            : "bg-transparent text-white border-gray-300"
+                        }`}
+                      >
+                        <Store className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex lg:hidden gap-2 items-center">
+                    {deliveryMode === "delivery" && (
+                      <Button
+                        className="border-1 border-white bg-transparent"
+                        onPress={() => setShowLocationModal(true)}
+                      >
+                        <MdLocationPin size={20} color="white" />
+                        <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                          {selectedLocation || "Select"}
+                        </span>
+                      </Button>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <div
+                        onClick={() => handleDeliveryToggle("delivery")}
+                        className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                          deliveryMode === "delivery"
+                            ? "bg-theme text-white border-theme"
+                            : "bg-transparent text-white border-gray-300"
+                        }`}
+                      >
+                        <Truck className="w-4 h-4" />
+                      </div>
+                      <div
+                        onClick={() => handleDeliveryToggle("pickup")}
+                        className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                          deliveryMode === "pickup"
+                            ? "bg-theme text-white border-theme"
+                            : "bg-transparent text-white border-gray-300"
+                        }`}
+                      >
+                        <Store className="w-4 h-4" />
+                      </div>
+                    </div>
+
+                    {/* Mobile Hamburger */}
+                    <button
+                      onClick={toggleMobileMenu}
+                      className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground cursor-pointer"
+                      aria-expanded={isMobileMenuOpen}
+                      aria-label="Open main menu"
+                    >
+                      {isMobileMenuOpen ? (
+                        <X className="block h-6 w-6 text-white" />
+                      ) : (
+                        <Menu className="block h-6 w-6 text-white" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <nav
+            className={`absolute py-2 top-0 w-full z-50 px-5  ${
+              isMobileMenuOpen ? "bg-(--secondary-theme)" : "backdrop-blur-xs"
+            }`}
           >
             <div className="flex justify-between py-2 items-center ">
               <Link
@@ -595,7 +395,7 @@ export function Nav() {
               <div className="hidden lg:flex gap-5 items-center">
                 <DesktopNavLinks
                   fixedHeader={showFixedNavbar}
-                  visibleMenuTabs={visibleMenuTabs}
+                  menuLinks={processedMenuLinks}
                   pathname={pathname}
                 />
                 {deliveryMode === "delivery" && (
@@ -633,6 +433,7 @@ export function Nav() {
                 </div>
               </div>
 
+              {/* Mobile Hamburger */}
               <div className="flex lg:hidden gap-2 items-center">
                 {deliveryMode === "delivery" && (
                   <Button
@@ -668,7 +469,6 @@ export function Nav() {
                   </div>
                 </div>
 
-                {/* Mobile Hamburger */}
                 <button
                   onClick={toggleMobileMenu}
                   className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground cursor-pointer"
@@ -683,182 +483,74 @@ export function Nav() {
                 </button>
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <nav
-        className={`absolute py-2 top-0 w-full z-50 px-5  ${
-          isMobileMenuOpen ? "bg-(--secondary-theme)" : "backdrop-blur-xs"
-        }`}
-      >
-        <div className="flex justify-between py-2 items-center ">
-          <Link
-            href="/"
-            className="text-base md:text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
-          >
-            Tasty
-          </Link>
-
-          {/* Desktop Nav */}
-          <div className="hidden lg:flex gap-5 items-center">
-            <DesktopNavLinks
-              fixedHeader={showFixedNavbar}
-              visibleMenuTabs={visibleMenuTabs}
-              pathname={pathname}
-            />
-            {deliveryMode === "delivery" && (
-              <Button
-                className="border-1 border-white bg-transparent"
-                onPress={() => setShowLocationModal(true)}
+          </nav>
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className={`lg:hidden overflow-hidden border-t border-border ${"bg-(--secondary-theme)"} fixed top-16 left-0 right-0 z-40`}
+                ref={mobileMenuRef}
               >
-                <MdLocationPin size={20} color="white" />
-                <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                  {selectedLocation || "Select"}
-                </span>
-              </Button>
+                <MobileNavLinks
+                  navLinks={processedMobileNavLinks}
+                  user={{
+                    id: session?.user?.id || "1",
+                    name: session?.user?.name || "Guest",
+                    email: session?.user?.email || "",
+                    image: session?.user?.image || "",
+                    role: (session?.user as any)?.role || "user",
+                  }}
+                  onCloseMenu={toggleMobileMenu}
+                />
+              </motion.div>
             )}
-            <div className="flex items-center gap-2">
-              <div
-                onClick={() => handleDeliveryToggle("delivery")}
-                className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
-                  deliveryMode === "delivery"
-                    ? "bg-theme text-white border-theme"
-                    : "bg-transparent text-white border-gray-300"
-                }`}
+            {showModal.open && (
+              <CustomModal
+                onClose={() =>
+                  setShowModal({
+                    open: false,
+                    title: "",
+                    description: "",
+                    button: "",
+                    onclose: () => {},
+                  })
+                }
+                isOpen={showModal.open}
+                title={showModal.title}
+                description={showModal.description}
               >
-                <Truck className="w-4 h-4" />
-              </div>
-              <div
-                onClick={() => handleDeliveryToggle("pickup")}
-                className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
-                  deliveryMode === "pickup"
-                    ? "bg-theme text-white border-theme"
-                    : "bg-transparent text-white border-gray-300"
-                }`}
-              >
-                <Store className="w-4 h-4" />
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Hamburger */}
-          <div className="flex lg:hidden gap-2 items-center">
-            {deliveryMode === "delivery" && (
-              <Button
-                className="border-1 border-white bg-transparent"
-                onPress={() => setShowLocationModal(true)}
-              >
-                <MdLocationPin size={20} color="white" />
-                <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                  {selectedLocation || "Select"}
-                </span>
-              </Button>
+                <Button
+                  color="warning"
+                  variant="flat"
+                  onPress={() =>
+                    handleResetCart(
+                      deliveryMode === "delivery" ? "pickup" : "delivery"
+                    )
+                  }
+                >
+                  {showModal.button}
+                </Button>
+                <Button
+                  color="default"
+                  onPress={() =>
+                    setShowModal({
+                      open: false,
+                      title: "",
+                      description: "",
+                      button: "",
+                      onclose: () => {},
+                    })
+                  }
+                >
+                  Close
+                </Button>
+              </CustomModal>
             )}
-            <div className="flex items-center gap-2">
-              <div
-                onClick={() => handleDeliveryToggle("delivery")}
-                className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
-                  deliveryMode === "delivery"
-                    ? "bg-theme text-white border-theme"
-                    : "bg-transparent text-white border-gray-300"
-                }`}
-              >
-                <Truck className="w-4 h-4" />
-              </div>
-              <div
-                onClick={() => handleDeliveryToggle("pickup")}
-                className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
-                  deliveryMode === "pickup"
-                    ? "bg-theme text-white border-theme"
-                    : "bg-transparent text-white border-gray-300"
-                }`}
-              >
-                <Store className="w-4 h-4" />
-              </div>
-            </div>
-
-            <button
-              onClick={toggleMobileMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground cursor-pointer"
-              aria-expanded={isMobileMenuOpen}
-              aria-label="Open main menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="block h-6 w-6 text-white" />
-              ) : (
-                <Menu className="block h-6 w-6 text-white" />
-              )}
-            </button>
-          </div>
-        </div>
-      </nav>
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className={`lg:hidden overflow-hidden border-t border-border ${"bg-(--secondary-theme)"} fixed top-16 left-0 right-0 z-40`}
-            ref={mobileMenuRef}
-          >
-            <MobileNavMenu
-              navLinks={processedMobileNavLinks}
-              user={{
-                id: "1",
-                name: "Saad",
-                email: "saad@example.com",
-                image: "",
-                role: "admin",
-              }}
-              onCloseMenu={toggleMobileMenu}
-            />
-          </motion.div>
-        )}
-        {showModal.open && (
-          <CustomModal
-            onClose={() =>
-              setShowModal({
-                open: false,
-                title: "",
-                description: "",
-                button: "",
-                onclose: () => {},
-              })
-            }
-            isOpen={showModal.open}
-            title={showModal.title}
-            description={showModal.description}
-          >
-            <Button
-              color="warning"
-              variant="flat"
-              onPress={() =>
-                handleResetCart(
-                  deliveryMode === "delivery" ? "pickup" : "delivery"
-                )
-              }
-            >
-              {showModal.button}
-            </Button>
-            <Button
-              color="default"
-              onPress={() =>
-                setShowModal({
-                  open: false,
-                  title: "",
-                  description: "",
-                  button: "",
-                  onclose: () => {},
-                })
-              }
-            >
-              Close
-            </Button>
-          </CustomModal>
-        )}
-      </AnimatePresence>
-      {/* )}  */}
+          </AnimatePresence>
+        </>
+      )}
     </>
   );
 }

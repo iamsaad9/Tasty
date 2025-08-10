@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "ts-node scripts/seedMenuLinks.ts"
   },
   "dependencies": {
     "@heroui/react": "^2.8.0-beta.7",
@@ -14,6 +15,7 @@
     "@stripe/react-stripe-js": "^3.9.0",
     "@stripe/stripe-js": "^7.8.0",
     "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel-autoplay": "^8.6.0",
@@ -29,6 +31,7 @@
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^9.16.0",
     "react-scroll-parallax": "^3.4.5",
+    "recharts": "^3.1.2",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.0",
     "zod": "^3.25.74",
@@ -37,13 +40,15 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/next-auth": "^3.13.0",
-    "@types/node": "^20",
+    "@types/node": "^20.19.10",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "9.32.0",
     "eslint-config-next": "15.4.5",
     "tailwindcss": "^4.1.8",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "tw-animate-css": "^1.3.4",
-    "typescript": "^5"
+    "typescript": "^5.9.2"
   }
 }

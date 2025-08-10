@@ -1,11 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
-import React from "react";
+import React, { JSX } from "react";
 import FadeInSection from "@/components/ui/scrollAnimated";
 import SpecialsCorousel from "@/components/Menu/SpecialsCorousel";
 import MenuFilter from "@/components/Menu/MenuSearch";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@heroui/react";
+import { Card } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import {
   FaDrumstickBite,
@@ -22,8 +21,6 @@ import LoadingScreen from "@/components/Loading";
 import LocationModal from "@/components/Modals/LocationModal";
 import MenuItemModal from "@/components/Modals/MenuItemModal";
 import { MenuItemCard } from "@/components/MenuItemCard";
-import { usePathname } from "next/navigation";
-import { useSelectedLayoutSegments } from "next/navigation";
 import { useMenuItemModalStore } from "@/lib/store/menuItemModalStore";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -55,50 +52,32 @@ interface MenuItems {
   };
 }
 
+interface CategoryType {
+  id: number;
+  name: string;
+  active: boolean;
+  icon: string; // icon name as string, e.g. "FaDrumstickBite"
+}
+
 function MenuPage() {
   const { data: session } = useSession();
-  const menuType = [
-    {
-      id: 1,
-      name: "Main Course",
-      active: true,
-      icon: (
-        <FaDrumstickBite className="xl:text-2xl lg:text-xl text-lg text-background" />
-      ),
-    },
-    {
-      id: 2,
-      name: "Appetizer",
-      active: false,
-      icon: (
-        <FaBreadSlice className="xl:text-2xl lg:text-xl text-lg text-background" />
-      ),
-    },
-    {
-      id: 3,
-      name: "Fast Food",
-      active: false,
-      icon: (
-        <FaPizzaSlice className="xl:text-2xl lg:text-xl text-lg text-background" />
-      ),
-    },
-    {
-      id: 4,
-      name: "Dessert",
-      active: false,
-      icon: (
-        <FaIceCream className="xl:text-2xl lg:text-xl text-lg text-background" />
-      ),
-    },
-    {
-      id: 5,
-      name: "Drinks",
-      active: false,
-      icon: (
-        <FaWineGlassAlt className="xl:text-2xl lg:text-xl text-lg text-background" />
-      ),
-    },
-  ];
+  const iconMap: Record<string, JSX.Element> = {
+    FaDrumstickBite: (
+      <FaDrumstickBite className="xl:text-2xl lg:text-xl text-lg text-background" />
+    ),
+    FaBreadSlice: (
+      <FaBreadSlice className="xl:text-2xl lg:text-xl text-lg text-background" />
+    ),
+    FaPizzaSlice: (
+      <FaPizzaSlice className="xl:text-2xl lg:text-xl text-lg text-background" />
+    ),
+    FaIceCream: (
+      <FaIceCream className="xl:text-2xl lg:text-xl text-lg text-background" />
+    ),
+    FaWineGlassAlt: (
+      <FaWineGlassAlt className="xl:text-2xl lg:text-xl text-lg text-background" />
+    ),
+  };
   const { selectedLocation, hasHydrated, deliveryMode } = useLocationStore();
   const [searchText, setSearchText] = React.useState("");
   const [activeMenu, setActiveMenu] = React.useState("Main Course");
@@ -114,12 +93,32 @@ function MenuPage() {
   const [itemToCard, setItemToCart] = useState<number | null>();
   const [showItemModal, setShowItemModal] = useState(false);
   const [menuItemClicked, setMenuItemClicker] = useState<number>();
-  const segments = useSelectedLayoutSegments(); // e.g. ['item', 'cheeseburger']
-  const isItemModal = segments[0] === "item";
-  const itemName = segments[1]; // 'cheeseburger'
   const openModal = useMenuItemModalStore((state) => state.openModal);
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [menuType, setMenuType] = useState<CategoryType[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [catRes] = await Promise.all([fetch("/api/categories")]);
+
+        if (!catRes.ok) {
+          throw new Error("One or more requests failed");
+        }
+
+        const [catData] = await Promise.all([catRes.json()]);
+
+        setMenuType(catData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const filterMenuItems = (data: MenuItems[]) => {
     if (deliveryMode !== "delivery") return data;
@@ -159,7 +158,6 @@ function MenuPage() {
         is_deliverable: item?.delivery.isDeliverable,
         delivery_locations: item?.delivery.areas,
       };
-      console.log("Opening Modal with variations:", MenuItem.itemVariation);
       const path = "/menu";
       openModal(MenuItem, path);
     }
@@ -172,12 +170,10 @@ function MenuPage() {
   }, [hasHydrated, selectedLocation, deliveryMode]);
 
   const handleApplySearch = (searchText: { searchText: string }) => {
-    console.log("Search applied:", searchText);
     setSearchText(searchText.searchText);
   };
 
   const handleMenuClick = (name: string) => {
-    console.log("Menu clicked:", name);
     setActiveMenu(name);
   };
 
@@ -193,7 +189,6 @@ function MenuPage() {
       priceRange: filters.priceRange,
       selectedSort: filters.selectedSort || "default",
     }));
-    console.log("Applying filters:", filters);
   };
 
   const handleResetFilters = () => {
@@ -202,7 +197,6 @@ function MenuPage() {
       priceRange: [0, 100],
       selectedSort: "default",
     });
-    console.log("Filters reset");
   };
 
   const handleAddtoCart = (itemId: number) => {
@@ -211,7 +205,6 @@ function MenuPage() {
       return null;
     }
     setItemToCart(itemId);
-    console.log("Add item", itemId, " to cart");
   };
 
   const handleMenuItemClick = (itemId: number) => {
@@ -251,16 +244,16 @@ function MenuPage() {
               <Card
                 key={item.id}
                 className={`${
-                  activeMenu == item.name
+                  activeMenu === item.name
                     ? "bg-theme scale-105"
                     : "bg-foreground hover:bg-background/10"
-                } rounded-sm  cursor-pointer xl:px-5 px-2 transition duration-300`}
+                } rounded-sm cursor-pointer xl:px-5 px-2 transition duration-300`}
               >
                 <div
                   className="p-2 py-5 flex gap-2"
                   onClick={() => handleMenuClick(item.name)}
                 >
-                  {item.icon}
+                  {iconMap[item.icon as keyof typeof iconMap] ?? null}
                   <h2 className="xl:text-lg lg:text-md text-sm font-semibold text-accent">
                     {item.name}
                   </h2>
