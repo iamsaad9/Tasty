@@ -7,7 +7,7 @@ export interface IItemVariation {
 }
 
 export interface IDeliveryArea {
-  name: string;
+  area: string;
   postalCode: string;
   fee: number;
 }
@@ -37,7 +37,7 @@ export interface IMenuItem extends Document {
 }
 
 const DeliveryAreaSchema = new Schema<IDeliveryArea>({
-  name: { type: String, required: true },
+  area: { type: String, required: true },
   postalCode: { type: String, required: true },
   fee: { type: Number, required: true }
 });

@@ -11,15 +11,17 @@ import {
   CardBody,
   Chip,
   Divider,
+  Autocomplete,
+  AutocompleteItem,
+  addToast,
 } from "@heroui/react";
 import { z } from "zod";
-import { Plus, Trash2, Upload } from "lucide-react";
+import { Plus, Trash2, Upload, AlertCircle } from "lucide-react";
 
 // Types for your data
 interface CategoryType {
   id: number;
   name: string;
-  active: boolean;
   icon: React.ReactNode;
 }
 
@@ -40,7 +42,7 @@ interface ItemVariation {
 }
 
 interface DeliveryArea {
-  name: string;
+  area: string;
   postalCode: string;
   fee: number;
 }
@@ -52,6 +54,11 @@ interface Delivery {
   freeAbove: number;
   minOrder: number;
   areas: DeliveryArea[];
+}
+
+interface LocationsType {
+  area: string;
+  postalCode: string;
 }
 
 interface MenuItem {
@@ -89,7 +96,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
   );
   const [special, setSpecial] = useState(menuItemDataProp?.special || false);
   const [selectedDiets, setSelectedDiets] = useState<Set<string>>(
-    new Set(menuItemDataProp?.diet || ["all"])
+    new Set(menuItemDataProp?.diet?.map(String) || ["all"])
   );
 
   // Item Variations
@@ -119,32 +126,37 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
 
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [deliveryAreasError, setDeliveryAreasError] = useState("");
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [dietary, setDietary] = useState<DietaryOption[]>([]);
   const [variations, setVariations] = useState<VariationType[]>([]);
+  const [locations, setLocations] = useState<LocationsType[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [catRes, dietRes, varRes] = await Promise.all([
+        const [catRes, dietRes, varRes, locRes] = await Promise.all([
           fetch("/api/categories"),
           fetch("/api/dietaryPreference"),
           fetch("/api/variationType"),
+          fetch("/api/locations"),
         ]);
 
-        if (!catRes.ok || !dietRes.ok || !varRes.ok) {
+        if (!catRes.ok || !dietRes.ok || !varRes.ok || !locRes.ok) {
           throw new Error("One or more requests failed");
         }
 
-        const [catData, dietData, varData] = await Promise.all([
+        const [catData, dietData, varData, locData] = await Promise.all([
           catRes.json(),
           dietRes.json(),
           varRes.json(),
+          locRes.json(),
         ]);
 
         setCategories(catData);
         setDietary(dietData);
         setVariations(varData);
+        setLocations(locData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -153,7 +165,12 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     fetchData();
   }, []);
 
-  console.log("MenuItemForm Data:", categories);
+  // Clear delivery areas error when areas change
+  useEffect(() => {
+    if (deliveryAreasError && deliveryAreas.length > 0) {
+      setDeliveryAreasError("");
+    }
+  }, [deliveryAreas, deliveryAreasError]);
 
   // Validation schema
   const schema = z.object({
@@ -168,6 +185,48 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
       .min(10, "Description must be at least 10 characters"),
     image: z.string().url("Must be a valid URL"),
   });
+
+  // Validate delivery areas
+  const validateDeliveryAreas = (): boolean => {
+    if (!isDeliverable) {
+      setDeliveryAreasError("");
+      return true;
+    }
+
+    if (deliveryAreas.length === 0) {
+      setDeliveryAreasError(
+        "At least one delivery area is required when delivery is enabled"
+      );
+      return false;
+    }
+
+    // Check if all delivery areas have required fields
+    const hasIncompleteAreas = deliveryAreas.some(
+      (area) => !area.area || !area.postalCode
+    );
+
+    if (hasIncompleteAreas) {
+      setDeliveryAreasError("All delivery areas must have name");
+      return false;
+    }
+
+    setDeliveryAreasError("");
+    return true;
+  };
+
+  // Handle delivery toggle with automatic area addition
+  const handleDeliveryToggle = (value: boolean) => {
+    if (value && deliveryAreas.length === 0) {
+      // Automatically add one delivery area when enabling delivery
+      addDeliveryArea();
+    }
+    setIsDeliverable(value);
+
+    if (!value) {
+      // Clear error when delivery is disabled
+      setDeliveryAreasError("");
+    }
+  };
 
   // Add new variation
   const addVariation = () => {
@@ -198,13 +257,21 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
   const addDeliveryArea = () => {
     setDeliveryAreas([
       ...deliveryAreas,
-      { name: "", postalCode: "", fee: 2.0 },
+      { area: "", postalCode: "", fee: 2.0 },
     ]);
   };
 
-  // Remove delivery area
+  // Remove delivery area with validation
   const removeDeliveryArea = (index: number) => {
-    setDeliveryAreas(deliveryAreas.filter((_, i) => i !== index));
+    const updatedAreas = deliveryAreas.filter((_, i) => i !== index);
+    setDeliveryAreas(updatedAreas);
+
+    // If this was the last area and delivery is enabled, show error
+    if (updatedAreas.length === 0 && isDeliverable) {
+      setDeliveryAreasError(
+        "At least one delivery area is required when delivery is enabled"
+      );
+    }
   };
 
   // Update delivery area
@@ -213,13 +280,15 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     field: keyof DeliveryArea,
     value: string | number
   ) => {
+    console.log("Updating delivery area:", index, field, value);
     const updated = deliveryAreas.map((area, i) =>
       i === index ? { ...area, [field]: value } : area
     );
+    console.log("Updated delivery areas:", updated);
     setDeliveryAreas(updated);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate basic fields
     const result = schema.safeParse({
       title,
@@ -230,6 +299,8 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
       rating,
       popularity,
     });
+
+    let hasErrors = false;
 
     if (!result.success) {
       const fieldErrors = result.error.format();
@@ -249,6 +320,17 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
         }
       });
       setErrors(newErrors);
+      hasErrors = true;
+    } else {
+      setErrors({});
+    }
+
+    // Validate delivery areas
+    if (!validateDeliveryAreas()) {
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
       return;
     }
 
@@ -274,8 +356,37 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
       },
     };
 
-    console.log("✅ Submitted Menu Item Data:", formData);
-    // Here: send to API or state
+    try {
+      const res = await fetch("/api/menuItems", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        addToast({
+          title: "Failed",
+          description: "Failed to submit menu item",
+          color: "danger",
+        });
+        throw new Error(`Failed to submit: ${res.statusText}`);
+      }
+
+      addToast({
+        title: "Success",
+        description: "Menu Item added successfully",
+        color: "success",
+      });
+
+      // Optionally reset form
+      handleReset();
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description: "Error submitting menu item",
+        color: "danger",
+      });
+    }
   };
 
   const handleReset = () => {
@@ -296,6 +407,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     setMinOrder(7);
     setDeliveryAreas([]);
     setErrors({});
+    setDeliveryAreasError("");
     resetData();
     setShowModal(false);
   };
@@ -331,6 +443,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                 />
 
                 <Select
+                  className="text-accent"
                   classNames={{
                     listboxWrapper: "text-accent",
                   }}
@@ -407,15 +520,22 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                 {dietary.map((diet) => (
                   <Chip
                     key={diet.id}
-                    variant={selectedDiets.has(diet.id) ? "solid" : "bordered"}
-                    color={selectedDiets.has(diet.id) ? "primary" : "secondary"}
+                    variant={
+                      selectedDiets.has(String(diet.id)) ? "solid" : "bordered"
+                    }
+                    color={
+                      selectedDiets.has(String(diet.id))
+                        ? "primary"
+                        : "secondary"
+                    }
                     className="cursor-pointer"
                     onClick={() => {
                       const newSelection = new Set(selectedDiets);
-                      if (newSelection.has(diet.id)) {
-                        newSelection.delete(diet.id);
+                      const dietIdString = String(diet.id);
+                      if (newSelection.has(dietIdString)) {
+                        newSelection.delete(dietIdString);
                       } else {
-                        newSelection.add(diet.id);
+                        newSelection.add(dietIdString);
                       }
                       setSelectedDiets(newSelection);
                     }}
@@ -436,7 +556,6 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                 </h3>
                 <Button
                   size="sm"
-                  //   color="primary"
                   className="bg-theme"
                   startContent={<Plus size={16} />}
                   onPress={addVariation}
@@ -517,7 +636,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                 </h3>
                 <Switch
                   isSelected={isDeliverable}
-                  onValueChange={setIsDeliverable}
+                  onValueChange={handleDeliveryToggle}
                   color="success"
                 />
               </div>
@@ -565,11 +684,12 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                   <Divider />
 
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-medium">Delivery Areas</h4>
+                    <div className="flex justify-between items-center text-accent">
+                      <h4 className="font-medium">
+                        Delivery Areas <span className="text-red-500">*</span>
+                      </h4>
                       <Button
                         size="sm"
-                        // color="primary"
                         className="bg-theme"
                         startContent={<Plus size={16} />}
                         onPress={addDeliveryArea}
@@ -578,42 +698,64 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                       </Button>
                     </div>
 
+                    {/* Error message for delivery areas */}
+                    {deliveryAreasError && (
+                      <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+                        <AlertCircle size={16} className="flex-shrink-0" />
+                        <span>{deliveryAreasError}</span>
+                      </div>
+                    )}
+
+                    {/* Show message when no areas exist */}
+                    {deliveryAreas.length === 0 && !deliveryAreasError && (
+                      <div className="text-orange-600 text-sm bg-orange-50 p-3 rounded-lg text-center border border-orange-200">
+                        No delivery areas added yet. Click "Add Area" to add
+                        your first delivery area.
+                      </div>
+                    )}
+
                     {deliveryAreas.map((area, index) => (
                       <div
                         key={index}
                         className="flex items-end gap-3 p-3 bg-gray-50 rounded-lg"
                       >
-                        <Input
+                        <Autocomplete
+                          className="flex-1 text-accent"
+                          classNames={{
+                            listboxWrapper: "text-accent",
+                          }}
                           label="Area Name"
-                          placeholder="Garden East"
-                          value={area.name}
-                          onValueChange={(val) =>
-                            updateDeliveryArea(index, "name", val)
-                          }
-                          className="flex-1 text-accent"
-                        />
+                          placeholder="Select Area"
+                          onSelectionChange={(val) => {
+                            const areaName = (val as string)?.trim() || "";
+                            const selectedLocation = locations.find(
+                              (loc) => loc.area === areaName
+                            );
 
-                        <Input
-                          label="Postal Code"
-                          placeholder="74400"
-                          value={area.postalCode}
-                          onValueChange={(val) =>
-                            updateDeliveryArea(index, "postalCode", val)
-                          }
-                          className="flex-1 text-accent"
-                        />
-
-                        <NumberInput
-                          label="Fee ($)"
-                          value={area.fee}
-                          onValueChange={(val) =>
-                            updateDeliveryArea(index, "fee", val)
-                          }
-                          step={0.5}
-                          minValue={0}
-                          startContent="$"
-                          className="flex-1 text-accent"
-                        />
+                            // Update both area and postalCode at once
+                            setDeliveryAreas((prev) => {
+                              const updated = prev.map((area, i) =>
+                                i === index
+                                  ? {
+                                      ...area,
+                                      area: areaName,
+                                      postalCode: selectedLocation
+                                        ? selectedLocation.postalCode
+                                        : "",
+                                    }
+                                  : area
+                              );
+                              console.log("Updated delivery areas:", updated);
+                              return updated;
+                            });
+                          }}
+                        >
+                          {locations.map((item) => (
+                            <AutocompleteItem key={item.area}>
+                              {item.area}
+                            </AutocompleteItem>
+                          ))}
+                        </Autocomplete>
 
                         <Button
                           size="sm"

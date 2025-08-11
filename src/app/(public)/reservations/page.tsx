@@ -76,8 +76,14 @@ function ReservationPage() {
             color="warning"
             classNames={{ tabList: "bg-secondary/30" }}
           >
-            <Tab key="newReservation" title="New Reservation">
-              <Heading title="RESERVATIONS" subheading="New Reservation" />
+            <Tab
+              key="newReservation"
+              title={`${editReservation ? "Edit" : "New"} Reservation`}
+            >
+              <Heading
+                title="RESERVATIONS"
+                subheading={`${editReservation ? "Edit" : "New"} Reservation`}
+              />
 
               <FadeInSection>
                 <ReservationForm
