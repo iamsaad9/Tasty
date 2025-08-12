@@ -252,7 +252,13 @@ export default function LoginModal({ open, onClose }: AuthModalProps) {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? "Processing..." : isLogin ? "Log In" : "Sign Up"}
+                {isLoading ? (
+                  <span className="miniloader" />
+                ) : isLogin ? (
+                  "Log In"
+                ) : (
+                  "Sign Up"
+                )}
               </button>
             </form>
 

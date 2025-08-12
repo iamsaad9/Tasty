@@ -17,6 +17,7 @@ import {
 } from "@heroui/react";
 import { z } from "zod";
 import { Plus, Trash2, Upload, AlertCircle } from "lucide-react";
+import CustomModal from "@/components/Modals/Modal";
 
 // Types for your data
 interface CategoryType {
@@ -26,7 +27,7 @@ interface CategoryType {
 }
 
 interface DietaryOption {
-  id: string;
+  id: number;
   label: string;
 }
 
@@ -62,6 +63,7 @@ interface LocationsType {
 }
 
 interface MenuItem {
+  _id?: string;
   id: number;
   title: string;
   category: string;
@@ -124,14 +126,19 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     menuItemDataProp?.delivery?.areas || []
   );
 
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState({
+    open: false,
+    title: "",
+    description: "",
+    button: "",
+  });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [deliveryAreasError, setDeliveryAreasError] = useState("");
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [dietary, setDietary] = useState<DietaryOption[]>([]);
   const [variations, setVariations] = useState<VariationType[]>([]);
   const [locations, setLocations] = useState<LocationsType[]>([]);
-
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -165,6 +172,9 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    console.log("menuItemDataProp", menuItemDataProp);
+  }, [menuItemDataProp]);
   // Clear delivery areas error when areas change
   useEffect(() => {
     if (deliveryAreasError && deliveryAreas.length > 0) {
@@ -274,22 +284,23 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     }
   };
 
-  // Update delivery area
-  const updateDeliveryArea = (
-    index: number,
-    field: keyof DeliveryArea,
-    value: string | number
-  ) => {
-    console.log("Updating delivery area:", index, field, value);
-    const updated = deliveryAreas.map((area, i) =>
-      i === index ? { ...area, [field]: value } : area
-    );
-    console.log("Updated delivery areas:", updated);
-    setDeliveryAreas(updated);
-  };
+  // // Update delivery area
+  // const updateDeliveryArea = (
+  //   index: number,
+  //   field: keyof DeliveryArea,
+  //   value: string | number
+  // ) => {
+  //   console.log("Updating delivery area:", index, field, value);
+  //   const updated = deliveryAreas.map((area, i) =>
+  //     i === index ? { ...area, [field]: value } : area
+  //   );
+  //   console.log("Updated delivery areas:", updated);
+  //   setDeliveryAreas(updated);
+  // };
 
   const handleSubmit = async () => {
     // Validate basic fields
+
     const result = schema.safeParse({
       title,
       category,
@@ -356,17 +367,23 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
       },
     };
 
+    const isEditing = !!menuItemDataProp;
+
     try {
+      setSubmitting(true);
       const res = await fetch("/api/menuItems", {
-        method: "POST",
+        method: isEditing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          ...(isEditing ? { _id: menuItemDataProp._id } : {}), // send _id if updating
+        }),
       });
 
       if (!res.ok) {
         addToast({
           title: "Failed",
-          description: "Failed to submit menu item",
+          description: `Failed to ${isEditing ? "update" : "add"} menu item`,
           color: "danger",
         });
         throw new Error(`Failed to submit: ${res.statusText}`);
@@ -374,18 +391,20 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
 
       addToast({
         title: "Success",
-        description: "Menu Item added successfully",
+        description: `Menu Item ${
+          isEditing ? "updated" : "added"
+        } successfully`,
         color: "success",
       });
-
-      // Optionally reset form
+      setSubmitting(false);
       handleReset();
     } catch (error) {
       addToast({
         title: "Error",
-        description: "Error submitting menu item",
+        description: `Error ${isEditing ? "updating" : "adding"} menu item`,
         color: "danger",
       });
+      setSubmitting(false);
     }
   };
 
@@ -409,7 +428,12 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     setErrors({});
     setDeliveryAreasError("");
     resetData();
-    setShowModal(false);
+    setShowModal({
+      open: false,
+      title: "",
+      description: "",
+      button: "",
+    });
   };
 
   return (
@@ -726,6 +750,8 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                           }}
                           label="Area Name"
                           placeholder="Select Area"
+                          // ✅ Set the value from existing data
+                          selectedKey={area.area || ""}
                           onSelectionChange={(val) => {
                             const areaName = (val as string)?.trim() || "";
                             const selectedLocation = locations.find(
@@ -734,16 +760,16 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
 
                             // Update both area and postalCode at once
                             setDeliveryAreas((prev) => {
-                              const updated = prev.map((area, i) =>
+                              const updated = prev.map((item, i) =>
                                 i === index
                                   ? {
-                                      ...area,
+                                      ...item,
                                       area: areaName,
                                       postalCode: selectedLocation
                                         ? selectedLocation.postalCode
                                         : "",
                                     }
-                                  : area
+                                  : item
                               );
                               console.log("Updated delivery areas:", updated);
                               return updated;
@@ -780,7 +806,15 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
               <Button
                 color="danger"
                 variant="light"
-                onPress={() => setShowModal(true)}
+                onPress={() =>
+                  setShowModal({
+                    open: true,
+                    title: "Reset Editing?",
+                    description:
+                      "Are you sure you want to Reset editing? All changes will be lost.",
+                    button: "Reset",
+                  })
+                }
               >
                 Reset
               </Button>
@@ -789,9 +823,15 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
               onPress={handleSubmit}
               color="primary"
               size="lg"
-              className="px-8"
+              className="w-30"
             >
-              {menuItemDataProp ? "Update Item" : "Create Item"}
+              {submitting ? (
+                <span className="miniloader"></span>
+              ) : menuItemDataProp ? (
+                "Update Item"
+              ) : (
+                "Create Item"
+              )}
             </Button>
           </div>
         </div>
@@ -799,33 +839,36 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
 
       {/* Reset Confirmation Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <Card className="w-full max-w-md mx-4">
-            <CardBody className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold">Cancel Editing?</h3>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Are you sure you want to cancel editing? All changes will be
-                    lost.
-                  </p>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    color="default"
-                    variant="light"
-                    onPress={() => setShowModal(false)}
-                  >
-                    Continue Editing
-                  </Button>
-                  <Button color="danger" onPress={handleReset}>
-                    Reset All
-                  </Button>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </div>
+        <CustomModal
+          onClose={() =>
+            setShowModal({
+              open: false,
+              title: "",
+              description: "",
+              button: "",
+            })
+          }
+          isOpen={showModal.open}
+          title={showModal.title}
+          description={showModal.description}
+        >
+          <Button color="danger" variant="flat" onPress={handleReset}>
+            {showModal.button}
+          </Button>
+          <Button
+            color="default"
+            onPress={() =>
+              setShowModal({
+                open: false,
+                title: "",
+                description: "",
+                button: "",
+              })
+            }
+          >
+            Close
+          </Button>
+        </CustomModal>
       )}
     </div>
   );

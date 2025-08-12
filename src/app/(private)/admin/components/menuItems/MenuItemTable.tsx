@@ -21,7 +21,24 @@ import {
   Star,
   TrendingUp,
 } from "lucide-react";
-import clsx from "clsx";
+import { set } from "mongoose";
+import LoadingScreen from "@/components/Loading";
+
+interface CategoryType {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+}
+
+interface DietaryOption {
+  id: number;
+  label: string;
+}
+
+interface VariationType {
+  id: string;
+  label: string;
+}
 
 interface ItemVariation {
   type: string;
@@ -29,8 +46,13 @@ interface ItemVariation {
   price_multiplier: number;
 }
 
+interface LocationsType {
+  area: string;
+  postalCode: string;
+}
+
 interface DeliveryArea {
-  name: string;
+  area: string;
   postalCode: string;
   fee: number;
 }
@@ -71,93 +93,6 @@ interface MenuManagementProps {
 }
 
 // Mock data
-const initialMenuItems: MenuItem[] = [
-  {
-    id: 1,
-    title: "Grilled Chicken Caesar Salad",
-    category: "Main Course",
-    diet: ["halal", "all"],
-    price: 12.99,
-    description:
-      "Fresh romaine lettuce with grilled chicken, parmesan cheese, croutons and Caesar dressing.",
-    image:
-      "https://images.unsplash.com/photo-1546793665-c74683f339c1?q=80&w=687&auto=format&fit=crop",
-    popularity: 85,
-    rating: 4.5,
-    special: true,
-    itemVariation: [
-      { type: "size", name: "Regular", price_multiplier: 1.0 },
-      { type: "size", name: "Large", price_multiplier: 1.4 },
-    ],
-    delivery: {
-      isDeliverable: true,
-      estimatedTime: "25-40 mins",
-      baseFee: 2.5,
-      freeAbove: 20,
-      minOrder: 10,
-      areas: [
-        { name: "Garden East", postalCode: "74400", fee: 2.5 },
-        { name: "Liaquatabad", postalCode: "75900", fee: 3.0 },
-      ],
-    },
-  },
-  {
-    id: 2,
-    title: "Margherita Pizza",
-    category: "Main Course",
-    diet: ["veg", "all"],
-    price: 14.99,
-    description:
-      "Classic pizza with fresh mozzarella, tomato sauce, and basil leaves.",
-    image:
-      "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=687&auto=format&fit=crop",
-    popularity: 92,
-    rating: 4.7,
-    special: false,
-    itemVariation: [
-      { type: "size", name: "Small", price_multiplier: 0.8 },
-      { type: "size", name: "Medium", price_multiplier: 1.0 },
-      { type: "size", name: "Large", price_multiplier: 1.5 },
-    ],
-    delivery: {
-      isDeliverable: true,
-      estimatedTime: "30-45 mins",
-      baseFee: 2.0,
-      freeAbove: 18,
-      minOrder: 8,
-      areas: [
-        { name: "Garden East", postalCode: "74400", fee: 2.0 },
-        { name: "Liaquatabad", postalCode: "75900", fee: 2.5 },
-      ],
-    },
-  },
-  {
-    id: 3,
-    title: "Chocolate Lava Cake",
-    category: "Dessert",
-    diet: ["veg", "all"],
-    price: 8.99,
-    description:
-      "Warm chocolate cake with a molten chocolate center, served with vanilla ice cream.",
-    image:
-      "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?q=80&w=687&auto=format&fit=crop",
-    popularity: 78,
-    rating: 4.3,
-    special: true,
-    itemVariation: [
-      { type: "quantity", name: "Single", price_multiplier: 1.0 },
-      { type: "quantity", name: "Double", price_multiplier: 1.8 },
-    ],
-    delivery: {
-      isDeliverable: true,
-      estimatedTime: "15-25 mins",
-      baseFee: 2.0,
-      freeAbove: 15,
-      minOrder: 5,
-      areas: [{ name: "Garden East", postalCode: "74400", fee: 2.0 }],
-    },
-  },
-];
 
 const columns: Column[] = [
   { name: "IMAGE", uid: "image" },
@@ -191,7 +126,59 @@ export default function MenuItemTable({
     button: "",
     itemId: null as number | null,
   });
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<CategoryType[]>([]);
+  const [dietary, setDietary] = useState<DietaryOption[]>([]);
+  const [variations, setVariations] = useState<VariationType[]>([]);
+  const [locations, setLocations] = useState<LocationsType[]>([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [menuRes, catRes, dietRes, varRes, locRes] = await Promise.all([
+          fetch("/api/menuItems"),
+          fetch("/api/categories"),
+          fetch("/api/dietaryPreference"),
+          fetch("/api/variationType"),
+          fetch("/api/locations"),
+        ]);
+
+        if (
+          !menuRes.ok ||
+          !catRes.ok ||
+          !dietRes.ok ||
+          !varRes.ok ||
+          !locRes.ok
+        ) {
+          setLoading(false);
+          throw new Error("One or more requests failed");
+        }
+
+        const [menuData, catData, dietData, varData, locData] =
+          await Promise.all([
+            menuRes.json(),
+            catRes.json(),
+            dietRes.json(),
+            varRes.json(),
+            locRes.json(),
+          ]);
+
+        setMenuItems(menuData);
+        setCategories(catData);
+        setDietary(dietData);
+        setVariations(varData);
+        setLocations(locData);
+        setLoading(true);
+      } catch (error) {
+        setLoading(false);
+
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleEditMenuItem = (menuItem: MenuItem) => {
     console.log("Menu Item Data", menuItem);
@@ -274,8 +261,9 @@ export default function MenuItemTable({
 
         case "category":
           return (
-            <Chip size="sm" variant="flat" color="secondary">
-              {item.category}
+            <Chip size="sm" variant="flat" className="text-accent">
+              {categories.find((i) => i.id == item.category)?.name ??
+                item.category}
             </Chip>
           );
 
@@ -296,21 +284,18 @@ export default function MenuItemTable({
         case "diet":
           return (
             <div className="flex flex-wrap gap-1 max-w-24">
-              {item.diet.slice(0, 2).map((dietType) => (
+              {item.diet.slice(1).map((dietType) => (
                 <Chip
                   key={dietType}
                   size="sm"
                   variant="dot"
+                  className="text-accent"
                   color={getDietColor(dietType)}
                 >
-                  {dietType.toUpperCase()}
+                  {dietary.find((i) => i.id === parseInt(dietType))?.label ??
+                    "All"}
                 </Chip>
               ))}
-              {item.diet.length > 2 && (
-                <Chip size="sm" variant="flat" color="default">
-                  +{item.diet.length - 2}
-                </Chip>
-              )}
             </div>
           );
 
@@ -335,7 +320,7 @@ export default function MenuItemTable({
             <Chip
               size="sm"
               variant={item.special ? "solid" : "bordered"}
-              color={item.special ? "warning" : "default"}
+              color={item.special ? "warning" : "secondary"}
             >
               {item.special ? "Special" : "Regular"}
             </Chip>
@@ -424,89 +409,96 @@ export default function MenuItemTable({
   }, [menuItems.length, onAddNew]);
 
   return (
-    <div className="w-full">
-      <Card className="mx-auto p-4 my-5 rounded-lg shadow-md">
-        <Table
-          isCompact
-          removeWrapper
-          aria-label="Menu items management table"
-          bottomContentPlacement="outside"
-          className="overflow-auto text-accent"
-          sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
-          //   onSortChange={setSortDescriptor}
-        >
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn
-                key={column.uid}
-                allowsSorting={column.sortable}
-                className="bg-default-100"
-              >
-                {column.name}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody emptyContent={"No menu items found"} items={sortedItems}>
-            {(item) => (
-              <TableRow key={item.id}>
-                {columns.map((column) => {
-                  const content = renderCell(item, column.uid);
-                  return (
-                    <TableCell key={column.uid} className="py-4">
-                      {content}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+    <>
+      <div className="w-full">
+        <Card className="mx-auto p-4 my-5 rounded-lg shadow-md">
+          <Table
+            isCompact
+            removeWrapper
+            aria-label="Menu items management table"
+            bottomContentPlacement="outside"
+            className="overflow-auto text-accent"
+            sortDescriptor={sortDescriptor}
+            topContent={topContent}
+            topContentPlacement="outside"
 
-      {/* Delete Confirmation Modal */}
-      {showModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <Card className="w-full max-w-md mx-4 p-6">
-            <div className="flex flex-col gap-4">
-              <div>
-                <h3 className="text-lg font-semibold">{showModal.title}</h3>
-                <p className="text-sm text-default-500 mt-2">
-                  {showModal.description}
-                </p>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  color="default"
-                  variant="light"
-                  onPress={() =>
-                    setShowModal({
-                      open: false,
-                      title: "",
-                      description: "",
-                      button: "",
-                      itemId: null,
-                    })
-                  }
+            //   onSortChange={setSortDescriptor}
+          >
+            <TableHeader columns={columns}>
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  allowsSorting={column.sortable}
+                  className="bg-default-100"
                 >
-                  Cancel
-                </Button>
-                <Button
-                  color="danger"
-                  onPress={() => {
-                    if (showModal.itemId) {
-                      handleDeleteItem(showModal.itemId);
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody
+              loadingContent={<LoadingScreen showLoading={true} />}
+              emptyContent={"No menu items found"}
+              items={sortedItems}
+            >
+              {(item) => (
+                <TableRow key={item.id}>
+                  {columns.map((column) => {
+                    const content = renderCell(item, column.uid);
+                    return (
+                      <TableCell key={column.uid} className="py-4">
+                        {content}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </Card>
+
+        {/* Delete Confirmation Modal */}
+        {showModal.open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <Card className="w-full max-w-md mx-4 p-6">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold">{showModal.title}</h3>
+                  <p className="text-sm text-default-500 mt-2">
+                    {showModal.description}
+                  </p>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    color="default"
+                    variant="light"
+                    onPress={() =>
+                      setShowModal({
+                        open: false,
+                        title: "",
+                        description: "",
+                        button: "",
+                        itemId: null,
+                      })
                     }
-                  }}
-                >
-                  {showModal.button}
-                </Button>
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    color="danger"
+                    onPress={() => {
+                      if (showModal.itemId) {
+                        handleDeleteItem(showModal.itemId);
+                      }
+                    }}
+                  >
+                    {showModal.button}
+                  </Button>
+                </div>
               </div>
-            </div>
-          </Card>
-        </div>
-      )}
-    </div>
+            </Card>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

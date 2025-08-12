@@ -17,7 +17,7 @@ interface ItemVariation {
 }
 
 interface DeliveryArea {
-  name: string;
+  area: string;
   postalCode: string;
   fee: number;
 }
@@ -84,7 +84,9 @@ function ReservationPage() {
   return (
     <div>
       <PageBanner
-        title="Manage Menu Items"
+        title={`${
+          editMenuItem !== null ? "Edit Menu Item" : "Add New Menu Item"
+        }`}
         image="/images/PageBanners/reservationPage.jpg"
       />
 
