@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import ReservationForm from "@/components/Dashboard/LocationForm";
+import React, { useState, useEffect } from "react";
+import LocationForm from "@/components/Dashboard/LocationForm";
 import { CarouselDemo } from "@/components/Dashboard/BgCarousel";
 import About from "@/components/Dashboard/About";
 import MenuItems from "@/components/Dashboard/MenuItems";
@@ -9,6 +9,7 @@ import ImageGallery from "@/components/ImageGallery";
 import LoadingScreen from "@/components/Loading";
 function Home() {
   const [loading, setLoading] = useState<boolean>(false);
+
   return (
     <div>
       <LoadingScreen showLoading={loading} />
@@ -17,7 +18,7 @@ function Home() {
         <CarouselDemo />
       </div>
 
-      <ReservationForm />
+      <LocationForm />
 
       <div className="w-full flex justify-center bg-foreground">
         <About />

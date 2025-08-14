@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import React, { JSX } from "react";
 import FadeInSection from "@/components/ui/scrollAnimated";
 import SpecialsCorousel from "@/components/Menu/SpecialsCorousel";
@@ -23,44 +23,14 @@ import MenuItemModal from "@/components/Modals/MenuItemModal";
 import { MenuItemCard } from "@/components/MenuItemCard";
 import { useMenuItemModalStore } from "@/lib/store/menuItemModalStore";
 import { useSearchParams, useRouter } from "next/navigation";
-
-interface MenuItems {
-  id: number;
-  title: string;
-  category: string;
-  diet: string[];
-  price: number;
-  description: string;
-  image: string;
-  popularity: number;
-  rating: number;
-  special: boolean;
-  itemVariation: [{ type: string; name: string; price_multiplier: number }];
-  delivery: {
-    isDeliverable: boolean;
-    estimatedTime: string;
-    baseFee: number;
-    freeAbove: number;
-    minOrder: number;
-    areas: [
-      {
-        name: string;
-        postalCode: string;
-        fee: number;
-      }
-    ];
-  };
-}
-
-interface CategoryType {
-  id: number;
-  name: string;
-  active: boolean;
-  icon: string; // icon name as string, e.g. "FaDrumstickBite"
-}
+import { useCategories } from "@/app/hooks/useCategories";
+import { MenuItem } from "@/types";
+import { useMenuItems } from "@/app/hooks/useMenuItems";
 
 function MenuPage() {
   const { data: session } = useSession();
+  const { data: MenuItems, isPending } = useMenuItems();
+
   const iconMap: Record<string, JSX.Element> = {
     FaDrumstickBite: (
       <FaDrumstickBite className="xl:text-2xl lg:text-xl text-lg text-background" />
@@ -80,13 +50,13 @@ function MenuPage() {
   };
   const { selectedLocation, hasHydrated, deliveryMode } = useLocationStore();
   const [searchText, setSearchText] = React.useState("");
-  const [activeMenu, setActiveMenu] = React.useState("Main Course");
+  const [activeMenu, setActiveMenu] = React.useState("1");
   const [filters, setFilters] = React.useState({
     selectedDiet: ["all"],
     priceRange: [0, 100],
     selectedSort: "default",
   });
-  const [menuItems, setMenuItems] = useState<MenuItems[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -95,54 +65,26 @@ function MenuPage() {
   const [menuItemClicked, setMenuItemClicker] = useState<number>();
   const openModal = useMenuItemModalStore((state) => state.openModal);
   const searchParams = useSearchParams();
-  const [menuType, setMenuType] = useState<CategoryType[]>([]);
+  const { data: Categories } = useCategories();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [catRes] = await Promise.all([fetch("/api/categories")]);
-
-        if (!catRes.ok) {
-          throw new Error("One or more requests failed");
-        }
-
-        const [catData] = await Promise.all([catRes.json()]);
-
-        setMenuType(catData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const filterMenuItems = (data: MenuItems[]) => {
+  const filterMenuItems = (data: MenuItem[]) => {
     if (deliveryMode !== "delivery") return data;
 
     return data.filter((item) => {
       return (
         item.delivery.isDeliverable === true &&
-        item.delivery.areas.some((area) => area.name === selectedLocation)
+        item.delivery.areas.some((area) => area.area === selectedLocation)
       );
     });
   };
 
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      setLoading(true);
-      const res = await fetch("/Data/menu.json");
-      const data = await res.json();
-      const filteredMenuItems = filterMenuItems(data);
+    if (!isPending && MenuItems) {
+      console.log("MenuItems", MenuItems);
+      const filteredMenuItems = filterMenuItems(MenuItems);
       setMenuItems(filteredMenuItems);
-
-      setLoading(false);
-    };
-    fetchMenuItems();
-  }, [selectedLocation, deliveryMode]);
+    }
+  }, [isPending, MenuItems]);
 
   useEffect(() => {
     const itemId = searchParams.get("item");
@@ -173,8 +115,8 @@ function MenuPage() {
     setSearchText(searchText.searchText);
   };
 
-  const handleMenuClick = (name: string) => {
-    setActiveMenu(name);
+  const handleMenuClick = (id: string) => {
+    setActiveMenu(id);
   };
 
   const handleApplyFilters = (filters: {
@@ -207,11 +149,6 @@ function MenuPage() {
     setItemToCart(itemId);
   };
 
-  const handleMenuItemClick = (itemId: number) => {
-    setMenuItemClicker(itemId);
-    setShowItemModal(true);
-  };
-
   return (
     <div className="w-full">
       <MenuItemModal />
@@ -229,6 +166,7 @@ function MenuPage() {
       />
       <SpecialsCorousel
         addItemToCart={(itemId: number) => handleAddtoCart(itemId)}
+        menuItems={MenuItems}
       />
 
       <MenuFilter
@@ -240,18 +178,18 @@ function MenuPage() {
       <div className="w-full flex flex-col items-center justify-center  gap-5 p-2 md:p-5">
         <div className="lg:w-[90%] w-full sm:px-2 py-5">
           <FadeInSection className="w-full flex md:flex-row justify-center flex-col gap-3 sm:gap-5 xl:gap-10 p-2 ">
-            {menuType.map((item) => (
+            {Categories?.map((item) => (
               <Card
                 key={item.id}
                 className={`${
-                  activeMenu === item.name
+                  activeMenu === item.id
                     ? "bg-theme scale-105"
                     : "bg-foreground hover:bg-background/10"
                 } rounded-sm cursor-pointer xl:px-5 px-2 transition duration-300`}
               >
                 <div
                   className="p-2 py-5 flex gap-2"
-                  onClick={() => handleMenuClick(item.name)}
+                  onClick={() => handleMenuClick(item.id)}
                 >
                   {iconMap[item.icon as keyof typeof iconMap] ?? null}
                   <h2 className="xl:text-lg lg:text-md text-sm font-semibold text-accent">
@@ -264,7 +202,7 @@ function MenuPage() {
         </div>
 
         <FadeInSection className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-5">
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             {menuItems
               .filter(
                 (item) =>
@@ -290,7 +228,7 @@ function MenuPage() {
                   case "rating":
                     return b.rating - a.rating;
                   default:
-                    return 0; // No sorting applied
+                    return 0;
                 }
               })
               .map((item) => (

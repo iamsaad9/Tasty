@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocations } from "@/app/hooks/useLocation";
 import {
   Card,
   Form,
@@ -8,34 +9,21 @@ import {
 } from "@heroui/react";
 import { LocateIcon } from "lucide-react";
 import { useLocationStore } from "@/lib/store/locationStore";
-interface Location {
-  area: string;
-  postalCode: string;
-}
+import LoadingScreen from "../Loading";
 
 function LocationForm() {
   const [action, setAction] = useState<string>("");
-  const [locationData, setLocationData] = useState<Location[]>([]);
   const { selectedLocation, setSelectedLocation, hasHydrated, deliveryMode } =
     useLocationStore();
   const [currentLocation, setCurrentLocation] = useState<string>("");
+  const { data: locations } = useLocations();
 
   useEffect(() => {
     if (hasHydrated) {
-      console.log("Hydrated selectedLocation", selectedLocation);
       setCurrentLocation(selectedLocation);
     }
   }, [hasHydrated, selectedLocation]);
 
-  useEffect(() => {
-    const fetchLocation = async () => {
-      const res = await fetch("/Data/location.json");
-      const data = await res.json();
-      console.log("data", data);
-      setLocationData(data);
-    };
-    fetchLocation();
-  }, []);
   return (
     <div className="w-full bg-foreground">
       <Card className="bg-theme mx-auto  xl:w-[70vw] 2xl:w-[60vw] p-5 2xl:p-10 rounded-none">
@@ -72,7 +60,7 @@ function LocationForm() {
               setCurrentLocation(key ? String(key) : "")
             }
           >
-            {locationData.map((loc) => (
+            {(locations ?? []).map((loc) => (
               <AutocompleteItem
                 key={loc.area}
                 className="text-accent font-medium"

@@ -13,54 +13,31 @@ import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@heroui/react";
 import Heading from "../Heading";
 import { MenuItemCard } from "../MenuItemCard";
-interface MenuItems {
-  id: number;
-  title: string;
-  category: string;
-  diet: string[];
-  price: number;
-  description: string;
-  image: string;
-  popularity: number;
-  rating: number;
-  special: boolean;
-  itemVariation: [{ type: string; name: string; price_multiplier: number }];
-  delivery: {
-    isDeliverable: boolean;
-    estimatedTime: string;
-    baseFee: number;
-    freeAbove: number;
-    minOrder: number;
-    areas: [
-      {
-        name: string;
-        postalCode: string;
-        fee: number;
-      }
-    ];
-  };
-}
+import { MenuItem } from "@/types";
 
 interface SpecialsCorouselProps {
   showLogin?: () => void;
+  menuItems: MenuItem[] | undefined;
   addItemToCart: (itemId: number) => void;
 }
 
-function SpecialsCorousel({ showLogin, addItemToCart }: SpecialsCorouselProps) {
-  const [specialItems, setSpecialItems] = useState<MenuItems[]>([]);
+function SpecialsCorousel({
+  showLogin,
+  addItemToCart,
+  menuItems,
+}: SpecialsCorouselProps) {
+  const [specialItems, setSpecialItems] = useState<MenuItem[]>([]);
+
+  const filterSpecialMenuItems = (data: MenuItem[]) => {
+    return data.filter((item) => item.special === true).slice(0, 4);
+  };
 
   useEffect(() => {
-    const fetchSpecial = async () => {
-      const res = await fetch("/Data/menu.json");
-      const data = await res.json();
-      const specialItems = data.filter(
-        (item: MenuItems) => item.special === true
-      );
-      setSpecialItems(specialItems);
-    };
-
-    fetchSpecial();
-  }, []);
+    if (!menuItems) return;
+    console.log("MenuItems", menuItems);
+    const filteredMenuItems = filterSpecialMenuItems(menuItems);
+    setSpecialItems(filteredMenuItems);
+  }, [menuItems]);
 
   return (
     <div className="w-full flex flex-col items-center justify-center mb-10">
@@ -68,22 +45,20 @@ function SpecialsCorousel({ showLogin, addItemToCart }: SpecialsCorouselProps) {
 
       <FadeInSection className="w-full flex items-center justify-center">
         <Carousel
-          className="w-full relative flex flex-row justify-center items-center "
+          className="w-full relative"
           plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]}
           opts={{ loop: true }}
         >
-          {/* Left Button */}
-
           {/* Carousel Content */}
-          <CarouselContent className="w-full mx-20 -ml-1 ">
+          <CarouselContent className="w-full">
             {specialItems
               .filter((i) => i.special === true)
               .map((item) => (
                 <CarouselItem
                   key={item.id}
-                  className="pl-1 basis-1/1 sm:basis-1/3 lg:basis-1/5"
+                  className="basis-full xs:basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
                 >
-                  <div className="p-5 md:p-1 flex justify-center">
+                  <div className="p-2 sm:p-3 md:p-4 lg:p-5 flex justify-center">
                     <MenuItemCard
                       itemId={item.id}
                       itemName={item.title}
@@ -98,8 +73,6 @@ function SpecialsCorousel({ showLogin, addItemToCart }: SpecialsCorouselProps) {
                 </CarouselItem>
               ))}
           </CarouselContent>
-
-          {/* Right Button */}
         </Carousel>
       </FadeInSection>
     </div>

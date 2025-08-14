@@ -2,48 +2,30 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { Card } from "@heroui/react";
 import FadeInSection from "../ui/scrollAnimated";
+import { useMenuItems } from "@/app/hooks/useMenuItems";
+import { MenuItem } from "@/types";
 
 function Speacials() {
-  const specialItems = [
-    {
-      id: 1,
-      title: "Beef Steak",
-      description:
-        "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.",
-      imageUrl: "/images/Specials/specials1.jpg",
-      price: "10.00",
-    },
-    {
-      id: 2,
-      title: "Chopsuey",
-      description:
-        "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.",
-      imageUrl: "/images/Specials/specials2.jpg",
-      price: "10.00",
-    },
-    {
-      id: 3,
-      title: "Beef Ribs Steak",
-      description:
-        "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.",
-      imageUrl: "/images/Specials/specials3.jpg",
-      price: "10.00",
-    },
-    {
-      id: 4,
-      title: "Roasted Chicken",
-      description:
-        "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.",
-      imageUrl: "/images/Specials/specials4.jpg",
-      price: "10.00",
-    },
-  ];
+  const [specialItems, setSpecialItems] = useState<MenuItem[]>([]);
+  const { data: MenuItems, isPending } = useMenuItems();
 
   const [offsetY, setOffsetY] = useState(0);
+
+  const filterSpecialMenuItems = (data: MenuItem[]) => {
+    return data.filter((item) => item.special === true).slice(0, 4);
+  };
 
   const handleScroll = () => {
     setOffsetY(window.scrollY);
   };
+
+  useEffect(() => {
+    if (!isPending && MenuItems) {
+      console.log("MenuItems", MenuItems);
+      const filteredMenuItems = filterSpecialMenuItems(MenuItems);
+      setSpecialItems(filteredMenuItems);
+    }
+  }, [isPending, MenuItems]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -69,7 +51,6 @@ function Speacials() {
           {specialItems.map((items) => (
             <FadeInSection
               key={items.id}
-              delay={items.id * 0.1}
               className="flex flex-col-reverse md:grid md:grid-cols-2 w-full bg-foreground "
             >
               {/* Text Content */}
@@ -87,7 +68,7 @@ function Speacials() {
 
               {/* Image */}
               <img
-                src={items.imageUrl}
+                src={items.image}
                 alt={`Special Dish ${items.id}`}
                 className="h-80 w-full object-cover"
               />

@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { ShoppingCart } from "lucide-react";
 import { Badge, Avatar } from "@heroui/react";
 import CartButton from "./CartButton";
 import { useCartStore } from "@/lib/store/cartStore";

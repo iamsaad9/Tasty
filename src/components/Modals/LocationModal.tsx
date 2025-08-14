@@ -41,9 +41,8 @@ function LocationModal({
 
   useEffect(() => {
     const fetchLocation = async () => {
-      const res = await fetch("/Data/location.json");
+      const res = await fetch("/api/locations");
       const data = await res.json();
-      console.log("data", data);
       setLocationData(data);
     };
     fetchLocation();

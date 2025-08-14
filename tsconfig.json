@@ -18,7 +18,7 @@
     "jsx": "preserve",
     "incremental": true,
     "typeRoots": [
-      "./types",
+      "src/types",
       "./node_modules/@types"
     ],
     "plugins": [
@@ -37,7 +37,7 @@
     "**/*.tsx",
     "next-env.d.ts",
     "src/app/api/auth/[...nextauth]/route.ts",
-    "types/**/*.ts",
+    "src/types/**/*.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [

@@ -8,12 +8,6 @@ import {
   DrawerBody,
   DrawerFooter,
   Button,
-  useDisclosure,
-  Image,
-  Link,
-  Tooltip,
-  Avatar,
-  AvatarGroup,
 } from "@heroui/react";
 import { ArrowRight, Minus, Plus, Trash } from "lucide-react";
 import { useCartStore } from "@/lib/store/cartStore";
@@ -21,26 +15,9 @@ import CheckoutButton from "./ui/CheckoutButton";
 import AddItemButton from "./ui/AddItemButton";
 import CustomModal from "./Modals/Modal";
 
-interface CartItem {
-  itemId?: number;
-  itemName?: string;
-  itemImage?: string;
-  itemPrice?: number;
-  itemBasePrice?: number;
-  itemQuantity?: number;
-  itemVariation?: string;
-  itemInstructions?: string;
-}
-
 export default function CartDrawer() {
-  const {
-    isOpen,
-    items,
-    toggleCart,
-    removeItem,
-    clearCart,
-    updateItemQuantity,
-  } = useCartStore();
+  const { isOpen, items, toggleCart, removeItem, updateItemQuantity } =
+    useCartStore();
   const [showModal, setShowModal] = useState({
     open: false,
     title: "",

@@ -18,23 +18,11 @@ import {
 import { z } from "zod";
 import { Plus, Trash2, Upload, AlertCircle } from "lucide-react";
 import CustomModal from "@/components/Modals/Modal";
-
-// Types for your data
-interface CategoryType {
-  id: number;
-  name: string;
-  icon: React.ReactNode;
-}
-
-interface DietaryOption {
-  id: number;
-  label: string;
-}
-
-interface VariationType {
-  id: string;
-  label: string;
-}
+import { useCategories } from "@/app/hooks/useCategories";
+import LoadingScreen from "@/components/Loading";
+import { useDietaries } from "@/app/hooks/useDieties";
+import { useVariations } from "@/app/hooks/useVariations";
+import { useLocations } from "@/app/hooks/useLocation";
 
 interface ItemVariation {
   type: string;
@@ -55,11 +43,6 @@ interface Delivery {
   freeAbove: number;
   minOrder: number;
   areas: DeliveryArea[];
-}
-
-interface LocationsType {
-  area: string;
-  postalCode: string;
 }
 
 interface MenuItem {
@@ -134,55 +117,18 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [deliveryAreasError, setDeliveryAreasError] = useState("");
-  const [categories, setCategories] = useState<CategoryType[]>([]);
-  const [dietary, setDietary] = useState<DietaryOption[]>([]);
-  const [variations, setVariations] = useState<VariationType[]>([]);
-  const [locations, setLocations] = useState<LocationsType[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [catRes, dietRes, varRes, locRes] = await Promise.all([
-          fetch("/api/categories"),
-          fetch("/api/dietaryPreference"),
-          fetch("/api/variationType"),
-          fetch("/api/locations"),
-        ]);
+  const { data: Categories } = useCategories();
+  const { data: Dietaries } = useDietaries();
+  const { data: Variations } = useVariations();
+  const { data: locations } = useLocations();
 
-        if (!catRes.ok || !dietRes.ok || !varRes.ok || !locRes.ok) {
-          throw new Error("One or more requests failed");
-        }
-
-        const [catData, dietData, varData, locData] = await Promise.all([
-          catRes.json(),
-          dietRes.json(),
-          varRes.json(),
-          locRes.json(),
-        ]);
-
-        setCategories(catData);
-        setDietary(dietData);
-        setVariations(varData);
-        setLocations(locData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    console.log("menuItemDataProp", menuItemDataProp);
-  }, [menuItemDataProp]);
-  // Clear delivery areas error when areas change
   useEffect(() => {
     if (deliveryAreasError && deliveryAreas.length > 0) {
       setDeliveryAreasError("");
     }
   }, [deliveryAreas, deliveryAreasError]);
 
-  // Validation schema
   const schema = z.object({
     title: z
       .string()
@@ -436,6 +382,9 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     });
   };
 
+  if (!Categories || !Dietaries || !Variations || !locations) {
+    return <LoadingScreen showLoading={true} />;
+  }
   return (
     <div className="flex flex-col items-center min-h-screen p-4">
       <div className="w-full max-w-6xl bg-white shadow-lg rounded-lg overflow-hidden">
@@ -479,7 +428,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                   }
                   isRequired
                 >
-                  {categories.map((cat) => (
+                  {Categories.map((cat) => (
                     <SelectItem key={cat.id}>{cat.name}</SelectItem>
                   ))}
                 </Select>
@@ -541,7 +490,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                 Dietary Options
               </h3>
               <div className="flex flex-wrap gap-2">
-                {dietary.map((diet) => (
+                {Dietaries.map((diet) => (
                   <Chip
                     key={diet.id}
                     variant={
@@ -610,7 +559,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                       }
                       className="flex-1 text-accent"
                     >
-                      {variations.map((type) => (
+                      {Variations.map((type) => (
                         <SelectItem key={type.id}>{type.label}</SelectItem>
                       ))}
                     </Select>

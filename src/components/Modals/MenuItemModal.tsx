@@ -20,33 +20,6 @@ import { useCartStore } from "@/lib/store/cartStore";
 import { useLocationStore } from "@/lib/store/locationStore";
 import LocationModal from "./LocationModal";
 import { useSession } from "next-auth/react";
-interface MenuItems {
-  id: number;
-  title: string;
-  category: string;
-  diet: string[];
-  price: number;
-  description: string;
-  image: string;
-  popularity: number;
-  rating: number;
-  special: boolean;
-  itemVariation: [{ type: string; name: string; price_multiplier: number }];
-  delivery: {
-    isDeliverable: boolean;
-    estimatedTime: string;
-    baseFee: number;
-    freeAbove: number;
-    minOrder: number;
-    areas: [
-      {
-        name: string;
-        postalCode: string;
-        fee: number;
-      }
-    ];
-  };
-}
 
 interface CartItem {
   itemId: number | undefined;
@@ -110,7 +83,6 @@ function MenuItemModal() {
       itemInstructions: instructions,
     } as CartItem;
 
-    console.log("cartItem", cartItem);
     addItem(cartItem);
     closeModal();
     addToast({
@@ -123,7 +95,6 @@ function MenuItemModal() {
   const variation = selectedItem?.itemVariation?.[selectedVariation];
   const basePrice = selectedItem?.price ?? 0;
   const finalPrice = basePrice * (variation?.price_multiplier ?? 1) * quantity;
-  console.log("In Modal:", selectedItem);
   return (
     <>
       <Modal
@@ -140,7 +111,7 @@ function MenuItemModal() {
           <div className="flex flex-col md:flex-row h-[80vh]">
             {selectedItem?.id === undefined ||
             (selectedItem?.delivery_locations?.every(
-              (i) => i.name !== selectedLocation
+              (i) => i.area !== selectedLocation
             ) &&
               deliveryMode === "delivery") ? (
               <div className="w-full h-full flex justify-center items-center">

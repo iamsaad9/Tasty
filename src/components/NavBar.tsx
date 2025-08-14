@@ -54,83 +54,15 @@ interface ProcessedMobileNavItem {
   icon: React.ReactNode;
 }
 
-// Mock function - replace with your actual API call
-// export async function getMenuLinksForRole(
-//   role: string
-// ): Promise<MenuLinkType[]> {
-//   // This should be your actual API call to fetch menu links
-//   // For now, returning the structure that matches your database
-//   const mockData: MenuLinkType[] = [
-//     {
-//       id: "dashboard",9
-//       name: "Dashboard",
-//       href: "/",
-//       icon: "MdSpaceDashboard",
-//       order: 1,
-//       roles: ["user", "admin"],
-//     },
-//     {
-//       id: "menu",
-//       name: "Menu",
-//       href: "/menu",
-//       icon: "MdOutlineRestaurantMenu",
-//       order: 2,
-//       roles: ["user", "admin"],
-//     },
-//     {
-//       id: "reservations",
-//       name: "Reservations",
-//       href: "/reservations",
-//       icon: "MdAdd",
-//       order: 4,
-//       roles: ["user", "admin"],
-//     },
-//     {
-//       id: "about",
-//       name: "About",
-//       href: "/about",
-//       icon: "MdInfoOutline",
-//       order: 5,
-//       roles: ["user", "admin"],
-//     },
-//     {
-//       id: "contact",
-//       name: "Contact",
-//       href: "/contact",
-//       icon: "MdPhone",
-//       order: 6,
-//       roles: ["user", "admin"],
-//     },
-//     {
-//       id: "admin",
-//       name: "Admin",
-//       href: "/admin",
-//       icon: "MdAdminPanelSettings",
-//       order: 7,
-//       roles: ["admin"],
-//     },
-//   ];
-
-//   return mockData
-//     .filter((link) => !link.roles || link.roles.includes(role))
-//     .sort((a, b) => a.order - b.order)
-//     .map((link) => ({
-//       ...link,
-//       icon: link.icon, // Keep as string for now, we'll convert to component later
-//     }));
-// }\
-
 export async function getMenuLinksForRole(
   role: string
 ): Promise<MenuLinkType[]> {
   try {
-    console.log("Fetching menu links for role:", role);
     const response = await fetch(`/api/menu-links?role=${role}`);
     if (!response.ok) {
       throw new Error("Failed to fetch menu links");
     }
     const data = await response.json();
-    console.log("Fetched menu links:", data);
     return data;
   } catch (error) {
     console.error("Error fetching menu links:", error);
@@ -177,6 +109,7 @@ export function Nav() {
     button: "",
     onclose: () => {},
   });
+
   const { items, clearCart } = useCartStore();
 
   useEffect(() => {
@@ -191,10 +124,13 @@ export function Nav() {
   // Convert menu links to the format expected by components
 
   const processedMenuLinks = useMemo(() => {
-    return menuLinks.map((link) => ({
-      ...link,
-      icon: Icons[link.icon] ? Icons[link.icon]({ size: 20 }) : null,
-    }));
+    return menuLinks.map((link) => {
+      const IconComponent = Icons[link.icon];
+      return {
+        ...link,
+        icon: IconComponent ? <IconComponent size={20} /> : null,
+      };
+    });
   }, [menuLinks]);
 
   const processedMobileNavLinks = useMemo(() => {

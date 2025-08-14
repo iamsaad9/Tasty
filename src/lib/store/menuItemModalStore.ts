@@ -7,8 +7,8 @@ interface Variations {
   price_multiplier: number;
 }
 
-interface DeliveryAreas {
-  name: string;
+interface DeliveryArea {
+  area: string;
   postalCode: string;
   fee: number;
 }
@@ -21,7 +21,7 @@ interface MenuItem {
   description: string | undefined;
   itemVariation: Variations[] | undefined;
   is_deliverable: boolean | undefined;
-  delivery_locations: DeliveryAreas[] | undefined;
+  delivery_locations: DeliveryArea[] | undefined;
 }
 
 interface MenuItemModalStore {

@@ -23,7 +23,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <NavBar />
       <CartIcon />
       <CartDrawer />
-      {children} <Footer />
+      {children}
+      <Footer />
       <MenuItemModal />
     </div>
   );
