@@ -1,63 +1,67 @@
-import React, { useState } from "react";
-import FadeInSection from "@/components/ui/scrollAnimated";
+import React, { useEffect, useState } from "react";
+import {
+  Calendar,
+  Clock,
+  Users,
+  Mail,
+  Phone,
+  User,
+  MessageSquare,
+  Utensils,
+} from "lucide-react";
 import {
   Input,
   Button,
   DatePicker,
-  NumberInput,
   Select,
   SelectItem,
   Textarea,
-  TimeInput,
+  Autocomplete,
+  AutocompleteItem,
+  Card,
+  CardBody,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  addToast,
 } from "@heroui/react";
-import {
-  CalendarDate,
-  CalendarDateTime,
-  parseTime,
-  Time,
-  toTime,
-} from "@internationalized/date";
-import CustomModal from "../Modals/Modal";
-import { z } from "zod";
-import { getLocalTimeZone, today } from "@internationalized/date";
-
-interface Reservation {
-  id: number;
-  name: string;
-  date: string;
-  phone?: string;
-  time: string;
-  guests: number;
-  email: string;
-  status: string;
-  occasion: string;
-  requests?: string;
-}
+import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
+import { Reservation } from "@/types";
+import { useOccasionType } from "@/app/hooks/useOccasionType";
+import LoadingScreen from "../Loading";
+import { useSession } from "next-auth/react";
 
 interface ReservationDataProps {
-  reservationDataProp: Reservation | null;
-  resetData: () => void;
+  reservationDataProp?: Reservation | null;
+  resetData?: () => void;
+  onSubmit?: (data: Reservation) => void;
 }
 
 function ReservationForm({
-  reservationDataProp,
+  reservationDataProp = null,
   resetData,
+  onSubmit,
 }: ReservationDataProps) {
-  const [reservationData, setReservationData] = useState(reservationDataProp);
-  const occasionType = [
-    { id: 0, label: "Casual" },
-    { id: 1, label: "Birthday" },
-    { id: 2, label: "Anniversary" },
-    { id: 3, label: "Wedding" },
-    { id: 4, label: "Business" },
-    { id: 5, label: "Solo Meal" },
-    { id: 6, label: "Other" },
-  ];
-  const [name, setName] = useState(reservationDataProp?.name || "");
-  const [email, setEmail] = useState(reservationDataProp?.email || "");
-  const [phone, setPhone] = useState(reservationDataProp?.phone || "");
-  const [date, setDate] = useState<CalendarDate | null>(
-    reservationDataProp
+  const {
+    isOpen: isResetModalOpen,
+    onOpen: onResetModalOpen,
+    onClose: onResetModalClose,
+  } = useDisclosure();
+
+  const guestOptions = Array.from({ length: 20 }, (_, i) => ({
+    key: (i + 1).toString(),
+    label: `${i + 1} ${i === 0 ? "Guest" : "Guests"}`,
+  }));
+
+  // Form state
+  const [formData, setFormData] = useState({
+    name: reservationDataProp?.name || "",
+    email: reservationDataProp?.email || "",
+    phone: reservationDataProp?.phone || "",
+    date: reservationDataProp?.date
       ? (() => {
           const d = new Date(reservationDataProp.date);
           return new CalendarDate(
@@ -66,389 +70,575 @@ function ReservationForm({
             d.getDate()
           );
         })()
-      : today(getLocalTimeZone()).add({ days: 3 })
-  );
-  const [time, setTime] = useState<Time | null>(
-    reservationDataProp?.time
-      ? (() => {
-          const [hours, minutes] = reservationDataProp.time
-            .split(":")
-            .map(Number);
-          return new Time(hours, minutes);
-        })()
-      : null
-  );
-  const [guests, setGuests] = useState(reservationDataProp?.guests || 1);
-  const [occasion, setOccasion] = useState<number | null>(
-    reservationDataProp?.occasion
-      ? occasionType.find((o) => o.label === reservationDataProp.occasion)
-          ?.id ?? null
-      : null
-  );
-  const [requests, setRequests] = useState(reservationDataProp?.requests || "");
-  const [showModal, setShowModal] = useState(false);
-
-  const schema = z.object({
-    name: z
-      .string({ required_error: "Name is required" })
-      .min(1, "Name is required")
-      .regex(/^[A-Za-z]+(?: [A-Za-z]+)+$/, "Please enter full name"),
-
-    email: z
-      .string()
-      .min(1, "Email is required")
-      .email("Invalid email address"),
-
-    phone: z
-      .string()
-      .min(1, "Phone number is required")
-      .regex(/^03[0-9]{2}[-]?[0-9]{7}$/, "Invalid format eg: 03xx-xxxxxxx"),
-
-    person: z
-      .number()
-      .min(1, "Number of Person must be at least 1")
-      .max(50, "Maximum 50 person allowed per Reservation"),
-
-    occasion: z
-      .number({
-        required_error: "Please select an occasion",
-        invalid_type_error: "Please select an occasion",
-      })
-      .refine((val) => !isNaN(val) && [0, 1, 2, 3, 4, 5, 6].includes(val), {
-        message: "Please select a valid occasion",
-      }),
-
-    time: z
-      .object({
-        hour: z.number(),
-        minute: z.number(),
-      })
-      .refine((val) => val.hour >= 8 && val.hour < 24, {
-        message: "Reservation time must be between 8:00 and 23:59",
-      }),
+      : null,
+    time: reservationDataProp?.time || "",
+    guests: reservationDataProp?.guests?.toString() || "2",
+    occasion: reservationDataProp?.occasion || 0,
+    requests: reservationDataProp?.requests || "",
   });
+  const { data: session } = useSession();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const { data: occasionTypes } = useOccasionType();
+  // Get today's date
+  const minDate = today(getLocalTimeZone()).add({ days: 1 });
+  const maxDate = today(getLocalTimeZone()).add({ days: 30 });
 
-  const [errors, setErrors] = useState<{
-    name?: string;
-    email?: string;
-    phone?: string;
-    person?: string;
-    occasion?: string;
-    time?: string;
-  }>({});
-
-  type FieldType = "name" | "email" | "phone" | "person" | "occasion";
-  const validateField = (field: FieldType, value: string | number) => {
-    const data = { name, email, phone, person: guests };
-    if (field === "person") {
-      data.person = typeof value === "number" ? value : Number(value);
-    } else {
-      (data as any)[field] = value;
+  useEffect(() => {
+    if (reservationDataProp) {
+      console.log("reservationDataProp", reservationDataProp);
     }
-    const result = schema.safeParse(data);
+  }, []);
 
-    if (!result.success) {
-      const fieldErrors = result.error.format();
-      setErrors((prev) => ({
+  useEffect(() => {
+    if (session?.user?.email) {
+      setFormData((prev) => ({
         ...prev,
-        [field]: fieldErrors[field]?._errors?.[0],
+        email: session.user.email,
       }));
-    } else {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+  }, [session]);
+
+  // Generate time slots
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 8; hour <= 23; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const timeString = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        const displayTime = new Date(
+          `2000-01-01T${timeString}`
+        ).toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+        slots.push({ key: timeString, label: displayTime });
+      }
+    }
+    return slots;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const timeSlots = generateTimeSlots();
 
-    // Validate all fields before proceeding
-    const result = schema.safeParse({
-      name,
-      email,
-      phone,
-      person: guests,
-      occasion,
-      time, // this must be an object like { hour: number, minute: number }
-    });
+  // Validation functions
+  const validateField = (
+    name: string,
+    value: string | CalendarDate | Number | null
+  ) => {
+    const newErrors = { ...errors };
 
-    if (!result.success) {
-      const fieldErrors = result.error.format();
-      setErrors({
-        name: fieldErrors.name?._errors[0],
-        email: fieldErrors.email?._errors[0],
-        phone: fieldErrors.phone?._errors[0],
-        person: fieldErrors.person?._errors[0],
-        occasion: fieldErrors.occasion?._errors[0],
-        time: fieldErrors.time?._errors[0],
-      });
-      return;
+    switch (name) {
+      case "name":
+        if (!value || typeof value !== "string" || value.trim().length < 2) {
+          newErrors.name =
+            "Please enter your full name (at least 2 characters)";
+        } else if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+          newErrors.name = "Name should only contain letters and spaces";
+        } else {
+          delete newErrors.name;
+        }
+        break;
+
+      case "email":
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (
+          !value ||
+          typeof value !== "string" ||
+          !emailRegex.test(value.trim())
+        ) {
+          newErrors.email = "Please enter a valid email address";
+        } else {
+          delete newErrors.email;
+        }
+        break;
+
+      case "phone":
+        const phoneRegex = /^(\+92|0)?3[0-9]{2}[-\s]?[0-9]{7}$/;
+        if (
+          !value ||
+          typeof value !== "string" ||
+          !phoneRegex.test(value.trim())
+        ) {
+          newErrors.phone =
+            "Please enter a valid Pakistani phone number (e.g., 03XX-XXXXXXX)";
+        } else {
+          delete newErrors.phone;
+        }
+        break;
+
+      case "date":
+        if (!value) {
+          newErrors.date = "Please select a reservation date";
+        } else {
+          delete newErrors.date;
+        }
+        break;
+
+      case "time":
+        if (!value || typeof value !== "string") {
+          newErrors.time = "Please select a reservation time";
+        } else {
+          delete newErrors.time;
+        }
+        break;
+
+      case "guests":
+        const guestCount = typeof value === "string" ? parseInt(value) : 0;
+        if (!guestCount || guestCount < 1 || guestCount > 20) {
+          newErrors.guests = "Please select between 1 and 20 guests";
+        } else {
+          delete newErrors.guests;
+        }
+        break;
+
+      case "occasion":
+        if (!value || typeof value === "string") {
+          newErrors.occasion = "Please select an occasion type";
+        } else {
+          delete newErrors.occasion;
+        }
+        break;
     }
 
-    const formData: Reservation = {
-      id: Math.random(),
-      name,
-      email,
-      phone,
-      guests,
-      date: date ? date.toDate("CST").toISOString().split("T")[0] : "",
-      time: time
-        ? `${time.hour.toString().padStart(2, "0")}:${time.minute
-            .toString()
-            .padStart(2, "0")}`
-        : "",
-      occasion: occasionType.find((o) => o.id === occasion)?.label ?? "",
-      status: "pending",
-      requests,
-    };
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    console.log("✅ Submitted Data:", formData);
-    // Here: send to API or state
+  const handleInputChange = (
+    name: string,
+    value: string | CalendarDate | null | Number
+  ) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value);
+  };
+
+  const validateAllFields = () => {
+    const fields = [
+      "name",
+      "email",
+      "phone",
+      "date",
+      "time",
+      "guests",
+      "occasion",
+    ];
+    let isValid = true;
+
+    fields.forEach((field) => {
+      if (
+        !validateField(field, formData[field as keyof typeof formData] as any)
+      ) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateAllFields()) {
+      return;
+    }
+    console.log("Submit clicked");
+
+    setIsSubmitting(true);
+
+    const reservation: Reservation = {
+      id: reservationDataProp?.id || Math.floor(Math.random() * 10000),
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      date: formData.date ? formData.date.toString() : "",
+      time: formData.time,
+      guests: parseInt(formData.guests),
+      occasion: formData.occasion,
+      requests: formData.requests,
+      status: "pending",
+    };
+    console.log("reservation", reservation);
+    const isEditing = !!reservationDataProp;
+
+    try {
+      setIsSubmitting(true);
+      const res = await fetch("/api/reservations", {
+        method: isEditing ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...reservation,
+          ...(isEditing ? { _id: reservationDataProp.id } : {}), // send _id if updating
+        }),
+      });
+
+      if (!res.ok) {
+        addToast({
+          title: "Failed",
+          description: `Failed to ${isEditing ? "update" : "add"} reservation`,
+          color: "danger",
+        });
+        throw new Error(`Failed to submit: ${res.statusText}`);
+      }
+
+      addToast({
+        title: "Success",
+        description: `Reservation ${
+          isEditing ? "updated" : "added"
+        } successfully`,
+        color: "success",
+      });
+      setIsSubmitting(false);
+      handleReset();
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description: `Error ${isEditing ? "updating" : "adding"} reservation`,
+        color: "danger",
+      });
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
-    setReservationData(null);
-    setName("");
-    setEmail("");
-    setPhone("");
-    setDate(null);
-    setTime(null);
-    setGuests(1);
-    setOccasion(null);
-    setRequests("");
-    resetData();
-    setShowModal(false);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      date: null,
+      time: "",
+      guests: "2",
+      occasion: 0,
+      requests: "",
+    });
+    setErrors({});
+    setShowSuccessMessage(false);
+    onResetModalClose();
+    if (resetData) resetData();
   };
+
+  if (!occasionTypes) {
+    return <LoadingScreen showLoading={true} />;
+  }
+
   return (
-    <div className="flex flex-col items-center ">
-      <FadeInSection className="w-full flex justify-center ">
-        <div className="flex flex-col md:flex-row justify-around  h-auto w-full lg:w-[80%] xl:w-[60%] my-10 bg-foreground shadow-md  rounded-lg">
-          {/* Left Image */}
-          <div className="  md:w-[30%] overflow-hidden">
-            <img
-              src="/images/BgCarousel/bg_1.jpg" // Replace with your image path
-              alt="Bar Interior"
-              className="object-cover w-full h-full"
-            />
-          </div>
-
-          {/* Right Form */}
-          <div className="p-5 md:p-8 flex flex-col justify-around flex-1">
-            <form
-              className="grid grid-cols-1 items-start sm:grid-cols-2 gap-5 h-full p-5"
-              onSubmit={handleSubmit}
-            >
-              {/* Name */}
-              <div>
-                <Input
-                  isClearable
-                  placeholder="eg: John Doe"
-                  label="Full Name"
-                  labelPlacement="outside-top"
-                  classNames={{
-                    clearButton: "text-secondary",
-                    label: "text-accent font-medium",
-                    input: "text-accent",
-                  }}
-                  value={name}
-                  onValueChange={(val) => {
-                    setName(val);
-                    validateField("name", val);
-                  }}
-                  errorMessage={errors.name}
-                  isInvalid={!!errors.name}
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <Input
-                  isClearable
-                  placeholder="eg: abc@gmail.com"
-                  label="Email"
-                  labelPlacement="outside-top"
-                  classNames={{
-                    clearButton: "text-secondary",
-                    label: "text-accent font-medium",
-                    input: "text-accent",
-                  }}
-                  value={email}
-                  onValueChange={(val) => {
-                    setEmail(val);
-                    validateField("email", val);
-                  }}
-                  errorMessage={errors.email}
-                  isInvalid={!!errors.email}
-                />
-              </div>
-
-              {/* Phone */}
-              <div>
-                <Input
-                  isClearable
-                  placeholder="03xx-xxxxxxx"
-                  label="Phone #"
-                  labelPlacement="outside-top"
-                  classNames={{
-                    clearButton: "text-secondary",
-                    label: "text-accent font-medium",
-                    input: "text-accent",
-                  }}
-                  value={phone}
-                  onValueChange={(val) => {
-                    setPhone(val);
-                    validateField("phone", val);
-                  }}
-                  errorMessage={errors.phone}
-                  isInvalid={!!errors.phone}
-                />
-              </div>
-
-              {/* Date */}
-              <div>
-                <DatePicker
-                  label="Date"
-                  labelPlacement="outside"
-                  value={date}
-                  onChange={setDate}
-                  minValue={today(getLocalTimeZone()).add({ days: 3 })}
-                  maxValue={today(getLocalTimeZone()).add({ days: 30 })}
-                  calendarProps={{
-                    classNames: {
-                      gridBody: "bg-white text-accent",
-                      cellButton: "text-secondary",
-                    },
-                  }}
-                  classNames={{
-                    label: "text-accent font-medium",
-                    segment: "!text-accent font-medium",
-                  }}
-                />
-              </div>
-
-              <div>
-                <TimeInput
-                  label="Time"
-                  labelPlacement="outside"
-                  classNames={{
-                    label: "text-accent font-medium",
-                    segment: "!text-accent",
-                  }}
-                  value={time}
-                  onChange={setTime}
-                  minValue={new Time(8.0)}
-                  maxValue={new Time(24.0)}
-                />
-              </div>
-
-              {/* Person Count */}
-              <div>
-                <NumberInput
-                  isClearable
-                  classNames={{
-                    clearButton: "text-secondary",
-                    label: "!text-accent font-medium",
-                  }}
-                  key={"numberOfPerson"}
-                  minValue={1}
-                  maxValue={50}
-                  label="Number of Person"
-                  labelPlacement="outside"
-                  value={guests}
-                  onValueChange={(num) => {
-                    setGuests(num);
-                    validateField("person", num);
-                  }}
-                  hideStepper
-                  errorMessage={errors.person}
-                  isInvalid={!!errors.person}
-                />
-              </div>
-
-              <div>
-                <Textarea
-                  isClearable
-                  labelPlacement="outside-top"
-                  classNames={{
-                    clearButton: "text-secondary",
-                    label: "text-accent font-medium",
-                    input: "py-2 text-accent",
-                  }}
-                  label="Special Requests"
-                  placeholder="Enter any special requests"
-                  value={requests}
-                  onValueChange={setRequests}
-                />
-              </div>
-
-              <div>
-                <Select
-                  labelPlacement="outside"
-                  label="Occasion Type"
-                  placeholder="Select"
-                  classNames={{
-                    label: "!text-accent font-medium",
-                    selectorIcon: "text-accent",
-                  }}
-                  selectedKeys={occasion !== null ? [occasion.toString()] : []}
-                  onSelectionChange={(keys) => {
-                    const selected = Array.from(keys)[0];
-                    setOccasion(Number(selected)); // convert back to number
-                    validateField("occasion", Number(selected));
-                  }}
-                  errorMessage={errors.occasion}
-                  isInvalid={!!errors.occasion}
+    <div className="max-w-4xl mx-auto p-6 ">
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <Card className="mb-6 border-l-4 border-l-green-500">
+          <CardBody>
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-green-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
                 >
-                  {occasionType.map((type) => (
-                    <SelectItem
-                      key={type.id.toString()}
-                      className="text-accent"
-                    >
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </Select>
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </div>
-
-              {/* Button */}
-              <div className="flex flex-row">
-                <Button
-                  type="submit"
-                  className="w-full bg-theme text-md text-white font-semibold rounded-none h-14 hover:bg-transparent border-2 border-theme hover:border-theme hover:text-theme transition-colors duration-300"
-                >
-                  {reservationData
-                    ? "Update Reservation"
-                    : "Make a Reservation"}
-                </Button>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-green-800">
+                  Reservation {reservationDataProp ? "Updated" : "Confirmed"}!
+                </h3>
+                <p className="text-sm text-green-700 mt-1">
+                  Your reservation has been successfully{" "}
+                  {reservationDataProp ? "updated" : "submitted"}. We'll send
+                  you a confirmation email shortly.
+                </p>
               </div>
-              {reservationData && (
-                <div className="h-full flex items-center">
-                  <Button
-                    onPress={() => setShowModal(true)}
-                    className="px-10 bg-secondary text-md text-white font-semibold rounded-none hover:bg-transparent border-2 border-secondary hover:text-secondary transition-colors duration-300"
-                  >
-                    Reset
-                  </Button>
-                </div>
-              )}
-            </form>
-          </div>
-        </div>
-      </FadeInSection>
-      {showModal && (
-        <CustomModal
-          onClose={() => setShowModal(false)}
-          isOpen={showModal}
-          title="Cancel Editing?"
-          description="Are you sure you want to cancel editing?"
-        >
-          <Button color="danger" variant="flat" onPress={handleReset}>
-            Reset
-          </Button>
-          <Button color="default" onPress={() => setShowModal(false)}>
-            Close
-          </Button>
-        </CustomModal>
+            </div>
+          </CardBody>
+        </Card>
       )}
+
+      <Card className="shadow-large ">
+        <CardBody className="p-8">
+          {/* Header */}
+          <div className="text-center mb-8 ">
+            <div className="flex justify-center items-center mb-4">
+              <Utensils className="h-8 w-8 text-amber-600 mr-2" />
+              <h1 className="text-3xl font-bold text-accent">
+                Restaurant Reservation
+              </h1>
+            </div>
+            <p className="text-default-500">
+              Reserve your table for an unforgettable dining experience
+            </p>
+          </div>
+
+          <div className="space-y-8">
+            {/* Personal Information */}
+            <Card className="bg-default-50">
+              <CardBody className="p-6">
+                <h2 className="text-xl font-semibold text-accent mb-4 flex items-center">
+                  <User className="h-5 w-5 mr-2" />
+                  Personal Information
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Name */}
+                  <Input
+                    label="Full Name"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onValueChange={(value) => handleInputChange("name", value)}
+                    errorMessage={errors.name}
+                    isInvalid={!!errors.name}
+                    isRequired
+                    startContent={<User className="h-4 w-4 text-default-400" />}
+                    classNames={{
+                      label: "text-accent font-medium",
+                      input: "text-accent",
+                    }}
+                  />
+
+                  {/* Email */}
+                  <Input
+                    type="email"
+                    label="Email Address"
+                    placeholder="your.email@example.com"
+                    value={formData.email || session?.user?.email || ""}
+                    disabled={!!session?.user?.email}
+                    onValueChange={(value) => handleInputChange("email", value)}
+                    errorMessage={errors.email}
+                    isInvalid={!!errors.email}
+                    isRequired
+                    startContent={<Mail className="h-4 w-4 text-default-400" />}
+                    classNames={{
+                      label: "text-accent font-medium",
+                      input: "text-accent",
+                    }}
+                  />
+
+                  {/* Phone */}
+                  <div className="md:col-span-2">
+                    <Input
+                      type="tel"
+                      label="Phone Number"
+                      placeholder="03XX-XXXXXXX"
+                      value={formData.phone}
+                      onValueChange={(value) =>
+                        handleInputChange("phone", value)
+                      }
+                      errorMessage={errors.phone}
+                      isInvalid={!!errors.phone}
+                      isRequired
+                      startContent={
+                        <Phone className="h-4 w-4 text-default-400" />
+                      }
+                      classNames={{
+                        label: "text-accent font-medium",
+                        input: "text-accent",
+                      }}
+                    />
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+
+            {/* Reservation Details */}
+            <Card className="bg-default-50">
+              <CardBody className="p-6">
+                <h2 className="text-xl font-semibold text-accent mb-4 flex items-center">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Reservation Details
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Date */}
+                  <DatePicker
+                    label="Reservation Date"
+                    value={formData.date}
+                    onChange={(date) => handleInputChange("date", date)}
+                    minValue={minDate}
+                    maxValue={maxDate}
+                    errorMessage={errors.date}
+                    isInvalid={!!errors.date}
+                    isRequired
+                    calendarProps={{
+                      classNames: {
+                        gridBody: "bg-white text-accent",
+                        cellButton: "text-secondary",
+                      },
+                    }}
+                    classNames={{
+                      label: "text-accent font-medium",
+                      segment: "!text-accent font-medium",
+                    }}
+                  />
+
+                  {/* Time */}
+                  <Autocomplete
+                    label="Reservation Time"
+                    placeholder="Select time"
+                    selectedKey={formData.time}
+                    onSelectionChange={(key) =>
+                      handleInputChange("time", key as string)
+                    }
+                    errorMessage={errors.time}
+                    isInvalid={!!errors.time}
+                    isRequired
+                    startContent={
+                      <Clock className="h-4 w-4 text-default-400" />
+                    }
+                    className="text-accent"
+                    classNames={{
+                      base: "text-accent font-medium",
+                      listboxWrapper: "text-accent font-medium",
+                    }}
+                  >
+                    {timeSlots.map((slot) => (
+                      <AutocompleteItem key={slot.key}>
+                        {slot.label}
+                      </AutocompleteItem>
+                    ))}
+                  </Autocomplete>
+
+                  {/* Guests */}
+                  <Select
+                    label="Number of Guests"
+                    placeholder="Select guests"
+                    selectedKeys={formData.guests ? [formData.guests] : []}
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      handleInputChange("guests", selected);
+                    }}
+                    errorMessage={errors.guests}
+                    isInvalid={!!errors.guests}
+                    isRequired
+                    startContent={
+                      <Users className="h-4 w-4 text-default-400" />
+                    }
+                    className="text-accent"
+                    classNames={{
+                      label: "text-accent font-medium",
+                      listboxWrapper: "text-accent font-medium",
+                    }}
+                  >
+                    {guestOptions.map((guest) => (
+                      <SelectItem key={guest.key}>{guest.label}</SelectItem>
+                    ))}
+                  </Select>
+                </div>
+              </CardBody>
+            </Card>
+
+            {/* Occasion & Special Requests */}
+            <Card className="bg-default-50">
+              <CardBody className="p-6">
+                <h2 className="text-xl font-semibold text-accent mb-4 flex items-center">
+                  <MessageSquare className="h-5 w-5 mr-2" />
+                  Additional Details
+                </h2>
+                <div className="space-y-4">
+                  {/* Occasion */}
+                  <Select
+                    label="Occasion Type"
+                    placeholder="Select occasion"
+                    selectedKeys={
+                      formData.occasion ? [String(formData.occasion)] : []
+                    }
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0];
+                      handleInputChange("occasion", Number(selected)); // convert if needed
+                    }}
+                    errorMessage={errors.occasion}
+                    isInvalid={!!errors.occasion}
+                    isRequired
+                    classNames={{
+                      label: "text-accent font-medium",
+                      listboxWrapper: "text-accent font-medium",
+                    }}
+                    className="text-accent"
+                  >
+                    {occasionTypes.map((occasion) => (
+                      <SelectItem key={String(occasion.id)}>
+                        {occasion.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
+
+                  {/* Special Requests */}
+                  <Textarea
+                    label="Special Requests"
+                    placeholder="Any dietary restrictions, special celebrations, seating preferences, etc."
+                    value={formData.requests}
+                    onValueChange={(value) =>
+                      handleInputChange("requests", value)
+                    }
+                    minRows={4}
+                    classNames={{
+                      label: "text-accent font-medium",
+                      input: "text-accent",
+                    }}
+                    className="text-accent"
+                  />
+                </div>
+              </CardBody>
+            </Card>
+
+            {/* Submit Button */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-end">
+              {reservationDataProp && (
+                <Button
+                  variant="bordered"
+                  onPress={onResetModalOpen}
+                  className="border-default-300 text-default-700 hover:bg-default-50"
+                >
+                  Reset Form
+                </Button>
+              )}
+
+              <Button
+                color="warning"
+                size="lg"
+                onPress={handleSubmit}
+                isDisabled={isSubmitting || Object.keys(errors).length > 0}
+                isLoading={isSubmitting}
+                className="px-8 font-medium bg-theme text-white hover:bg-amber-700"
+              >
+                {reservationDataProp
+                  ? "Update Reservation"
+                  : "Confirm Reservation"}
+              </Button>
+            </div>
+
+            {errors.submit && (
+              <p className="text-center text-sm text-danger">{errors.submit}</p>
+            )}
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Reset Confirmation Modal */}
+      <Modal isOpen={isResetModalOpen} onClose={onResetModalClose}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1 text-accent">
+                Confirm Reset
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-default-600">
+                  Are you sure you want to reset the form? All entered
+                  information will be lost.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button color="danger" onPress={handleReset}>
+                  Reset Form
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -10,4 +10,5 @@ const LocationsSchema = new Schema<ILocations>({
   postalCode: { type: String, required: true },
 });
 
-export default mongoose.models.Area || mongoose.model<ILocations>("Locations", LocationsSchema);
+export default mongoose.models.Locations ||
+  mongoose.model<ILocations>("Locations", LocationsSchema);

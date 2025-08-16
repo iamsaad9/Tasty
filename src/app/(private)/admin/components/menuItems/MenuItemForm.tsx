@@ -117,11 +117,19 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [deliveryAreasError, setDeliveryAreasError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [isSubmitting, setIsisSubmitting] = useState(false);
+
+  // Hook data with fallback to empty arrays
   const { data: Categories } = useCategories();
   const { data: Dietaries } = useDietaries();
   const { data: Variations } = useVariations();
   const { data: locations } = useLocations();
+
+  // Safe data with default empty arrays
+  const safeCategories = Categories || [];
+  const safeDietaries = Dietaries || [];
+  const safeVariations = Variations || [];
+  const safeLocations = locations || [];
 
   useEffect(() => {
     if (deliveryAreasError && deliveryAreas.length > 0) {
@@ -230,20 +238,6 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     }
   };
 
-  // // Update delivery area
-  // const updateDeliveryArea = (
-  //   index: number,
-  //   field: keyof DeliveryArea,
-  //   value: string | number
-  // ) => {
-  //   console.log("Updating delivery area:", index, field, value);
-  //   const updated = deliveryAreas.map((area, i) =>
-  //     i === index ? { ...area, [field]: value } : area
-  //   );
-  //   console.log("Updated delivery areas:", updated);
-  //   setDeliveryAreas(updated);
-  // };
-
   const handleSubmit = async () => {
     // Validate basic fields
 
@@ -316,7 +310,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     const isEditing = !!menuItemDataProp;
 
     try {
-      setSubmitting(true);
+      setIsisSubmitting(true);
       const res = await fetch("/api/menuItems", {
         method: isEditing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -342,7 +336,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
         } successfully`,
         color: "success",
       });
-      setSubmitting(false);
+      setIsisSubmitting(false);
       handleReset();
     } catch (error) {
       addToast({
@@ -350,7 +344,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
         description: `Error ${isEditing ? "updating" : "adding"} menu item`,
         color: "danger",
       });
-      setSubmitting(false);
+      setIsisSubmitting(false);
     }
   };
 
@@ -382,9 +376,6 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     });
   };
 
-  if (!Categories || !Dietaries || !Variations || !locations) {
-    return <LoadingScreen showLoading={true} />;
-  }
   return (
     <div className="flex flex-col items-center min-h-screen p-4">
       <div className="w-full max-w-6xl bg-white shadow-lg rounded-lg overflow-hidden">
@@ -428,7 +419,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                   }
                   isRequired
                 >
-                  {Categories.map((cat) => (
+                  {safeCategories.map((cat) => (
                     <SelectItem key={cat.id}>{cat.name}</SelectItem>
                   ))}
                 </Select>
@@ -490,7 +481,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                 Dietary Options
               </h3>
               <div className="flex flex-wrap gap-2">
-                {Dietaries.map((diet) => (
+                {safeDietaries.map((diet) => (
                   <Chip
                     key={diet.id}
                     variant={
@@ -559,7 +550,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                       }
                       className="flex-1 text-accent"
                     >
-                      {Variations.map((type) => (
+                      {safeVariations.map((type) => (
                         <SelectItem key={type.id}>{type.label}</SelectItem>
                       ))}
                     </Select>
@@ -703,7 +694,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                           selectedKey={area.area || ""}
                           onSelectionChange={(val) => {
                             const areaName = (val as string)?.trim() || "";
-                            const selectedLocation = locations.find(
+                            const selectedLocation = safeLocations?.find(
                               (loc) => loc.area === areaName
                             );
 
@@ -725,7 +716,7 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                             });
                           }}
                         >
-                          {locations.map((item) => (
+                          {safeLocations.map((item) => (
                             <AutocompleteItem key={item.area}>
                               {item.area}
                             </AutocompleteItem>
@@ -768,19 +759,16 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                 Reset
               </Button>
             )}
+
             <Button
               onPress={handleSubmit}
-              color="primary"
+              color="warning"
               size="lg"
-              className="w-30"
+              isDisabled={isSubmitting || Object.keys(errors).length > 0}
+              isLoading={isSubmitting}
+              className="px-8 font-medium bg-theme text-white hover:bg-amber-700"
             >
-              {submitting ? (
-                <span className="miniloader"></span>
-              ) : menuItemDataProp ? (
-                "Update Item"
-              ) : (
-                "Create Item"
-              )}
+              {menuItemDataProp ? "Update Item" : "Confirm Item"}
             </Button>
           </div>
         </div>

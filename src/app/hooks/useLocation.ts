@@ -13,7 +13,7 @@ export function useLocations() {
       console.log("Fetching Location using API");
       const res = await fetch("/api/locations");
       if (!res.ok) throw new Error("Failed to fetch locations");
-      return res.json() as Promise<Location[]>; // should return an array of Location
+      return res.json() as Promise<Location[]>;
     },
     staleTime: 5 * 60 * 1000,
   });

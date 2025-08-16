@@ -8,7 +8,7 @@
     "guests": 2,
     "email": "john@example.com",
     "status": "confirmed",
-    "occasion": "Anniversary",
+    "occasion": "anniversary",
     "requests": "Window seat"
   },
   {
@@ -20,7 +20,7 @@
     "guests": 4,
     "email": "jane@example.com",
     "status": "pending",
-    "occasion": "Birthday",
+    "occasion": "birthday",
     "requests": "Gluten-free meal"
   },
   {
@@ -32,7 +32,7 @@
     "guests": 3,
     "email": "alex@example.com",
     "status": "cancelled",
-    "occasion": "Business"
+    "occasion": "business"
   },
   {
     "id": 4,
@@ -43,7 +43,7 @@
     "guests": 5,
     "email": "sara@example.com",
     "status": "confirmed",
-    "occasion": "Casual",
+    "occasion": "casual",
     "requests": "High chair for child"
   },
   {
@@ -55,6 +55,6 @@
     "guests": 1,
     "email": "michael@example.com",
     "status": "confirmed",
-    "occasion": "Solo Meal"
+    "occasion": "solo"
   }
 ]
