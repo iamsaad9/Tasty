@@ -27,6 +27,49 @@ export default function CartDrawer() {
     itemIndex: -1,
   });
 
+  useEffect(() => {
+    console.log("items", items);
+  }, []);
+
+  // Helper function to format variations display - handles both old and new formats
+  const formatVariations = (
+    variations: { [key: string]: string } | ItemVariation[] | undefined
+  ) => {
+    if (!variations) return "";
+
+    // Handle new format (object)
+    if (typeof variations === "object" && !Array.isArray(variations)) {
+      if (Object.keys(variations).length === 0) return "";
+      return Object.entries(variations)
+        .map(
+          ([type, value]) =>
+            `${type.charAt(0).toUpperCase() + type.slice(1)}: ${value}`
+        )
+        .join(", ");
+    }
+
+    // Handle old format (array) for backward compatibility
+    if (Array.isArray(variations)) {
+      return variations
+        .map(
+          (variation) =>
+            `${
+              variation.type.charAt(0).toUpperCase() + variation.type.slice(1)
+            }: ${variation.name}`
+        )
+        .join(", ");
+    }
+
+    return "";
+  };
+
+  // Add interface for backward compatibility
+  interface ItemVariation {
+    type: string;
+    name: string;
+    price_multiplier: number;
+  }
+
   // Handle quantity decrease
   const handleDecreaseQuantity = (index: number) => {
     const currentItem = items[index];
@@ -104,8 +147,12 @@ export default function CartDrawer() {
                             <p className="text-xs text-default-500 line-clamp-2">
                               {item.itemInstructions}
                             </p>
+                            {/* Fixed variations display - handles both formats */}
                             <p className="text-xs text-default-500 line-clamp-2">
-                              {item.itemVariation}
+                              {formatVariations(
+                                item.itemVariations ||
+                                  (item as any).itemVariation
+                              )}
                             </p>
                           </div>
                           <div className="flex items-center justify-between gap-5 ">

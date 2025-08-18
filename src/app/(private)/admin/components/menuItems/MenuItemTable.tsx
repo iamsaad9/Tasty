@@ -402,7 +402,7 @@ export default function MenuItemTable({
           onPress={onAddNew}
         >
           <Plus size={20} />
-          Add New Item
+          Add New
         </Button>
       </div>
     );

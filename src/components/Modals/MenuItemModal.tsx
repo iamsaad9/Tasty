@@ -21,6 +21,18 @@ import { useLocationStore } from "@/lib/store/locationStore";
 import LocationModal from "./LocationModal";
 import { useSession } from "next-auth/react";
 
+// Updated interfaces to support multiple variation types
+interface ItemVariation {
+  type: string;
+  name: string;
+  price_multiplier: number;
+}
+
+interface VariationGroup {
+  type: string;
+  variations: ItemVariation[];
+}
+
 interface CartItem {
   itemId: number | undefined;
   itemName: string | undefined;
@@ -28,7 +40,7 @@ interface CartItem {
   itemPrice: number;
   itemBasePrice: number;
   itemQuantity: number;
-  itemVariation: string | undefined;
+  itemVariations: { [key: string]: string }; // Changed to object to store multiple variations
   itemInstructions: string;
 }
 
@@ -43,7 +55,7 @@ export const CustomRadio = ({
     <Radio
       value={value}
       classNames={{
-        base: "inline-flex m-0 bg-content1 hover:bg-content2 items-center justify-between flex-row-reverse max-w-[300px]  cursor-pointer rounded-lg gap-4 p-4 border-2 border-transparent data-[selected=true]:border-primary border-(--secondary)/20",
+        base: "inline-flex m-0 bg-content1 hover:bg-content2 items-center justify-between flex-row-reverse max-w-[300px] cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent data-[selected=true]:border-primary border-(--secondary)/20",
       }}
     >
       {children}
@@ -57,31 +69,110 @@ function MenuItemModal() {
   const router = useRouter();
   const { addItem } = useCartStore();
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariation, setSelectedVariation] = useState(0);
+  const [selectedVariations, setSelectedVariations] = useState<{
+    [key: string]: number;
+  }>({});
   const [instructions, setInstructions] = useState("");
   const { selectedLocation, deliveryMode } = useLocationStore();
   const [showAddressModal, setShowAddressModal] = useState(false);
   const session = useSession();
 
+  // Group variations by type
+  const getVariationGroups = (): VariationGroup[] => {
+    if (!selectedItem?.itemVariation) return [];
+
+    const groups: { [key: string]: ItemVariation[] } = {};
+
+    selectedItem.itemVariation.forEach((variation) => {
+      if (!groups[variation.type]) {
+        groups[variation.type] = [];
+      }
+      groups[variation.type].push(variation);
+    });
+
+    return Object.entries(groups).map(([type, variations]) => ({
+      type,
+      variations,
+    }));
+  };
+
+  // Initialize selected variations when modal opens
+  useEffect(() => {
+    if (isOpen && selectedItem) {
+      const variationGroups = getVariationGroups();
+      const initialSelections: { [key: string]: number } = {};
+
+      variationGroups.forEach((group) => {
+        // Default to first variation in each group
+        initialSelections[group.type] = 0;
+      });
+
+      setSelectedVariations(initialSelections);
+    }
+  }, [isOpen, selectedItem]);
+
   const handleClose = () => {
     closeModal();
     router.push(previousPath || "/", { scroll: false });
     setQuantity(1);
-    setSelectedVariation(0);
+    setSelectedVariations({});
     setInstructions("");
   };
 
+  const handleVariationChange = (type: string, index: number) => {
+    setSelectedVariations((prev) => ({
+      ...prev,
+      [type]: index,
+    }));
+  };
+
+  const calculateFinalPrice = () => {
+    const basePrice = selectedItem?.price ?? 0;
+    let totalMultiplier = 1;
+
+    const variationGroups = getVariationGroups();
+
+    // Calculate combined price multiplier from all selected variations
+    variationGroups.forEach((group) => {
+      const selectedIndex = selectedVariations[group.type] ?? 0;
+      const selectedVariation = group.variations[selectedIndex];
+      if (selectedVariation) {
+        totalMultiplier *= selectedVariation.price_multiplier;
+      }
+    });
+
+    return basePrice * totalMultiplier * quantity;
+  };
+
+  const getSelectedVariationNames = (): { [key: string]: string } => {
+    const variationGroups = getVariationGroups();
+    const selectedNames: { [key: string]: string } = {};
+
+    variationGroups.forEach((group) => {
+      const selectedIndex = selectedVariations[group.type] ?? 0;
+      const selectedVariation = group.variations[selectedIndex];
+      if (selectedVariation) {
+        selectedNames[group.type] = selectedVariation.name;
+      }
+    });
+
+    return selectedNames;
+  };
+
   const handleAddItem = () => {
-    const cartItem = {
+    const finalPrice = calculateFinalPrice();
+
+    const cartItem: CartItem = {
       itemId: selectedItem?.id,
       itemName: selectedItem?.name,
       itemImage: selectedItem?.image,
       itemPrice: Number(finalPrice.toFixed(2)),
       itemBasePrice: finalPrice / quantity,
       itemQuantity: quantity,
-      itemVariation: selectedItem?.itemVariation?.[selectedVariation].name,
+      itemVariations: getSelectedVariationNames(),
       itemInstructions: instructions,
-    } as CartItem;
+    };
+    console.log("cartItem", cartItem);
 
     addItem(cartItem);
     closeModal();
@@ -92,9 +183,10 @@ function MenuItemModal() {
     });
   };
 
-  const variation = selectedItem?.itemVariation?.[selectedVariation];
+  const variationGroups = getVariationGroups();
+  const finalPrice = calculateFinalPrice();
   const basePrice = selectedItem?.price ?? 0;
-  const finalPrice = basePrice * (variation?.price_multiplier ?? 1) * quantity;
+
   return (
     <>
       <Modal
@@ -104,7 +196,7 @@ function MenuItemModal() {
         backdrop="blur"
         size="5xl"
         placement="center"
-        scrollBehavior="inside"
+        scrollBehavior="outside"
         className="rounded-xl text-accent overflow-auto"
       >
         <ModalContent>
@@ -129,7 +221,7 @@ function MenuItemModal() {
                     alt={selectedItem?.name || ""}
                     width={600}
                     height={600}
-                    className="rounded-xl object-cover w-full h-full "
+                    className="rounded-xl object-cover w-full h-full"
                   />
                 </div>
 
@@ -141,12 +233,8 @@ function MenuItemModal() {
                       <h1 className="text-2xl font-bold">
                         {selectedItem?.name}
                       </h1>
-
                       <div className="text-xl font-semibold text-theme">
-                        $.{" "}
-                        {(
-                          basePrice * (variation?.price_multiplier ?? 1)
-                        ).toFixed(2)}
+                        $. {(finalPrice / quantity).toFixed(2)}
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -162,42 +250,71 @@ function MenuItemModal() {
                     </div>
                   </div>
 
-                  {/* Variations */}
-                  <div className="mt-6">
-                    <RadioGroup
-                      className=""
-                      classNames={{
-                        wrapper: "grid grid-cols-2 sm:grid-cols-1",
-                      }}
-                      value={selectedVariation.toString()}
-                      onChange={(e) =>
-                        setSelectedVariation(Number(e.target.value))
-                      }
-                    >
-                      {selectedItem?.itemVariation?.map((v, index) => (
-                        <CustomRadio key={index} value={index.toString()}>
-                          <h1 className="text-accent"> {v.name}</h1>
-                        </CustomRadio>
-                      ))}
-                    </RadioGroup>
+                  {/* Variations - Multiple Groups */}
+                  <div className="mt-4 space-y-4 overflow-y-auto flex-1 max-h-[40vh]">
+                    {variationGroups.map((group) => (
+                      <div key={group.type}>
+                        <h3 className="text-base font-semibold mb-2 capitalize">
+                          {group.type}
+                        </h3>
+                        <RadioGroup
+                          className=""
+                          classNames={{
+                            wrapper: "grid grid-cols-3 sm:grid-cols-2 gap-1",
+                          }}
+                          value={(
+                            selectedVariations[group.type] ?? 0
+                          ).toString()}
+                          onChange={(e) =>
+                            handleVariationChange(
+                              group.type,
+                              Number(e.target.value)
+                            )
+                          }
+                        >
+                          {group.variations.map((variation, index) => (
+                            <CustomRadio key={index} value={index.toString()}>
+                              <div className="flex justify-between items-center w-full gap-5">
+                                <h1 className="text-accent text-sm">
+                                  {variation.name}
+                                </h1>
+                                {variation.price_multiplier !== 1 && (
+                                  <span className="text-sm text-gray-500">
+                                    {variation.price_multiplier > 1
+                                      ? "$ +"
+                                      : "$ "}
+                                    {(
+                                      basePrice * variation.price_multiplier -
+                                      basePrice
+                                    ).toFixed(2)}
+                                  </span>
+                                )}
+                              </div>
+                            </CustomRadio>
+                          ))}
+                        </RadioGroup>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Special Instructions */}
-                  <div className="mt-4">
-                    <label className="font-medium">Special Instructions</label>
+                  <div className="mt-3">
+                    <label className="font-medium text-sm">
+                      Special Instructions
+                    </label>
                     <textarea
                       placeholder="Please enter instructions about this item"
                       value={instructions}
                       onChange={(e) => setInstructions(e.target.value)}
-                      className="w-full mt-2 border rounded-md p-2 resize-none h-20"
+                      className="w-full mt-1 border rounded-md p-2 resize-none h-16 text-sm"
                     />
                   </div>
 
-                  {/* Spacer */}
-                  <div className="flex-grow"></div>
+                  {/* Spacer - Reduced */}
+                  <div className="flex-grow min-h-[10px]"></div>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between mt-6 border-t pt-4">
+                  <div className="flex items-center justify-between mt-4 border-t pt-3">
                     <div className="flex items-center gap-4">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}

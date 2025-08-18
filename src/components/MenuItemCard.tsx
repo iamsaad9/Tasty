@@ -71,9 +71,6 @@ export function MenuItemCard({
     router.push(`/menu?${params.toString()}`, { scroll: false });
   };
 
-  useEffect(() => {
-    console.log("MenuItemCard rendered with item:", MenuItem);
-  });
   return (
     <motion.div
       key={MenuItem.id}

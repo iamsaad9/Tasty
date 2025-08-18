@@ -22,6 +22,7 @@ import { useReservations } from "@/app/hooks/useReservations";
 import LoadingScreen from "../Loading";
 import { useOccasionType } from "@/app/hooks/useOccasionType";
 import { useSession } from "next-auth/react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Column {
   name: string;
@@ -54,6 +55,7 @@ export default function ViewReservations({
   const { data: allReservations = [] } = useReservations();
   const { data: occasionType = [], isPending } = useOccasionType();
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
   const [filterValue, setFilterValue] = useState("");
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "id",
@@ -64,13 +66,13 @@ export default function ViewReservations({
     title: "",
     description: "",
     button: "",
-    reservationId: null as number | null,
+    reservationId: "" as string | undefined,
   });
 
-  const reservations = useMemo(() => {
-    if (!allReservations || !session) return [];
-    return allReservations.filter((i) => i.email === session.user?.email);
-  }, [allReservations, session]);
+  const reservations =
+    !allReservations || !session
+      ? []
+      : allReservations.filter((i) => i.email === session.user?.email);
 
   // Create occasion lookup map for better performance
   const occasionMap = useMemo(() => {
@@ -87,15 +89,27 @@ export default function ViewReservations({
     onAddNew();
   };
 
+  // Helper function to safely get property value
+  const getReservationProperty = (
+    reservation: Reservation,
+    key: string
+  ): any => {
+    return (reservation as any)[key];
+  };
+
   // Fixed sorting logic
   const sortedItems = useMemo(() => {
     if (!reservations || reservations.length === 0) return [];
 
     return [...reservations].sort((a, b) => {
-      let first: string | number | Date | undefined =
-        a[sortDescriptor.column as keyof Reservation];
-      let second: string | number | Date | undefined =
-        b[sortDescriptor.column as keyof Reservation];
+      let first: string | number | Date | undefined = getReservationProperty(
+        a,
+        sortDescriptor.column as string
+      );
+      let second: string | number | Date | undefined = getReservationProperty(
+        b,
+        sortDescriptor.column as string
+      );
 
       // Handle special cases for different data types
       if (sortDescriptor.column === "date") {
@@ -153,24 +167,41 @@ export default function ViewReservations({
     );
   }, [sortedItems, filterValue, occasionMap]);
 
-  const handleDeleteReservation = useCallback((reservationId: number) => {
-    // Add your delete logic here
-    console.log("Deleting reservation:", reservationId);
-    addToast({
-      title: "Success!",
-      description: "Reservation deleted successfully",
-      color: "success",
-    });
-    setShowModal({
-      open: false,
-      title: "",
-      description: "",
-      button: "",
-      reservationId: null,
-    });
-  }, []);
+  const handleDeleteReservation = async (id: string) => {
+    console.log("Deleting reservation with id:", id);
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
 
-  const handleCancelReservation = useCallback((reservationId: number) => {
+      if (!res.ok) {
+        addToast({
+          title: "Failed",
+          description: `Failed to delete reservation`,
+          color: "danger",
+        });
+        throw new Error("Failed to delete reservation");
+      }
+
+      addToast({
+        title: "Deleted",
+        description: "Reservation deleted successfully",
+        color: "success",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["Reservations"] });
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description: "Failed to delete reservation",
+        color: "danger",
+      });
+    }
+  };
+
+  const handleCancelReservation = useCallback((reservationId: string) => {
     // Add your cancel logic here
     console.log("Cancelling reservation:", reservationId);
     addToast({
@@ -183,7 +214,7 @@ export default function ViewReservations({
       title: "",
       description: "",
       button: "",
-      reservationId: null,
+      reservationId: "",
     });
   }, []);
 
@@ -286,7 +317,7 @@ export default function ViewReservations({
               className={clsx(
                 {
                   "bg-red-100 border-red-500 text-red-700":
-                    item.status === "cancelled",
+                    item.status === "rejected",
                   "bg-green-100 border-green-500 text-green-700":
                     item.status === "confirmed",
                   "bg-orange-100 border-orange-500 text-orange-700":
@@ -355,7 +386,7 @@ export default function ViewReservations({
                           description:
                             "Are you sure you want to delete this reservation? This action cannot be undone.",
                           button: "Delete",
-                          reservationId: item.id,
+                          reservationId: item._id,
                         });
                       }}
                     />
@@ -369,7 +400,7 @@ export default function ViewReservations({
                           description:
                             "Are you sure you want to cancel this reservation?",
                           button: "Cancel",
-                          reservationId: item.id,
+                          reservationId: item._id,
                         });
                       }}
                     />
@@ -519,14 +550,27 @@ export default function ViewReservations({
             title: "",
             description: "",
             button: "",
-            reservationId: null,
+            reservationId: "",
           })
         }
         isOpen={showModal.open}
         title={showModal.title}
         description={showModal.description}
       >
-        <Button color="danger" variant="flat" onPress={handleModalAction}>
+        <Button
+          color="danger"
+          variant="flat"
+          onPress={() => {
+            handleModalAction();
+            setShowModal({
+              open: false,
+              title: "",
+              description: "",
+              button: "",
+              reservationId: "",
+            });
+          }}
+        >
           {showModal.button}
         </Button>
         <Button
@@ -537,7 +581,7 @@ export default function ViewReservations({
               title: "",
               description: "",
               button: "",
-              reservationId: null,
+              reservationId: "",
             })
           }
         >

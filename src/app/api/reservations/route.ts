@@ -60,3 +60,34 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+// DELETE - Delete a reservation
+export async function DELETE(req: Request) {
+  try {
+    await connectDB();
+    const { id } = await req.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Missing id for deletion" },
+        { status: 400 }
+      );
+    }
+
+    const deletedReservation = await Reservation.findByIdAndDelete(id);
+
+    if (!deletedReservation) {
+      return NextResponse.json(
+        { error: "Reservation not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Reservation deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

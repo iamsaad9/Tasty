@@ -27,6 +27,7 @@ import { useState } from "react";
 import { useLocationStore } from "@/lib/store/locationStore";
 import { validateAddressWithMaps } from "@/lib/validateAddressWithMaps";
 import PageBanner from "@/components/PageBanner";
+import { useSession } from "next-auth/react";
 import {
   CheckCircle,
   CreditCard,
@@ -38,7 +39,25 @@ import {
   Download,
   Home,
   Package,
+  MessageSquare,
+  Utensils,
+  AlertCircle,
+  Clock,
+  CreditCardIcon,
+  User,
 } from "lucide-react";
+
+// Updated CartItem interface to match the new format
+interface CartItem {
+  itemId: number | undefined;
+  itemName: string | undefined;
+  itemImage: string | undefined;
+  itemPrice: number;
+  itemBasePrice: number;
+  itemQuantity: number;
+  itemVariations: { [key: string]: string }; // Updated to object format
+  itemInstructions: string;
+}
 
 // Types
 interface FormData {
@@ -81,6 +100,21 @@ interface StripePaymentModalProps {
   isProcessing: boolean;
   setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+// Helper function to format variations display
+const formatVariations = (
+  variations: { [key: string]: string } | undefined
+) => {
+  if (!variations || Object.keys(variations).length === 0) return "";
+
+  return Object.entries(variations)
+    .map(
+      ([type, value]) =>
+        `${type.charAt(0).toUpperCase() + type.slice(1)}: ${value}`
+    )
+    .join(", ");
+};
+
 // Stripe Payment Modal Component
 const StripePaymentModal = ({
   isOpen,
@@ -269,6 +303,258 @@ interface OrderConfirmationData {
   onClose: () => void;
   orderData: any;
 }
+
+// Order Details Modal Component
+
+interface OrderDetailsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  items: CartItem[];
+  formData: FormData;
+  deliveryMode: string;
+  selectedLocation: string;
+  paymentMethod: "Card" | "Cash";
+  tip: number;
+  subTotal: number;
+  tax: number;
+  delivery: number;
+  total: number;
+  isProcessing?: boolean;
+}
+
+// Add this new component before the main CheckoutPage component
+const OrderDetailsModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  items,
+  formData,
+  deliveryMode,
+  selectedLocation,
+  paymentMethod,
+  tip,
+  subTotal,
+  tax,
+  delivery,
+  total,
+  isProcessing = false,
+}: OrderDetailsModalProps) => {
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="2xl"
+      isDismissable={!isProcessing}
+      scrollBehavior="inside"
+      className="text-accent"
+    >
+      <ModalContent>
+        <ModalHeader className="flex items-center gap-2">
+          <Package className="w-5 h-5" />
+          Review Your Order
+        </ModalHeader>
+        <ModalBody>
+          <div className="space-y-6">
+            {/* Customer Information */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Customer Information
+              </h3>
+              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium">Name:</span>
+                    <p>
+                      {formData.firstName} {formData.lastName}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Email:</span>
+                    <p>{formData.email}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Phone:</span>
+                    <p>{formData.phone}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Payment:</span>
+                    <p>
+                      {paymentMethod === "Cash"
+                        ? `Cash on ${
+                            deliveryMode === "pickup" ? "Pickup" : "Delivery"
+                          }`
+                        : "Credit Card"}
+                    </p>
+                  </div>
+                </div>
+
+                {deliveryMode === "delivery" && (
+                  <div className="mt-3 pt-3 border-t">
+                    <span className="font-medium">Delivery Address:</span>
+                    <p className="text-sm">{formData.address}</p>
+                    <p className="text-sm text-blue-600">
+                      {selectedLocation}, Karachi
+                    </p>
+                  </div>
+                )}
+
+                {deliveryMode === "pickup" && (
+                  <div className="mt-3 pt-3 border-t">
+                    <span className="font-medium">Pickup Location:</span>
+                    <p className="text-sm text-blue-600">{selectedLocation}</p>
+                  </div>
+                )}
+
+                {formData.orderNotes && (
+                  <div className="mt-3 pt-3 border-t">
+                    <span className="font-medium">Order Notes:</span>
+                    <p className="text-sm">{formData.orderNotes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Order Items */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <Utensils className="w-4 h-4" />
+                Order Items ({items.length})
+              </h3>
+              <div className="border border-gray-200 rounded-lg divide-y max-h-64 overflow-y-auto">
+                {items.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex justify-between items-start p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={item.itemImage}
+                        alt={item.itemName || "Item image"}
+                        className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+                      />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-sm">{item.itemName}</h4>
+                        {item.itemVariations &&
+                          Object.keys(item.itemVariations).length > 0 && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {formatVariations(item.itemVariations)}
+                            </p>
+                          )}
+                        {item.itemInstructions && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Note: {item.itemInstructions}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right text-sm flex-shrink-0 ml-4">
+                      <p className="font-medium">
+                        {item.itemQuantity} × $
+                        {(item.itemBasePrice ?? 0).toFixed(2)}
+                      </p>
+                      <p className="text-gray-500">
+                        $
+                        {(
+                          (item.itemBasePrice ?? 0) * item.itemQuantity
+                        ).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Order Summary */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <CreditCard className="w-4 h-4" />
+                Order Summary
+              </h3>
+              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Subtotal ({items.length} items)</span>
+                  <span>${subTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>
+                    {deliveryMode === "delivery" ? "Delivery Fee" : "Pickup"}
+                  </span>
+                  <span>
+                    {delivery > 0 ? `$${delivery.toFixed(2)}` : "Free"}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Tax (8%)</span>
+                  <span>${tax.toFixed(2)}</span>
+                </div>
+                {tip > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span>Tip</span>
+                    <span>${tip.toFixed(2)}</span>
+                  </div>
+                )}
+                <Divider />
+                <div className="flex justify-between text-lg font-semibold">
+                  <span>Total</span>
+                  <span>${total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Important Notes */}
+            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium text-yellow-800 mb-1">
+                    Before you confirm:
+                  </p>
+                  <ul className="text-yellow-700 space-y-1">
+                    <li>• Please verify all information is correct</li>
+                    <li>
+                      •{" "}
+                      {deliveryMode === "delivery"
+                        ? "Estimated delivery time: 30-45 minutes"
+                        : "Your order will be ready for pickup in 15-20 minutes"}
+                    </li>
+                    {paymentMethod === "Cash" && (
+                      <li>• Please have exact change ready</li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="light" onPress={onClose} isDisabled={isProcessing}>
+            Back to Edit
+          </Button>
+          <Button
+            color="primary"
+            onPress={onConfirm}
+            isDisabled={isProcessing}
+            startContent={
+              isProcessing ? (
+                <Spinner size="sm" />
+              ) : (
+                <CheckCircle className="w-4 h-4" />
+              )
+            }
+            className="bg-theme"
+          >
+            {isProcessing
+              ? "Placing Order..."
+              : `Confirm Order - $${total.toFixed(2)}`}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+};
+
 // Order Confirmation Modal Component
 const OrderConfirmationModal = ({
   isOpen,
@@ -282,7 +568,13 @@ const OrderConfirmationModal = ({
   const orderId = generateOrderId();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="2xl" isDismissable={false}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="2xl"
+      isDismissable={false}
+      className="text-accent"
+    >
       <ModalContent>
         <ModalHeader className="text-center">
           <div className="w-full text-center">
@@ -398,6 +690,7 @@ const OrderConfirmationModal = ({
 export default function CheckoutPage() {
   const { items, clearCart } = useCartStore();
   const router = useRouter();
+  const { data: session } = useSession();
 
   // Add selected location state - you might get this from a location store/context
   const { selectedLocation, deliveryMode } = useLocationStore();
@@ -436,6 +729,11 @@ export default function CheckoutPage() {
   const [touched, setTouched] = useState<TouchedFields>({});
   const [isValidatingAddress, setIsValidatingAddress] =
     useState<boolean>(false);
+  const {
+    isOpen: isOrderDetailsOpen,
+    onOpen: onOrderDetailsOpen,
+    onClose: onOrderDetailsClose,
+  } = useDisclosure();
 
   // Calculate totals using useMemo for better performance
   const { subTotal, tax, delivery, total } = useMemo(() => {
@@ -461,8 +759,19 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (items.length === 0) {
       router.push("/");
+    } else {
+      console.log("checkout items", items);
     }
   }, [items, router]);
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      setFormData((prev) => ({
+        ...prev,
+        email: session.user.email,
+      }));
+    }
+  }, [session]);
 
   // Form validation
   const validateForm = async (): Promise<boolean> => {
@@ -596,6 +905,13 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Open the order details modal instead of directly placing the order
+    onOrderDetailsOpen();
+  };
+
+  const handleConfirmOrder = async () => {
+    onOrderDetailsClose();
+
     if (paymentMethod === "Card") {
       onPaymentOpen();
     } else {
@@ -622,13 +938,8 @@ export default function CheckoutPage() {
   // Handle confirmation modal close
   const handleConfirmationClose = () => {
     onConfirmationClose();
+    clearCart();
     router.push("/");
-  };
-
-  // Custom tip input
-  const handleCustomTip = (value: string) => {
-    const customTip = parseFloat(value) || 0;
-    setTip(customTip);
   };
 
   return (
@@ -641,57 +952,90 @@ export default function CheckoutPage() {
         {/* Contact + Shipping */}
         <div className="space-y-8">
           <div>
-            <h2 className="text-xl font-semibold mb-4">Contact Information</h2>
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <Phone className="h-5 w-5 mr-2" />
+              Additional information
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Email */}
               <Input
-                label="Email address"
-                size="sm"
-                variant="flat"
                 type="email"
-                value={formData.email}
+                label="Email Address"
+                placeholder="your.email@example.com"
+                value={formData.email || session?.user?.email || ""}
+                disabled={!!session?.user?.email}
                 onValueChange={(value) => handleInputChange("email", value)}
                 onBlur={() => handleBlur("email")}
-                isInvalid={!!errors.email && touched.email}
                 errorMessage={errors.email}
+                isInvalid={!!errors.email}
                 isRequired
+                startContent={<Mail className="h-4 w-4 text-default-400" />}
+                classNames={{
+                  label: "text-accent font-medium",
+                  input: "text-accent",
+                }}
               />
+
               <Input
-                label="Phone"
-                size="sm"
-                variant="flat"
                 type="tel"
+                label="Phone Number"
+                placeholder="03XX-XXXXXXX"
                 value={formData.phone}
                 onValueChange={(value) => handleInputChange("phone", value)}
                 onBlur={() => handleBlur("phone")}
-                isInvalid={!!errors.phone && touched.phone}
                 errorMessage={errors.phone}
+                isInvalid={!!errors.phone}
                 isRequired
+                startContent={<Phone className="h-4 w-4 text-default-400" />}
+                classNames={{
+                  label: "text-accent font-medium",
+                  input: "text-accent",
+                }}
               />
+
+              {/*First Name */}
               <Input
                 label="First name"
-                size="sm"
-                variant="flat"
+                placeholder="Enter your First name"
                 value={formData.firstName}
                 onValueChange={(value) => handleInputChange("firstName", value)}
-                isInvalid={!!errors.firstName}
                 errorMessage={errors.firstName}
+                isInvalid={!!errors.firstName}
                 isRequired
+                startContent={<User className="h-4 w-4 text-default-400" />}
+                classNames={{
+                  label: "text-accent font-medium",
+                  input: "text-accent",
+                }}
               />
+
+              {/*lirst Name */}
               <Input
-                label="Last name"
-                size="sm"
-                variant="flat"
+                label="First name"
+                placeholder="Enter your Last name"
                 value={formData.lastName}
                 onValueChange={(value) => handleInputChange("lastName", value)}
-                isInvalid={!!errors.lastName}
                 errorMessage={errors.lastName}
+                isInvalid={!!errors.lastName}
                 isRequired
+                startContent={<User className="h-4 w-4 text-default-400" />}
+                classNames={{
+                  label: "text-accent font-medium",
+                  input: "text-accent",
+                }}
               />
             </div>
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold mb-4">Billing & Shipping</h2>
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              {deliveryMode === "delivery" ? (
+                <Truck className="h-5 w-5 mr-2" />
+              ) : (
+                <CreditCard className="h-5 w-5 mr-2" />
+              )}
+              Billing & Shipping
+            </h2>
             <div className="grid grid-cols-1 gap-4">
               {deliveryMode === "delivery" && (
                 <>
@@ -737,23 +1081,31 @@ export default function CheckoutPage() {
               )}
               <Select
                 label="Payment Method"
-                size="sm"
                 variant="flat"
                 selectedKeys={[paymentMethod]}
                 onSelectionChange={(keys) =>
                   setPaymentMethod(Array.from(keys)[0] as "Card" | "Cash")
                 }
+                className="text-accent"
+                classNames={{
+                  listboxWrapper: "text-accent",
+                }}
               >
-                <SelectItem key="Card">Card</SelectItem>
-                <SelectItem key="Cash">
-                  Cash on {deliveryMode === "pickup" ? "Pickup" : "Delivery"}
+                <SelectItem key="Card" className="text-accent">
+                  Card
+                </SelectItem>
+                <SelectItem key="Cash" className="text-accent">
+                  {`Cash on ${
+                    deliveryMode === "pickup" ? "Pickup" : "Delivery"
+                  }`}
                 </SelectItem>
               </Select>
             </div>
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <MessageSquare className="h-5 w-5 mr-2" />
               Additional information
             </h2>
             <Textarea
@@ -793,11 +1145,13 @@ export default function CheckoutPage() {
                   />
                   <div>
                     <h3 className="font-medium">{item.itemName}</h3>
-                    {item.itemVariation && (
-                      <p className="text-sm text-default-500">
-                        {item.itemVariation}
-                      </p>
-                    )}
+                    {/* Updated variations display */}
+                    {item.itemVariations &&
+                      Object.keys(item.itemVariations).length > 0 && (
+                        <p className="text-sm text-default-500">
+                          {formatVariations(item.itemVariations)}
+                        </p>
+                      )}
                     {item.itemInstructions && (
                       <p className="text-sm text-default-500">
                         {item.itemInstructions}
@@ -831,7 +1185,6 @@ export default function CheckoutPage() {
                 </Button>
               ))}
               <Button
-                size="sm"
                 variant={!tip ? "solid" : "bordered"}
                 onPress={() => setTip(0)}
                 className="text-accent col-span-1"
@@ -881,7 +1234,8 @@ export default function CheckoutPage() {
               ? "Placing Order..."
               : isValidatingAddress
               ? "Validating Address..."
-              : "Place Order"}
+              : "Review Order"}{" "}
+            {/* Changed from "Place Order" to "Review Order" */}
           </Button>
         </div>
       </div>
@@ -894,6 +1248,24 @@ export default function CheckoutPage() {
         total={total}
         isProcessing={isPaymentProcessing}
         setIsProcessing={setIsPaymentProcessing}
+      />
+
+      {/* Order Details Modal */}
+      <OrderDetailsModal
+        isOpen={isOrderDetailsOpen}
+        onClose={onOrderDetailsClose}
+        onConfirm={handleConfirmOrder}
+        items={items}
+        formData={formData}
+        deliveryMode={deliveryMode}
+        selectedLocation={selectedLocation}
+        paymentMethod={paymentMethod}
+        tip={tip}
+        subTotal={subTotal}
+        tax={tax}
+        delivery={delivery}
+        total={total}
+        isProcessing={isOrderPlaced}
       />
 
       {/* Order Confirmation Modal */}

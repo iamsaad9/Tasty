@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Input,
   Button,
@@ -23,6 +23,8 @@ import LoadingScreen from "@/components/Loading";
 import { useDietaries } from "@/app/hooks/useDieties";
 import { useVariations } from "@/app/hooks/useVariations";
 import { useLocations } from "@/app/hooks/useLocation";
+import { useSession } from "next-auth/react";
+import { useReservations } from "@/app/hooks/useReservations";
 
 interface ItemVariation {
   type: string;
@@ -118,6 +120,8 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [deliveryAreasError, setDeliveryAreasError] = useState("");
   const [isSubmitting, setIsisSubmitting] = useState(false);
+  const { data: allReservations = [] } = useReservations();
+  const { data: session } = useSession();
 
   // Hook data with fallback to empty arrays
   const { data: Categories } = useCategories();
@@ -136,6 +140,11 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
       setDeliveryAreasError("");
     }
   }, [deliveryAreas, deliveryAreasError]);
+
+  const reservations = useMemo(() => {
+    if (!allReservations || !session) return [];
+    return allReservations.filter((i) => i.email === session.user?.email);
+  }, [allReservations, session]);
 
   const schema = z.object({
     title: z

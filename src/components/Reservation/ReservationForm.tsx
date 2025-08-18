@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Calendar,
   Clock,
@@ -8,6 +8,7 @@ import {
   User,
   MessageSquare,
   Utensils,
+  AlertCircle,
 } from "lucide-react";
 import {
   Input,
@@ -33,6 +34,8 @@ import { Reservation } from "@/types";
 import { useOccasionType } from "@/app/hooks/useOccasionType";
 import LoadingScreen from "../Loading";
 import { useSession } from "next-auth/react";
+import { useReservations } from "@/app/hooks/useReservations";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ReservationDataProps {
   reservationDataProp?: Reservation | null;
@@ -76,11 +79,80 @@ function ReservationForm({
     occasion: reservationDataProp?.occasion || 0,
     requests: reservationDataProp?.requests || "",
   });
+
   const { data: session } = useSession();
+  const { data: allReservations = [] } = useReservations();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [reservationLimitErrors, setReservationLimitErrors] = useState<
+    string[]
+  >([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const { data: occasionTypes } = useOccasionType();
+  const queryClient = useQueryClient();
+  // Get user's reservations
+  const userReservations = useMemo(() => {
+    if (!allReservations || !session?.user?.email) return [];
+    return allReservations.filter(
+      (reservation) => reservation.email === session.user?.email
+    );
+  }, [allReservations, session]);
+
+  // Count pending/confirmed reservations
+  const pendingConfirmedCount = useMemo(() => {
+    return userReservations.filter(
+      (reservation) =>
+        reservation.status === "pending" || reservation.status === "confirmed"
+    ).length;
+  }, [userReservations]);
+
+  // Helper function to check if user has reservation on a specific date
+  const checkReservationOnDate = (dateToCheck: CalendarDate | null) => {
+    if (!dateToCheck) return false;
+
+    const selectedDateString = dateToCheck.toString();
+    return userReservations.some((reservation) => {
+      // If we're editing, exclude the current reservation from the check
+      if (reservationDataProp && reservation.id === reservationDataProp.id) {
+        return false;
+      }
+      return reservation.date === selectedDateString;
+    });
+  };
+
+  // Check reservation limits for general errors (only max reservations)
+  const validateReservationLimits = useMemo(() => {
+    const limitErrors: string[] = [];
+
+    // Check if user has more than 5 pending/confirmed reservations
+    if (!reservationDataProp && pendingConfirmedCount >= 5) {
+      limitErrors.push(
+        "You cannot have more than 5 pending or confirmed reservations at a time."
+      );
+    } else if (reservationDataProp && pendingConfirmedCount >= 5) {
+      // If editing, check if the current reservation is changing status
+      const currentReservationStatus = reservationDataProp.status;
+      if (
+        currentReservationStatus !== "pending" &&
+        currentReservationStatus !== "confirmed"
+      ) {
+        limitErrors.push(
+          "You cannot have more than 5 pending or confirmed reservations at a time."
+        );
+      }
+    }
+
+    return limitErrors;
+  }, [pendingConfirmedCount, reservationDataProp]);
+
+  // Update reservation limit errors when validation changes
+  useEffect(() => {
+    setReservationLimitErrors(validateReservationLimits);
+  }, [validateReservationLimits]);
+
+  // Check if form should be disabled (only for max reservations, not date conflict)
+  const isFormDisabled = reservationLimitErrors.length > 0;
+
   // Get today's date
   const minDate = today(getLocalTimeZone()).add({ days: 1 });
   const maxDate = today(getLocalTimeZone()).add({ days: 30 });
@@ -172,6 +244,9 @@ function ReservationForm({
       case "date":
         if (!value) {
           newErrors.date = "Please select a reservation date";
+        } else if (checkReservationOnDate(value as CalendarDate)) {
+          newErrors.date =
+            "You already have a reservation on this date. Only one reservation per day is allowed.";
         } else {
           delete newErrors.date;
         }
@@ -239,6 +314,7 @@ function ReservationForm({
   };
 
   const handleSubmit = async () => {
+    // Don't validate reservation limits here since they're already checked
     if (!validateAllFields()) {
       return;
     }
@@ -260,6 +336,7 @@ function ReservationForm({
     };
     console.log("reservation", reservation);
     const isEditing = !!reservationDataProp;
+    console.log("isEditing", isEditing);
 
     try {
       setIsSubmitting(true);
@@ -268,7 +345,7 @@ function ReservationForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...reservation,
-          ...(isEditing ? { _id: reservationDataProp.id } : {}), // send _id if updating
+          ...(isEditing ? { _id: reservationDataProp._id } : {}),
         }),
       });
 
@@ -288,6 +365,8 @@ function ReservationForm({
         } successfully`,
         color: "success",
       });
+      queryClient.invalidateQueries({ queryKey: ["Reservations"] });
+
       setIsSubmitting(false);
       handleReset();
     } catch (error) {
@@ -312,6 +391,7 @@ function ReservationForm({
       requests: "",
     });
     setErrors({});
+    setReservationLimitErrors([]);
     setShowSuccessMessage(false);
     onResetModalClose();
     if (resetData) resetData();
@@ -323,6 +403,29 @@ function ReservationForm({
 
   return (
     <div className="max-w-4xl mx-auto p-6 ">
+      {/* Reservation Limit Errors - Only for max reservations */}
+      {reservationLimitErrors.length > 0 && (
+        <Card className="mb-6 border-l-4 border-l-red-500">
+          <CardBody>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-5 w-5 text-red-400" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Maximum Reservations Reached
+                </h3>
+                <div className="text-sm text-red-700 mt-1 space-y-1">
+                  {reservationLimitErrors.map((error, index) => (
+                    <p key={index}>{error}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
       {/* Success Message */}
       {showSuccessMessage && (
         <Card className="mb-6 border-l-4 border-l-green-500">
@@ -389,6 +492,7 @@ function ReservationForm({
                     errorMessage={errors.name}
                     isInvalid={!!errors.name}
                     isRequired
+                    isDisabled={isFormDisabled}
                     startContent={<User className="h-4 w-4 text-default-400" />}
                     classNames={{
                       label: "text-accent font-medium",
@@ -402,7 +506,7 @@ function ReservationForm({
                     label="Email Address"
                     placeholder="your.email@example.com"
                     value={formData.email || session?.user?.email || ""}
-                    disabled={!!session?.user?.email}
+                    disabled={!!session?.user?.email || isFormDisabled}
                     onValueChange={(value) => handleInputChange("email", value)}
                     errorMessage={errors.email}
                     isInvalid={!!errors.email}
@@ -427,6 +531,7 @@ function ReservationForm({
                       errorMessage={errors.phone}
                       isInvalid={!!errors.phone}
                       isRequired
+                      isDisabled={isFormDisabled}
                       startContent={
                         <Phone className="h-4 w-4 text-default-400" />
                       }
@@ -458,6 +563,7 @@ function ReservationForm({
                     errorMessage={errors.date}
                     isInvalid={!!errors.date}
                     isRequired
+                    isDisabled={isFormDisabled}
                     calendarProps={{
                       classNames: {
                         gridBody: "bg-white text-accent",
@@ -481,6 +587,7 @@ function ReservationForm({
                     errorMessage={errors.time}
                     isInvalid={!!errors.time}
                     isRequired
+                    isDisabled={isFormDisabled}
                     startContent={
                       <Clock className="h-4 w-4 text-default-400" />
                     }
@@ -509,6 +616,7 @@ function ReservationForm({
                     errorMessage={errors.guests}
                     isInvalid={!!errors.guests}
                     isRequired
+                    isDisabled={isFormDisabled}
                     startContent={
                       <Users className="h-4 w-4 text-default-400" />
                     }
@@ -548,6 +656,7 @@ function ReservationForm({
                     errorMessage={errors.occasion}
                     isInvalid={!!errors.occasion}
                     isRequired
+                    isDisabled={isFormDisabled}
                     classNames={{
                       label: "text-accent font-medium",
                       listboxWrapper: "text-accent font-medium",
@@ -570,6 +679,7 @@ function ReservationForm({
                       handleInputChange("requests", value)
                     }
                     minRows={4}
+                    isDisabled={isFormDisabled}
                     classNames={{
                       label: "text-accent font-medium",
                       input: "text-accent",
@@ -586,6 +696,7 @@ function ReservationForm({
                 <Button
                   variant="bordered"
                   onPress={onResetModalOpen}
+                  isDisabled={isFormDisabled}
                   className="border-default-300 text-default-700 hover:bg-default-50"
                 >
                   Reset Form
@@ -596,7 +707,11 @@ function ReservationForm({
                 color="warning"
                 size="lg"
                 onPress={handleSubmit}
-                isDisabled={isSubmitting || Object.keys(errors).length > 0}
+                isDisabled={
+                  isSubmitting ||
+                  Object.keys(errors).length > 0 ||
+                  isFormDisabled
+                }
                 isLoading={isSubmitting}
                 className="px-8 font-medium bg-theme text-white hover:bg-amber-700"
               >

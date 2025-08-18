@@ -1,4 +1,5 @@
 export interface Reservation {
+  _id?: string;
   id: number;
   name: string;
   date: string;
