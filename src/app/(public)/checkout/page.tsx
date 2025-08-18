@@ -46,6 +46,7 @@ import {
   CreditCardIcon,
   User,
 } from "lucide-react";
+import { useCreateOrder } from "@/app/hooks/useOrders";
 
 // Updated CartItem interface to match the new format
 interface CartItem {
@@ -532,6 +533,7 @@ const OrderDetailsModal = ({
           <Button variant="light" onPress={onClose} isDisabled={isProcessing}>
             Back to Edit
           </Button>
+
           <Button
             color="primary"
             onPress={onConfirm}
@@ -734,6 +736,7 @@ export default function CheckoutPage() {
     onOpen: onOrderDetailsOpen,
     onClose: onOrderDetailsClose,
   } = useDisclosure();
+  const createOrderMutation = useCreateOrder();
 
   // Calculate totals using useMemo for better performance
   const { subTotal, tax, delivery, total } = useMemo(() => {
@@ -868,29 +871,54 @@ export default function CheckoutPage() {
   };
 
   // Handle order completion
-  const handleOrderCompletion = () => {
+  const handleOrderCompletion = async () => {
     const orderData = {
       customer: formData,
-      items,
+      items: items.map((item) => ({
+        itemId: item.itemId || undefined,
+        itemName: item.itemName || "", // ✅ Added fallback ""
+        itemImage: item.itemImage || "", // ✅ Added fallback ""
+        itemBasePrice: item.itemBasePrice ?? 0,
+        itemQuantity: item.itemQuantity ?? 1,
+        itemVariations: item.itemVariations || {}, // ✅ Added fallback {}
+        itemInstructions: item.itemInstructions || "", // ✅ Added fallback ""
+      })),
       pricing: { subTotal, tax, delivery, tip, total },
       deliveryMode,
       paymentMethod,
       selectedLocation,
-      orderDate: new Date().toISOString(),
-      total,
     };
 
-    setOrderConfirmationData(orderData);
+    try {
+      // Use React Query mutation to create order
+      const orderResponse = await createOrderMutation.mutateAsync(orderData);
 
-    addToast({
-      title: "Order Placed Successfully!",
-      description: `Thank you ${
-        formData.firstName
-      }! Your order total is $${total.toFixed(2)}.`,
-      color: "success",
-    });
+      // Store order data with backend response
+      setOrderConfirmationData({
+        ...orderData,
+        orderId: orderResponse.orderId,
+        orderNumber: orderResponse.orderNumber,
+        estimatedDeliveryTime: orderResponse.estimatedDeliveryTime,
+        orderStatus: orderResponse.orderStatus,
+      });
 
-    onConfirmationOpen();
+      addToast({
+        title: "Order Placed Successfully!",
+        description: `Thank you ${formData.firstName}! Your order #${orderResponse.orderNumber} has been received.`,
+        color: "success",
+      });
+
+      onConfirmationOpen();
+    } catch (error: any) {
+      console.error("Failed to place order:", error);
+      addToast({
+        title: "Order Failed",
+        description:
+          error.message ||
+          "Something went wrong while placing your order. Please try again.",
+        color: "danger",
+      });
+    }
   };
 
   // Handle placing the order
@@ -912,6 +940,9 @@ export default function CheckoutPage() {
   const handleConfirmOrder = async () => {
     onOrderDetailsClose();
 
+    console.log("Form Data:", formData);
+    console.log("Item Data:", items);
+
     if (paymentMethod === "Card") {
       onPaymentOpen();
     } else {
@@ -919,16 +950,10 @@ export default function CheckoutPage() {
       setIsOrderPlaced(true);
 
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        handleOrderCompletion();
+        await handleOrderCompletion();
       } catch (error) {
-        addToast({
-          title: "Order Failed",
-          description: "Something went wrong. Please try again.",
-          color: "danger",
-        });
+        console.error("Order placement failed:", error);
+        // Error handling is already done in handleOrderCompletion
       } finally {
         setIsOrderPlaced(false);
       }
@@ -1224,18 +1249,22 @@ export default function CheckoutPage() {
             className="w-full mt-4 bg-theme text-white"
             onPress={handlePlaceOrder}
             isDisabled={
-              isOrderPlaced || items.length === 0 || isValidatingAddress
+              isOrderPlaced ||
+              items.length === 0 ||
+              isValidatingAddress ||
+              createOrderMutation.isPending
             }
             startContent={
-              isOrderPlaced ? <Spinner size="sm" color="white" /> : null
+              isOrderPlaced || createOrderMutation.isPending ? (
+                <Spinner size="sm" color="white" />
+              ) : null
             }
           >
-            {isOrderPlaced
+            {isOrderPlaced || createOrderMutation.isPending
               ? "Placing Order..."
               : isValidatingAddress
               ? "Validating Address..."
-              : "Review Order"}{" "}
-            {/* Changed from "Place Order" to "Review Order" */}
+              : "Review Order"}
           </Button>
         </div>
       </div>
