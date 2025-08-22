@@ -36,6 +36,7 @@ import LoadingScreen from "../Loading";
 import { useSession } from "next-auth/react";
 import { useReservations } from "@/app/hooks/useReservations";
 import { useQueryClient } from "@tanstack/react-query";
+import { MdOutlineAccessTimeFilled } from "react-icons/md";
 
 interface ReservationDataProps {
   reservationDataProp?: Reservation | null;
@@ -75,6 +76,7 @@ function ReservationForm({
         })()
       : null,
     time: reservationDataProp?.time || "",
+    duration: reservationDataProp?.duration || 1,
     guests: reservationDataProp?.guests?.toString() || "2",
     occasion: reservationDataProp?.occasion || 0,
     requests: reservationDataProp?.requests || "",
@@ -98,14 +100,6 @@ function ReservationForm({
     );
   }, [allReservations, session]);
 
-  // Count pending/confirmed reservations
-  const pendingConfirmedCount = useMemo(() => {
-    return userReservations.filter(
-      (reservation) =>
-        reservation.status === "pending" || reservation.status === "confirmed"
-    ).length;
-  }, [userReservations]);
-
   // Helper function to check if user has reservation on a specific date
   const checkReservationOnDate = (dateToCheck: CalendarDate | null) => {
     if (!dateToCheck) return false;
@@ -123,27 +117,17 @@ function ReservationForm({
   // Check reservation limits for general errors (only max reservations)
   const validateReservationLimits = useMemo(() => {
     const limitErrors: string[] = [];
-
+    const onGoingReservations = userReservations.filter(
+      (i) => i.date >= today(getLocalTimeZone()).toString()
+    );
     // Check if user has more than 5 pending/confirmed reservations
-    if (!reservationDataProp && pendingConfirmedCount >= 5) {
+    if (!reservationDataProp && onGoingReservations.length >= 5) {
       limitErrors.push(
-        "You cannot have more than 5 pending or confirmed reservations at a time."
+        "You cannot have more than 5 ongoing reservations at a time."
       );
-    } else if (reservationDataProp && pendingConfirmedCount >= 5) {
-      // If editing, check if the current reservation is changing status
-      const currentReservationStatus = reservationDataProp.status;
-      if (
-        currentReservationStatus !== "pending" &&
-        currentReservationStatus !== "confirmed"
-      ) {
-        limitErrors.push(
-          "You cannot have more than 5 pending or confirmed reservations at a time."
-        );
-      }
     }
-
     return limitErrors;
-  }, [pendingConfirmedCount, reservationDataProp]);
+  }, [userReservations, reservationDataProp]);
 
   // Update reservation limit errors when validation changes
   useEffect(() => {
@@ -260,6 +244,15 @@ function ReservationForm({
         }
         break;
 
+      case "duration":
+        const durationCount = typeof value === "string" ? parseInt(value) : 0;
+        if (!durationCount || durationCount < 0 || durationCount > 6) {
+          newErrors.duration = "Please select between 0 and 6 Hours";
+        } else {
+          delete newErrors.duration;
+        }
+        break;
+
       case "guests":
         const guestCount = typeof value === "string" ? parseInt(value) : 0;
         if (!guestCount || guestCount < 1 || guestCount > 20) {
@@ -297,6 +290,7 @@ function ReservationForm({
       "phone",
       "date",
       "time",
+      "duration",
       "guests",
       "occasion",
     ];
@@ -314,10 +308,6 @@ function ReservationForm({
   };
 
   const handleSubmit = async () => {
-    // Don't validate reservation limits here since they're already checked
-    if (!validateAllFields()) {
-      return;
-    }
     console.log("Submit clicked");
 
     setIsSubmitting(true);
@@ -329,10 +319,12 @@ function ReservationForm({
       phone: formData.phone,
       date: formData.date ? formData.date.toString() : "",
       time: formData.time,
+      duration: formData.duration,
       guests: parseInt(formData.guests),
       occasion: formData.occasion,
       requests: formData.requests,
       status: "pending",
+      tableId: "",
     };
     console.log("reservation", reservation);
     const isEditing = !!reservationDataProp;
@@ -386,6 +378,7 @@ function ReservationForm({
       phone: "",
       date: null,
       time: "",
+      duration: 1,
       guests: "2",
       occasion: 0,
       requests: "",
@@ -552,7 +545,7 @@ function ReservationForm({
                   <Calendar className="h-5 w-5 mr-2" />
                   Reservation Details
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Date */}
                   <DatePicker
                     label="Reservation Date"
@@ -603,6 +596,39 @@ function ReservationForm({
                       </AutocompleteItem>
                     ))}
                   </Autocomplete>
+
+                  {/* Duration */}
+                  <Select
+                    label="Estimated Duration (Hours)"
+                    placeholder="Estimated duration"
+                    selectedKeys={
+                      formData.duration.toString()
+                        ? [formData.duration.toString()]
+                        : []
+                    }
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      handleInputChange("duration", selected);
+                    }}
+                    errorMessage={errors.duration}
+                    isInvalid={!!errors.duration}
+                    isRequired
+                    isDisabled={isFormDisabled}
+                    startContent={
+                      <MdOutlineAccessTimeFilled className="h-4 w-4 text-default-400" />
+                    }
+                    className="text-accent"
+                    classNames={{
+                      label: "text-accent font-medium",
+                      listboxWrapper: "text-accent font-medium",
+                    }}
+                  >
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <SelectItem key={i} textValue={i.toString() + " Hours"}>
+                        {i}
+                      </SelectItem>
+                    ))}
+                  </Select>
 
                   {/* Guests */}
                   <Select

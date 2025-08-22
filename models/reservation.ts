@@ -6,11 +6,13 @@ export interface IReservation extends Document {
   date: string;
   phone?: string;
   time: string;
+  duration: number;
   guests: number;
   email: string;
   status: string;
   occasion: number;
   requests?: string;
+  tableId?: string | null;
 }
 
 const ReservationSchema = new Schema<IReservation>({
@@ -19,11 +21,13 @@ const ReservationSchema = new Schema<IReservation>({
   date: { type: String, required: true },
   phone: { type: String },
   time: { type: String, required: true },
+  duration: { type: Number, required: true },
   guests: { type: Number, required: true },
   email: { type: String, required: true },
   status: { type: String, required: true },
   occasion: { type: Number, required: true },
   requests: { type: String },
+  tableId: { type: String },
 });
 
 export default mongoose.models.Reservation ||

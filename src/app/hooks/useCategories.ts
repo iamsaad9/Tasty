@@ -1,11 +1,6 @@
 // hooks/useCategories.ts
 import { useQuery } from "@tanstack/react-query";
-
-interface Categories {
-  id: string;
-  name: string;
-  icon: string;
-}
+import { Categories } from "@/types";
 
 export function useCategories() {
   return useQuery({

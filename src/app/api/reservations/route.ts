@@ -19,6 +19,7 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
+    console.log("Incoming body", body);
     const newReservation = await Reservation.create(body);
     return NextResponse.json(newReservation, { status: 201 });
   } catch (error: any) {
@@ -32,16 +33,18 @@ export async function PUT(req: Request) {
     await connectDB();
     const body = await req.json();
 
-    if (!body._id) {
+    if (!body.id) {
       return NextResponse.json(
-        { error: "Missing _id for update" },
+        { error: "Missing id for update" },
         { status: 400 }
       );
     }
 
+    const { id, ...updateData } = body; // take id out, keep rest dynamic
+
     const updatedReservation = await Reservation.findByIdAndUpdate(
-      body._id,
-      body,
+      id,
+      updateData,
       {
         new: true,
         runValidators: true,

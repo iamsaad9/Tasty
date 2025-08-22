@@ -23,6 +23,12 @@ import LoadingScreen from "../Loading";
 import { useOccasionType } from "@/app/hooks/useOccasionType";
 import { useSession } from "next-auth/react";
 import { useQueryClient } from "@tanstack/react-query";
+import { MdTableRestaurant } from "react-icons/md";
+import { FaUserFriends } from "react-icons/fa";
+import { BsFillCalendarDateFill } from "react-icons/bs";
+import { MdOutlineAccessTimeFilled } from "react-icons/md";
+import { FaPhone } from "react-icons/fa6";
+import { MdAvTimer } from "react-icons/md";
 
 interface Column {
   name: string;
@@ -40,11 +46,13 @@ const columns: Column[] = [
   { name: "NAME", uid: "name", sortable: true },
   { name: "DATE", uid: "date", sortable: true },
   { name: "TIME", uid: "time", sortable: true },
+  { name: "DURATION", uid: "duration", sortable: true },
   { name: "GUESTS", uid: "guests", sortable: true },
   { name: "PHONE", uid: "phone", sortable: true },
   { name: "OCCASION", uid: "occasion", sortable: true },
   { name: "REQUESTS", uid: "requests", sortable: true },
   { name: "STATUS", uid: "status", sortable: true },
+  { name: "TABLE", uid: "table", sortable: true },
   { name: "ACTIONS", uid: "actions" },
 ];
 
@@ -72,7 +80,16 @@ export default function ViewReservations({
   const reservations =
     !allReservations || !session
       ? []
-      : allReservations.filter((i) => i.email === session.user?.email);
+      : allReservations.filter(
+          (i) =>
+            i.email === session.user?.email &&
+            i.status !== "deleted" &&
+            i.status !== "cancelled"
+        );
+
+  const onGoingReservations = reservations.filter(
+    (i) => i.date >= new Date().toISOString().split("T")[0]
+  );
 
   // Create occasion lookup map for better performance
   const occasionMap = useMemo(() => {
@@ -167,27 +184,30 @@ export default function ViewReservations({
     );
   }, [sortedItems, filterValue, occasionMap]);
 
-  const handleDeleteReservation = async (id: string) => {
-    console.log("Deleting reservation with id:", id);
+  const handleStatusChange = async (id: string, status: string) => {
     try {
       const res = await fetch("/api/reservations", {
-        method: "DELETE",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({
+          id,
+          status,
+          tableId: null,
+        }),
       });
 
       if (!res.ok) {
         addToast({
           title: "Failed",
-          description: `Failed to delete reservation`,
+          description: `Failed to ${status} reservation`,
           color: "danger",
         });
-        throw new Error("Failed to delete reservation");
+        throw new Error(`Failed to ${status} reservation`);
       }
 
       addToast({
         title: "Deleted",
-        description: "Reservation deleted successfully",
+        description: `Reservation ${status} successfully`,
         color: "success",
       });
 
@@ -195,7 +215,7 @@ export default function ViewReservations({
     } catch (error) {
       addToast({
         title: "Error",
-        description: "Failed to delete reservation",
+        description: `Failed to ${status} reservation`,
         color: "danger",
       });
     }
@@ -250,7 +270,8 @@ export default function ViewReservations({
             }
           );
           return (
-            <div className="flex flex-col min-w-30">
+            <div className="flex gap-2 items-center justify-center min-w-30">
+              <BsFillCalendarDateFill size={20} />
               <p className="text-bold">{formattedDate}</p>
             </div>
           );
@@ -264,14 +285,26 @@ export default function ViewReservations({
               })
             : "N/A";
           return (
-            <div className="flex flex-col">
+            <div className="flex justify-center items-center gap-2">
+              <MdOutlineAccessTimeFilled size={20} />
               <p className="text-bold">{formattedTime}</p>
+            </div>
+          );
+
+        case "duration":
+          return (
+            <div className="flex items-center justify-center gap-2">
+              <MdAvTimer size={20} />
+              <p className="text-bold">
+                {item.duration} {item.duration === 1 ? "Hours" : "Hours"}
+              </p>
             </div>
           );
 
         case "guests":
           return (
-            <div className="flex flex-col">
+            <div className="flex items-center justify-center gap-2">
+              <FaUserFriends size={20} />
               <p className="text-bold">
                 {item.guests} {item.guests === 1 ? "Guest" : "Guests"}
               </p>
@@ -280,7 +313,8 @@ export default function ViewReservations({
 
         case "phone":
           return (
-            <div className="flex flex-col min-w-40">
+            <div className="flex items-center justify-center gap-2">
+              <FaPhone size={20} />
               <p className="text-bold">{item.phone || "N/A"}</p>
             </div>
           );
@@ -317,7 +351,7 @@ export default function ViewReservations({
               className={clsx(
                 {
                   "bg-red-100 border-red-500 text-red-700":
-                    item.status === "rejected",
+                    item.status === "cancelled",
                   "bg-green-100 border-green-500 text-green-700":
                     item.status === "confirmed",
                   "bg-orange-100 border-orange-500 text-orange-700":
@@ -330,17 +364,29 @@ export default function ViewReservations({
             </div>
           );
 
+        case "table":
+          return (
+            <div className="flex items-center gap-2 justify-center border-1 border-accent rounded-sm p-1 min-w-16">
+              <MdTableRestaurant size={20} />
+              <p className="font-medium">
+                {item.tableId ? item.tableId : "N/A"}
+              </p>
+            </div>
+          );
+
         case "actions":
           return (
             <div className="relative flex items-center gap-2">
               <Tooltip
                 color="secondary"
                 content="Edit reservation"
-                isDisabled={item.status === "confirmed"}
+                isDisabled={
+                  item.status === "confirmed" || item.status === "cancelled"
+                }
               >
                 <span
                   className={`text-lg ${
-                    item.status !== "confirmed"
+                    item.status !== "confirmed" || "cancelled"
                       ? "text-default-400 cursor-pointer hover:text-primary"
                       : "text-default-200 cursor-not-allowed"
                   }`}
@@ -348,13 +394,13 @@ export default function ViewReservations({
                   <PenIcon
                     size={20}
                     onClick={() => {
-                      if (item.status !== "confirmed") {
+                      if (item.status === "pending") {
                         handleEditReservation(item);
                       } else {
                         addToast({
                           title: "Alert!",
                           description:
-                            "Confirmed reservations cannot be edited",
+                            "Confirmed or Cancelled reservations cannot be edited",
                           color: "warning",
                         });
                       }
@@ -364,12 +410,17 @@ export default function ViewReservations({
               </Tooltip>
 
               <Tooltip
-                color={item.status === "confirmed" ? "warning" : "danger"}
+                color={
+                  item.status === "confirmed" || "cancelled"
+                    ? "warning"
+                    : "danger"
+                }
                 content={
                   item.status === "confirmed"
                     ? "Cancel reservation"
                     : "Delete reservation"
                 }
+                isDisabled={item.status === "cancelled"}
               >
                 <span
                   className={`${
@@ -440,16 +491,20 @@ export default function ViewReservations({
             )}
           </div>
           <Button
-            color={reservations.length >= 5 ? "danger" : "success"}
+            color={onGoingReservations.length >= 5 ? "danger" : "success"}
             size="sm"
             className="text-sm shadow-md"
             onPress={onAddNew}
-            isDisabled={reservations.length >= 5}
+            isDisabled={onGoingReservations.length >= 5}
             startContent={
-              reservations.length >= 5 ? <Ban size={16} /> : <Plus size={16} />
+              onGoingReservations.length >= 5 ? (
+                <Ban size={16} />
+              ) : (
+                <Plus size={16} />
+              )
             }
           >
-            {reservations.length >= 5 ? "Limit Reached" : "Add New"}
+            {onGoingReservations.length >= 5 ? "Limit Reached" : "Add New"}
           </Button>
         </div>
 
@@ -478,15 +533,15 @@ export default function ViewReservations({
   const handleModalAction = () => {
     if (showModal.reservationId) {
       if (showModal.button === "Delete") {
-        handleDeleteReservation(showModal.reservationId);
+        handleStatusChange(showModal.reservationId, "deleted");
       } else if (showModal.button === "Cancel") {
-        handleCancelReservation(showModal.reservationId);
+        handleStatusChange(showModal.reservationId, "cancelled");
       }
     }
   };
 
   // Show loading only when reservations are being fetched
-  if (!reservations && isPending) {
+  if (!reservations || isPending) {
     return <LoadingScreen showLoading={true} />;
   }
 
