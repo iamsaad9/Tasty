@@ -338,8 +338,8 @@ export default function ViewReservations({
 
         case "requests":
           return (
-            <div className="flex flex-col min-w-40">
-              <p className="text-bold line-clamp-2" title={item.requests || ""}>
+            <div className="flex flex-col w-40 whitespace-normal break-words">
+              <p className="text-bold" title={item.requests || ""}>
                 {item.requests ? item.requests : "N/A"}
               </p>
             </div>

@@ -28,6 +28,7 @@ import { useLocationStore } from "@/lib/store/locationStore";
 import { validateAddressWithMaps } from "@/lib/validateAddressWithMaps";
 import PageBanner from "@/components/PageBanner";
 import { useSession } from "next-auth/react";
+import { OrderData } from "@/types";
 import {
   CheckCircle,
   CreditCard,
@@ -209,6 +210,7 @@ const StripePaymentModal = ({
       onClose={onClose}
       size="lg"
       isDismissable={!isProcessing}
+      className="text-accent"
     >
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
@@ -289,7 +291,7 @@ const StripePaymentModal = ({
             color="primary"
             onPress={handlePayment}
             isDisabled={isProcessing}
-            startContent={isProcessing ? <Spinner size="sm" /> : null}
+            isLoading={isProcessing}
           >
             {isProcessing ? "Processing..." : `Pay $${total.toFixed(2)}`}
           </Button>
@@ -396,15 +398,8 @@ const OrderDetailsModal = ({
                     <span className="font-medium">Delivery Address:</span>
                     <p className="text-sm">{formData.address}</p>
                     <p className="text-sm text-blue-600">
-                      {selectedLocation}, Karachi
+                      {selectedLocation}, San Francisco
                     </p>
-                  </div>
-                )}
-
-                {deliveryMode === "pickup" && (
-                  <div className="mt-3 pt-3 border-t">
-                    <span className="font-medium">Pickup Location:</span>
-                    <p className="text-sm text-blue-600">{selectedLocation}</p>
                   </div>
                 )}
 
@@ -563,12 +558,6 @@ const OrderConfirmationModal = ({
   onClose,
   orderData,
 }: OrderConfirmationData) => {
-  const generateOrderId = () => {
-    return "#" + Math.random().toString(36).substring(2, 8).toUpperCase();
-  };
-
-  const orderId = generateOrderId();
-
   return (
     <Modal
       isOpen={isOpen}
@@ -596,14 +585,16 @@ const OrderConfirmationModal = ({
                 <div className="flex items-center gap-2">
                   <Package className="w-4 h-4" />
                   <span className="font-medium">Order ID:</span>
-                  <span className="font-bold text-theme">{orderId}</span>
+                  <span className="font-bold text-theme">
+                    {orderData?.orderNumber}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CreditCard className="w-4 h-4" />
                   <span className="font-medium">Payment:</span>
                   <span>
                     {orderData?.paymentMethod === "Cash"
-                      ? "Cash on Delivery"
+                      ? "Cash"
                       : "Credit Card"}
                   </span>
                 </div>
@@ -612,7 +603,7 @@ const OrderConfirmationModal = ({
                   <Truck className="w-4 h-4" />
                   <span className="font-medium">Total Amount:</span>
                   <span className="font-bold">
-                    ${orderData?.total?.toFixed(2) || "0.00"}
+                    ${orderData?.pricing.total?.toFixed(2) || "0.00"}
                   </span>
                 </div>
               </div>
@@ -623,7 +614,7 @@ const OrderConfirmationModal = ({
               <div className="border-l-4 border-blue-500 pl-4">
                 <div className="flex items-center gap-2 mb-2">
                   <MapPin className="w-4 h-4" />
-                  <span className="font-medium">📍 Delivery Address:</span>
+                  <span className="font-medium"> Delivery Address:</span>
                 </div>
                 <div className="text-sm text-gray-600">
                   <p className="font-medium">
@@ -631,7 +622,7 @@ const OrderConfirmationModal = ({
                     {orderData?.customer?.lastName}
                   </p>
                   <p>{orderData?.customer?.address}</p>
-                  <p>Karachi, Pakistan</p>
+                  <p>San Francisco, CA</p>
                 </div>
               </div>
             )}
@@ -724,7 +715,8 @@ export default function CheckoutPage() {
   const [isOrderPlaced, setIsOrderPlaced] = useState<boolean>(false);
   const [isPaymentProcessing, setIsPaymentProcessing] =
     useState<boolean>(false);
-  const [orderConfirmationData, setOrderConfirmationData] = useState<any>(null);
+  const [orderConfirmationData, setOrderConfirmationData] =
+    useState<OrderData>();
 
   // Form validation state
   const [errors, setErrors] = useState<FormErrors>({});
@@ -800,68 +792,109 @@ export default function CheckoutPage() {
       newErrors.phone = "Please enter a valid phone number";
     }
 
-    if (deliveryMode === "delivery") {
-      if (!formData.address.trim()) {
-        newErrors.address = "Address is required for delivery";
-      } else {
-        // Validate address with Google Maps
-        setIsValidatingAddress(true);
-        try {
-          const locationValidation = await validateAddressWithMaps(
-            formData.address,
-            selectedLocation
-          );
+    // if (deliveryMode === "delivery") {
+    //   if (!formData.address.trim()) {
+    //     newErrors.address = "Address is required for delivery";
+    //   } else {
+    //     // Validate address with Google Maps
+    //     setIsValidatingAddress(true);
+    //     try {
+    //       const locationValidation = await validateAddressWithMaps(
+    //         formData.address,
+    //         selectedLocation
+    //       );
 
-          if (!locationValidation.isValid) {
-            newErrors.address =
-              locationValidation.message ?? "Invalid address.";
-          }
-        } catch (error) {
-          console.error("Address validation failed:", error);
-          // Don't block submission if validation fails
-        } finally {
-          setIsValidatingAddress(false);
-        }
-      }
-    }
+    //       if (!locationValidation.isValid) {
+    //         newErrors.address =
+    //           locationValidation.message ?? "Invalid address.";
+    //       }
+    //     } catch (error) {
+    //       console.error("Address validation failed:", error);
+    //       // Don't block submission if validation fails
+    //     } finally {
+    //       setIsValidatingAddress(false);
+    //     }
+    //   }
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   // Handle input changes
+  let validationTimeout: ReturnType<typeof setTimeout>;
+
   const handleInputChange = (field: FormField, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
 
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
+    // Clear existing timeout
+    if (validationTimeout) clearTimeout(validationTimeout);
+
+    // Run validation after short delay (so it doesn’t flicker while typing)
+    validationTimeout = setTimeout(() => {
+      const newErrors: FormErrors = { ...errors };
+
+      if (field === "email") {
+        if (!value.trim()) {
+          newErrors.email = "Email is required";
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          newErrors.email = "Please enter a valid email";
+        } else {
+          newErrors.email = "";
+        }
+      }
+
+      if (field === "phone") {
+        if (!value.trim()) {
+          newErrors.phone = "Phone number is required";
+        } else if (!/^\+?[\d\s\-\(\)]{10,}$/.test(value)) {
+          newErrors.phone = "Please enter a valid phone number";
+        } else {
+          newErrors.phone = "";
+        }
+      }
+
+      if (field === "firstName" && !value.trim()) {
+        newErrors.firstName = "First name is required";
+      } else if (field === "firstName") {
+        newErrors.firstName = "";
+      }
+
+      if (field === "lastName" && !value.trim()) {
+        newErrors.lastName = "Last name is required";
+      } else if (field === "lastName") {
+        newErrors.lastName = "";
+      }
+
+      setErrors(newErrors);
+    }, 400); // 👈 adjust delay for smoother UX
   };
 
   // Handle input blur for validation feedback
   const handleBlur = (field: FormField) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
 
-    // Validate specific field on blur
-    const newErrors: FormErrors = { ...errors };
+    setTimeout(() => {
+      const newErrors: FormErrors = { ...errors };
 
-    if (
-      field === "email" &&
-      formData.email &&
-      !/\S+@\S+\.\S+/.test(formData.email)
-    ) {
-      newErrors.email = "Please enter a valid email";
-    }
-    if (
-      field === "phone" &&
-      formData.phone &&
-      !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone)
-    ) {
-      newErrors.phone = "Please enter a valid phone number";
-    }
+      if (
+        field === "email" &&
+        formData.email &&
+        !/\S+@\S+\.\S+/.test(formData.email)
+      ) {
+        newErrors.email = "Please enter a valid email";
+      }
 
-    setErrors(newErrors);
+      if (
+        field === "phone" &&
+        formData.phone &&
+        !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone)
+      ) {
+        newErrors.phone = "Please enter a valid phone number";
+      }
+
+      setErrors(newErrors);
+    }, 300); // 👈 short delay on blur
   };
 
   // Handle payment success
@@ -1036,7 +1069,7 @@ export default function CheckoutPage() {
 
               {/*lirst Name */}
               <Input
-                label="First name"
+                label="Last name"
                 placeholder="Enter your Last name"
                 value={formData.lastName}
                 onValueChange={(value) => handleInputChange("lastName", value)}

@@ -8,19 +8,7 @@ import ImageGallery from "@/components/ImageGallery";
 import ViewReservationsTable from "@/components/Reservation/ReservationTable";
 import Heading from "@/components/Heading";
 import { useRouter, useSearchParams } from "next/navigation";
-
-interface Reservation {
-  id: number;
-  name: string;
-  date: string;
-  phone?: string;
-  time: string;
-  guests: number;
-  email: string;
-  status: string;
-  occasion: string;
-  requests?: string;
-}
+import { Reservation } from "@/types";
 
 function ReservationPage() {
   const searchParams = useSearchParams();

@@ -82,7 +82,7 @@ export function MenuItemCard({
       }}
       whileTap={{ scale: 0.9 }}
     >
-      <Card className="h-full rounded-2xl  md:max-w-xs border-2 md:border-3 border-theme overflow-hidden transition-shadow duration-300 group cursor-pointer">
+      <Card className="h-full rounded-2xl  md:max-w-xs overflow-hidden transition-shadow duration-300 group cursor-pointer">
         {showLoginModal && (
           <LoginModal
             open={showLoginModal}
@@ -159,12 +159,19 @@ export function DashboardMenuItemCard({
       setShowLoginModal(true);
       return null;
     }
-    const currentPath = window.location.pathname + window.location.search;
-    openModal(MenuItem, currentPath); // Save previous location
 
+    // Get current path + query
+    const currentPath = window.location.pathname;
     const params = new URLSearchParams(window.location.search);
+
+    // Add/replace item param
     params.set("item", MenuItem.id.toString());
-    router.push(`/menu?${params.toString()}`, { scroll: false });
+
+    // Open modal and remember where we came from
+    openModal(MenuItem, currentPath + window.location.search);
+
+    // Push to current page with ?item=12 instead of always /menu
+    router.push(`${currentPath}?${params.toString()}`, { scroll: false });
   };
 
   return (

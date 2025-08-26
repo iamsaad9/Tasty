@@ -14,7 +14,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <ToastProvider placement="bottom-center" />
         <QueryClientProvider client={queryClient}>
           {children}
-          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </HeroUIProvider>
     </SessionProvider>

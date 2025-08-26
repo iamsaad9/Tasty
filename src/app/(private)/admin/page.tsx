@@ -15,6 +15,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import {
+  ChevronDown,
   TrendingUp,
   Users,
   ShoppingBag,
@@ -29,6 +30,7 @@ import {
   Sun,
   Wine,
   Lock,
+  MessageSquare,
 } from "lucide-react";
 import { Select, SelectItem } from "@heroui/react";
 import PageBanner from "@/components/PageBanner";
@@ -39,7 +41,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Reservation } from "@/types";
 // import { Tables } from "@/types";
 import LoadingScreen from "@/components/Loading";
-import { addToast } from "@heroui/react";
+import { addToast, Tooltip as Tip } from "@heroui/react";
+import { useOrders } from "@/app/hooks/useOrders";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Button,
+} from "@heroui/react";
 
 interface StatData {
   value: string | number;
@@ -64,15 +74,6 @@ interface OrderStatusData {
   name: string;
   value: number;
   color: string;
-}
-
-interface RecentOrder {
-  id: string;
-  customer: string;
-  items: number;
-  total: number;
-  status: "preparing" | "ready" | "delivered" | "pending";
-  time: string;
 }
 
 interface StatCardProps {
@@ -102,6 +103,7 @@ const AdminDashboard: React.FC = () => {
     [key: string]: string;
   }>({});
   const { data: mockTables } = useTables();
+  const { data: orders } = useOrders();
 
   // Mock data with proper TypeScript typing
   const stats: Stats = {
@@ -132,40 +134,40 @@ const AdminDashboard: React.FC = () => {
     { name: "Cancelled", value: 5, color: "#ef4444" },
   ];
 
-  const recentOrders: RecentOrder[] = [
-    {
-      id: "#001",
-      customer: "John Doe",
-      items: 3,
-      total: 45.5,
-      status: "preparing",
-      time: "5 min ago",
-    },
-    {
-      id: "#002",
-      customer: "Sarah Smith",
-      items: 2,
-      total: 32.0,
-      status: "ready",
-      time: "12 min ago",
-    },
-    {
-      id: "#003",
-      customer: "Mike Johnson",
-      items: 4,
-      total: 68.75,
-      status: "delivered",
-      time: "18 min ago",
-    },
-    {
-      id: "#004",
-      customer: "Emily Brown",
-      items: 1,
-      total: 15.25,
-      status: "pending",
-      time: "25 min ago",
-    },
-  ];
+  // const recentOrders: RecentOrder[] = [
+  //   {
+  //     id: "#001",
+  //     customer: "John Doe",
+  //     items: 3,
+  //     total: 45.5,
+  //     status: "preparing",
+  //     time: "5 min ago",
+  //   },
+  //   {
+  //     id: "#002",
+  //     customer: "Sarah Smith",
+  //     items: 2,
+  //     total: 32.0,
+  //     status: "ready",
+  //     time: "12 min ago",
+  //   },
+  //   {
+  //     id: "#003",
+  //     customer: "Mike Johnson",
+  //     items: 4,
+  //     total: 68.75,
+  //     status: "delivered",
+  //     time: "18 min ago",
+  //   },
+  //   {
+  //     id: "#004",
+  //     customer: "Emily Brown",
+  //     items: 1,
+  //     total: 15.25,
+  //     status: "pending",
+  //     time: "25 min ago",
+  //   },
+  // ];
 
   const StatCard: React.FC<StatCardProps> = ({
     title,
@@ -204,25 +206,42 @@ const AdminDashboard: React.FC = () => {
     </div>
   );
 
-  const getStatusColor = (status: RecentOrder["status"]): string => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "delivered":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 capitalize";
+      case "confirmed":
+        return "bg-green-100 text-green-800 capitalize";
       case "ready":
         return (
           "text-white" +
           " " +
-          "px-2 py-1 rounded-full text-xs font-medium" +
+          "px-2 py-1 rounded-full text-xs font-medium capitalize" +
           " " +
           "bg-[--theme]"
         );
       case "preparing":
         return "bg-yellow-100 text-yellow-800";
       case "pending":
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-200 text-gray-800 capitalize";
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const getOrderTime = (orderDate: string) => {
+    const now = new Date();
+    const diffMs = now.getTime() - new Date(orderDate).getTime();
+
+    const seconds = Math.floor(diffMs / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
   };
 
   const handleStatusUpdate = async (
@@ -350,10 +369,6 @@ const AdminDashboard: React.FC = () => {
         return reservationDate >= today && reservation.status !== "cancelled";
       })
       .slice(0, 5) || [];
-
-  if (isLoading || !mockTables || error) {
-    return <LoadingScreen showLoading={true} />;
-  }
 
   // Enhanced reservation component with table availability checking
 
@@ -510,6 +525,10 @@ const AdminDashboard: React.FC = () => {
     });
   };
 
+  if (isLoading || !mockTables || error) {
+    return <LoadingScreen showLoading={true} />;
+  }
+
   return (
     <>
       <PageBanner
@@ -529,16 +548,33 @@ const AdminDashboard: React.FC = () => {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <select
-                value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-theme focus:border-transparent"
-              >
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="year">This Year</option>
-              </select>
+              <Dropdown className="text-accent">
+                <DropdownTrigger>
+                  <Button
+                    variant="bordered"
+                    endContent={<ChevronDown size={16} />}
+                  >
+                    {timeRange === "today" && "Today"}
+                    {timeRange === "week" && "This Week"}
+                    {timeRange === "month" && "This Month"}
+                    {timeRange === "year" && "This Year"}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Time range selection"
+                  selectedKeys={[timeRange]}
+                  selectionMode="single"
+                  onSelectionChange={(keys) => {
+                    const selectedKey = Array.from(keys)[0];
+                    setTimeRange(selectedKey as string);
+                  }}
+                >
+                  <DropdownItem key="today">Today</DropdownItem>
+                  <DropdownItem key="week">This Week</DropdownItem>
+                  <DropdownItem key="month">This Month</DropdownItem>
+                  <DropdownItem key="year">This Year</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             </div>
           </div>
 
@@ -576,6 +612,33 @@ const AdminDashboard: React.FC = () => {
               icon={Users}
               color="bg-[--theme]"
             />
+          </div>
+
+          {/* Quick Actions */}
+          <div className="my-8 bg-white rounded-md p-6 shadow-sm border border-gray-100">
+            <h3 className="text-lg font-semibold text-accent mb-4">
+              Quick Actions
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <button
+                onClick={() => router.push("/admin/manageMenu")}
+                className="flex items-center justify-center gap-2 p-4 bg-red-50 text-red-700 hover:bg-red-100 cursor-pointer rounded-md hover:bg-opacity-20 transition-colors"
+              >
+                <Plus className="h-5 w-5" />
+                Manage Menu Items
+              </button>
+              <button
+                onClick={() => router.push("/admin/processOrders")}
+                className="flex items-center justify-center gap-2 p-4 bg-green-50 text-green-700 rounded-md hover:bg-green-100 cursor-pointer transition-colors"
+              >
+                <ShoppingBag className="h-5 w-5" />
+                Process Order
+              </button>
+              <button className="flex items-center justify-center gap-2 p-4 bg-purple-50 text-purple-700 rounded-md hover:bg-purple-100 cursor-pointer transition-colors">
+                <Users className="h-5 w-5" />
+                Manage Staff
+              </button>
+            </div>
           </div>
 
           {/* Charts Section */}
@@ -637,39 +700,41 @@ const AdminDashboard: React.FC = () => {
                 <h3 className="text-lg font-semibold text-accent">
                   Recent Orders
                 </h3>
-                <button className="text-theme hover:opacity-80 font-medium flex items-center gap-1">
+                <button className="text-theme hover:opacity-80 font-medium flex items-center gap-1 cursor-pointer">
                   <Eye className="h-4 w-4" />
                   View All
                 </button>
               </div>
               <div className="space-y-4">
-                {recentOrders.map((order) => (
+                {orders?.slice(0, 5).map((order) => (
                   <div
                     key={order.id}
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-md"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
-                        <p className="font-medium text-(--secondary-theme)">
-                          {order.id}
+                        <p className="font-medium text-sm text-(--secondary-theme)">
+                          {order.orderNumber}
                         </p>
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                            order.status
+                            order.orderStatus
                           )}`}
                         >
-                          {order.status}
+                          {order.orderStatus}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 mt-1">
-                        {order.customer} • {order.items} items
+                        {order.customer.firstName} • {order.items.length} items
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-accent">
-                        ${order.total}
+                        ${order.pricing.total.toFixed(2)}
                       </p>
-                      <p className="text-sm text-gray-500">{order.time}</p>
+                      <p className="text-sm text-gray-500">
+                        {getOrderTime(order.createdAt)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -741,8 +806,26 @@ const AdminDashboard: React.FC = () => {
                             <p className="text-xs text-gray-600">
                               {reservation.guests} guests • {reservation.date} •{" "}
                               {reservation.time} • {reservation.duration}h
-                              duration
                             </p>
+                            {reservation.requests && (
+                              <Tip
+                                placement="bottom"
+                                content={
+                                  <div className="max-w-xs whitespace-normal break-words p-2">
+                                    {reservation.requests}
+                                  </div>
+                                }
+                                showArrow={true}
+                                className="text-accent max-w-xs "
+                                classNames={{
+                                  base: "max-w-xs",
+                                  content:
+                                    "text-xs max-w-xs whitespace-normal break-words",
+                                }}
+                              >
+                                <MessageSquare className="h-5 w-5 mt-2 text-theme" />
+                              </Tip>
+                            )}
                           </div>
                           <div className="text-xs text-accent bg-orange-300 px-2 py-1 rounded capitalize">
                             {reservation.status}
@@ -948,34 +1031,6 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="mt-8 bg-white rounded-md p-6 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-accent mb-4">
-              Quick Actions
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <button
-                onClick={() => router.push("/admin/manageMenu")}
-                className="flex items-center justify-center gap-2 p-4 bg-red-50 text-red-700 hover:bg-red-100 cursor-pointer rounded-md hover:bg-opacity-20 transition-colors"
-              >
-                <Plus className="h-5 w-5" />
-                Manage Menu Items
-              </button>
-              <button className="flex items-center justify-center gap-2 p-4 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 cursor-pointer transition-colors">
-                <Calendar className="h-5 w-5" />
-                New Reservation
-              </button>
-              <button className="flex items-center justify-center gap-2 p-4 bg-green-50 text-green-700 rounded-md hover:bg-green-100 cursor-pointer transition-colors">
-                <ShoppingBag className="h-5 w-5" />
-                Process Order
-              </button>
-              <button className="flex items-center justify-center gap-2 p-4 bg-purple-50 text-purple-700 rounded-md hover:bg-purple-100 cursor-pointer transition-colors">
-                <Users className="h-5 w-5" />
-                Manage Staff
-              </button>
             </div>
           </div>
         </div>

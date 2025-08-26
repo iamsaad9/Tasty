@@ -102,3 +102,47 @@ export async function GET() {
     );
   }
 }
+
+// Add this to your existing /api/orders/route.ts file (after your GET method)
+
+export async function PUT(req: Request) {
+  try {
+    await connectDB();
+    const body = await req.json();
+
+    if (!body.id) {
+      return NextResponse.json(
+        { error: "Missing id for update" },
+        { status: 400 }
+      );
+    }
+
+    const { id, ...updateData } = body;
+
+    console.log("Updating order with ID:", id, "Data:", updateData);
+
+    // Find by your custom 'id' field, not MongoDB's '_id'
+    const updatedOrder = await Order.findOneAndUpdate(
+      { id: id }, // Using your custom id field from nanoid
+      {
+        ...updateData,
+        updatedAt: new Date(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedOrder) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    console.log("Order updated successfully:", updatedOrder.orderNumber);
+
+    return NextResponse.json(updatedOrder, { status: 200 });
+  } catch (error: any) {
+    console.error("Error updating order:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

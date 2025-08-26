@@ -137,12 +137,18 @@ export function useUpdateOrderStatus() {
         orderStatus,
         paymentStatus,
       });
-      const res = await fetch(`/api/order/${orderId}`, {
-        method: "PATCH",
+
+      const res = await fetch(`/api/order`, {
+        // Changed to /api/orders
+        method: "PUT", // Changed to PUT
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ orderStatus, paymentStatus }),
+        body: JSON.stringify({
+          id: orderId,
+          orderStatus,
+          paymentStatus,
+        }),
       });
 
       if (!res.ok) {
@@ -153,7 +159,6 @@ export function useUpdateOrderStatus() {
       return res.json();
     },
     onSuccess: (data, variables) => {
-      // Invalidate and refetch orders
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["order", variables.orderId] });
     },

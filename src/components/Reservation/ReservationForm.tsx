@@ -395,7 +395,7 @@ function ReservationForm({
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 ">
+    <div className="max-w-4xl mx-auto  ">
       {/* Reservation Limit Errors - Only for max reservations */}
       {reservationLimitErrors.length > 0 && (
         <Card className="mb-6 border-l-4 border-l-red-500">
@@ -453,16 +453,16 @@ function ReservationForm({
       )}
 
       <Card className="shadow-large ">
-        <CardBody className="p-8">
+        <CardBody className="p-4 md:p-5 lg:p-8">
           {/* Header */}
           <div className="text-center mb-8 ">
             <div className="flex justify-center items-center mb-4">
               <Utensils className="h-8 w-8 text-amber-600 mr-2" />
-              <h1 className="text-3xl font-bold text-accent">
+              <h1 className="text-xl md:text-3xl font-bold text-accent">
                 Restaurant Reservation
               </h1>
             </div>
-            <p className="text-default-500">
+            <p className="text-sm md:text-base text-default-500">
               Reserve your table for an unforgettable dining experience
             </p>
           </div>

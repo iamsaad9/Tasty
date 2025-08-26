@@ -15,6 +15,7 @@ interface MobileNavMenuProps {
   navLinks: ProcessedMobileNavItem[];
   user: NextAuthUser & { role: string };
   onCloseMenu: () => void;
+  setShowLogin: (val: boolean) => void;
 }
 
 interface ProcessedMobileNavItem {
@@ -26,15 +27,13 @@ interface ProcessedMobileNavItem {
 export const MobileNavLinks: React.FC<MobileNavMenuProps> = ({
   navLinks,
   onCloseMenu,
+  setShowLogin,
 }) => {
   const pathname = usePathname();
-  const [showLogin, setShowLogin] = useState(false);
+  // const [showLogin, setShowLogin] = useState(false);
   const { data: session } = useSession();
   return (
     <div className="px-2 pt-2 pb-4 space-y-1 bg-transparent">
-      {showLogin && (
-        <AuthModal open={showLogin} onClose={() => setShowLogin(false)} />
-      )}
       {navLinks.map((link) => (
         <Link
           key={link.href}
@@ -57,7 +56,9 @@ export const MobileNavLinks: React.FC<MobileNavMenuProps> = ({
           <div className="flex items-center justify-center">
             <Button
               className="bg-theme text-background text-base 2xl:text-lg w-full sm:w-[50%]"
-              onPress={() => setShowLogin(true)}
+              onPress={() => {
+                setShowLogin(true);
+              }}
             >
               Login
             </Button>

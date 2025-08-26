@@ -10,8 +10,12 @@ interface Props {
   className?: string;
 }
 
-export default function FadeInSection({ className,children, delay = 0 }: Props) {
-  const { ref, inView } = useInView({ threshold: 0.2 });
+export default function FadeInSection({
+  className,
+  children,
+  delay = 0,
+}: Props) {
+  const { ref, inView } = useInView({ threshold: 0.1 });
   const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {

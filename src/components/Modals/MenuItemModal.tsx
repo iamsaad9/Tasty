@@ -20,6 +20,7 @@ import { useCartStore } from "@/lib/store/cartStore";
 import { useLocationStore } from "@/lib/store/locationStore";
 import LocationModal from "./LocationModal";
 import { useSession } from "next-auth/react";
+import ItemNotAvailable from "../ItemNotAvailable";
 
 // Updated interfaces to support multiple variation types
 interface ItemVariation {
@@ -197,7 +198,7 @@ function MenuItemModal() {
         size="5xl"
         placement="center"
         scrollBehavior="outside"
-        className="rounded-xl text-accent overflow-auto"
+        className="rounded-xl text-accent overflow-auto my-5 mx-2"
       >
         <ModalContent>
           <div className="flex flex-col md:flex-row h-[80vh]">
@@ -206,12 +207,7 @@ function MenuItemModal() {
               (i) => i.area !== selectedLocation
             ) &&
               deliveryMode === "delivery") ? (
-              <div className="w-full h-full flex justify-center items-center">
-                <img
-                  src="/images/Miscellaneous/not_available.png"
-                  alt="Not Available Image"
-                />
-              </div>
+              <ItemNotAvailable />
             ) : (
               <>
                 {/* Left image */}

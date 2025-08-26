@@ -27,6 +27,7 @@ import MenuLink from "@/../models/menuLinks";
 import { DesktopNavLinks } from "./DesktopNavLinks";
 import { MobileNavLinks } from "./MobileNavLinks";
 import LoadingScreen from "./Loading";
+import LoginModal from "./Modals/LoginModal";
 
 // --- Type Definitions (Re-added as inline types) ---
 // Icon mapping
@@ -80,6 +81,7 @@ export function Nav() {
   const { data: session } = useSession();
   const [menuLinks, setMenuLinks] = useState<MenuLinkType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     async function fetchMenuLinks() {
@@ -231,7 +233,7 @@ export function Nav() {
                         onPress={() => setShowLocationModal(true)}
                       >
                         <MdLocationPin size={20} color="white" />
-                        <span className="lg:text-base 2xl:text-lg font-medium text-white">
+                        <span className="text-sm lg:text-base 2xl:text-lg font-medium text-white">
                           {selectedLocation || "Select"}
                         </span>
                       </Button>
@@ -426,7 +428,7 @@ export function Nav() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className={`lg:hidden overflow-hidden border-t border-border ${"bg-(--secondary-theme)"} fixed top-16 left-0 right-0 z-40`}
+                className="lg:hidden overflow-hidden border-t border-border bg-(--secondary-theme) fixed top-16 left-0 right-0 z-20"
                 ref={mobileMenuRef}
               >
                 <MobileNavLinks
@@ -439,9 +441,11 @@ export function Nav() {
                     role: (session?.user as any)?.role || "user",
                   }}
                   onCloseMenu={toggleMobileMenu}
+                  setShowLogin={(val) => setShowLogin(val)}
                 />
               </motion.div>
             )}
+
             {showModal.open && (
               <CustomModal
                 onClose={() =>
@@ -485,6 +489,9 @@ export function Nav() {
               </CustomModal>
             )}
           </AnimatePresence>
+          {showLogin && (
+            <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
+          )}
         </>
       )}
     </>

@@ -34,12 +34,15 @@ function MenuItems({ showLoading }: MenuItemProps) {
   const { data: MenuItems, isPending } = useMenuItems();
 
   const filterCategories = (categories: Categories[]) => {
-    return categories.slice(0, 3);
+    return categories.filter(
+      (cat) => cat.id === "1" || cat.id === "2" || cat.id === "3"
+    );
   };
 
   useEffect(() => {
     if (!isLoading && Categories) {
       const filteredCategories = filterCategories(Categories);
+      console.log("Categories:", filteredCategories);
       setFilteredCategories(filteredCategories);
     } else {
       console.log("No Category found");

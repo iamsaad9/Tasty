@@ -171,7 +171,7 @@ export default function LoginModal({ open, onClose }: AuthModalProps) {
         closeButton: "m-2 cursor-pointer",
       }}
       placement="center"
-      className="bg-gradient-to-t from-white to-orange-50 rounded-[40px] p-5 max-w-sm border-[5px] border-white shadow-xl shadow-theme/50 m-5"
+      className="bg-gradient-to-t from-white to-orange-50 rounded-[40px] p-5 max-w-sm border-[5px] border-white shadow-xl shadow-theme/50 m-5 z-50"
     >
       <ModalContent>
         {(onClose) => (

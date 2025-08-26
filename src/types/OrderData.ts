@@ -1,5 +1,9 @@
 import { OrderItem } from "./OrderItem";
+
 export interface OrderData {
+  id: string;
+  orderNumber: string;
+  estimatedDeliveryTime: Date;
   customer: {
     email: string;
     phone: string;
@@ -19,7 +23,7 @@ export interface OrderData {
   deliveryMode: "delivery" | "pickup";
   paymentMethod: "Card" | "Cash";
   selectedLocation: string;
-  paymentStatus: "pending" | "completed" | "failed";
+  paymentStatus?: "pending" | "completed" | "failed";
   orderStatus:
     | "pending"
     | "confirmed"

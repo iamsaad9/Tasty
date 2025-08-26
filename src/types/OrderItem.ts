@@ -1,9 +1,3 @@
-interface ItemVariation {
-  type: string;
-  name: string;
-  price_multiplier: number;
-}
-
 export interface OrderItem {
   _id?: string;
   itemId?: number;
@@ -12,6 +6,9 @@ export interface OrderItem {
   itemBasePrice?: number;
   itemPrice?: number;
   itemQuantity?: number;
-  itemVariation?: ItemVariation[];
+  itemVariations?: Record<string, string>; // Changed from ItemVariation[] to object
   itemInstructions?: string;
 }
+
+// You can remove the ItemVariation interface since it's no longer needed
+// Or keep it if you use it elsewhere, but update itemVariations type
