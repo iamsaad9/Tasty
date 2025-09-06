@@ -35,9 +35,9 @@ interface VariationGroup {
 }
 
 interface CartItem {
-  itemId: number | undefined;
-  itemName: string | undefined;
-  itemImage: string | undefined;
+  itemId: number;
+  itemName: string;
+  itemImage: string;
   itemPrice: number;
   itemBasePrice: number;
   itemQuantity: number;
@@ -164,9 +164,9 @@ function MenuItemModal() {
     const finalPrice = calculateFinalPrice();
 
     const cartItem: CartItem = {
-      itemId: selectedItem?.id,
-      itemName: selectedItem?.name,
-      itemImage: selectedItem?.image,
+      itemId: selectedItem?.id ?? 0,
+      itemName: selectedItem?.name ?? "",
+      itemImage: selectedItem?.image ?? "",
       itemPrice: Number(finalPrice.toFixed(2)),
       itemBasePrice: finalPrice / quantity,
       itemQuantity: quantity,
