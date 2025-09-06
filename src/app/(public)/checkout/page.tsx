@@ -755,7 +755,7 @@ export default function CheckoutPage() {
     if (session?.user?.email) {
       setFormData((prev) => ({
         ...prev,
-        email: session.user.email,
+        email: session?.user?.email ?? "",
       }));
     }
   }, [session]);
