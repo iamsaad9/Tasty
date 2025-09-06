@@ -11,6 +11,10 @@ declare module "next-auth" {
       role: string;
     } & DefaultSession["user"];
   }
+
+  interface User {
+    role?: string;
+  }
 }
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongoose";
@@ -76,7 +80,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         await connectDB();
         const dbUser = await User.findOne({ email: user.email });
-        token.role = dbUser?.role || (user as any).role || "user";
+        token.role = dbUser?.role || user.role || "user";
         token.picture = user.image || dbUser?.image || token.picture || null;
       }
       return token;
