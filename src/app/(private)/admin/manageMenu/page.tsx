@@ -1,16 +1,12 @@
-import PageBanner from "@/components/PageBanner";
-import ImageGallery from "@/components/ImageGallery";
-import ManageMenuClient from "./ManageMenuClient"; // client wrapper
+// app/menu/page.tsx
+import { Suspense } from "react";
+import ManageMenuClient from "./ManageMenuClient";
+import LoadingScreen from "@/components/Loading";
 
-export default function ReservationPage() {
+export default function Page() {
   return (
-    <div>
-      <PageBanner
-        title="Manage Menu"
-        image="/images/PageBanners/reservationPage.jpg"
-      />
-      <ManageMenuClient /> {/* client-only part */}
-      <ImageGallery />
-    </div>
+    <Suspense fallback={<LoadingScreen showLoading={true} />}>
+      <ManageMenuClient />
+    </Suspense>
   );
 }

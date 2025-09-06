@@ -3,47 +3,12 @@ import React, { useEffect, useState } from "react";
 import PageBanner from "@/components/PageBanner";
 import { Tabs, Tab } from "@heroui/react";
 import FadeInSection from "@/components/ui/scrollAnimated";
+import ReservationForm from "@/components/Reservation/ReservationForm";
 import ImageGallery from "@/components/ImageGallery";
-import MenuItemTable from "../components/menuItems/MenuItemTable";
+import ViewReservationsTable from "@/components/Reservation/ReservationTable";
 import Heading from "@/components/Heading";
 import { useRouter, useSearchParams } from "next/navigation";
-import MenuItemForm from "../components/menuItems/MenuItemForm";
-
-interface ItemVariation {
-  type: string;
-  name: string;
-  price_multiplier: number;
-}
-
-interface DeliveryArea {
-  area: string;
-  postalCode: string;
-  fee: number;
-}
-
-interface Delivery {
-  isDeliverable: boolean;
-  estimatedTime: string;
-  baseFee: number;
-  freeAbove: number;
-  minOrder: number;
-  areas: DeliveryArea[];
-}
-
-interface MenuItem {
-  id: number;
-  title: string;
-  category: string;
-  diet: string[];
-  price: number;
-  description: string;
-  image: string;
-  popularity: number;
-  rating: number;
-  special: boolean;
-  itemVariation: ItemVariation[];
-  delivery: Delivery;
-}
+import { Reservation } from "@/types";
 
 function ReservationPage() {
   const searchParams = useSearchParams();
@@ -51,13 +16,15 @@ function ReservationPage() {
 
   // Extract tab from URL or default to "new"
   const initialTab =
-    searchParams.get("mode") === "view" ? "viewMenuItem" : "newMenuItem";
+    searchParams.get("mode") === "view" ? "viewReservation" : "newReservation";
   const [selectedTab, setSelectedTab] = useState<string>(initialTab);
-  const [editMenuItem, setMenuItem] = useState<MenuItem | null>(null);
+  const [editReservation, setEditReservation] = useState<Reservation | null>(
+    null
+  );
 
   // Update URL when tab changes
   const handleTabChange = (key: string) => {
-    const urlTab = key === "viewMenuItem" ? "view" : "new";
+    const urlTab = key === "viewReservation" ? "view" : "new";
     router.push(`?mode=${urlTab}`, { scroll: false });
     setSelectedTab(key);
   };
@@ -74,18 +41,16 @@ function ReservationPage() {
 
     // Sync tab state from URL
     if (urlTab === "view") {
-      setSelectedTab("viewMenuItem");
+      setSelectedTab("viewReservation");
     } else {
-      setSelectedTab("newMenuItem");
+      setSelectedTab("newReservation");
     }
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   return (
     <div>
       <PageBanner
-        title={`${
-          editMenuItem !== null ? "Edit Menu Item" : "Add New Menu Item"
-        }`}
+        title="Make a Reservation"
         image="/images/PageBanners/reservationPage.jpg"
       />
 
@@ -99,28 +64,34 @@ function ReservationPage() {
             color="warning"
             classNames={{ tabList: "bg-secondary/30" }}
           >
-            <Tab key="newMenuItem" title="New Menu Item">
-              <Heading title="MENUITEMS" subheading="New Menu Item" />
+            <Tab
+              key="newReservation"
+              title={`${editReservation ? "Edit" : "New"} Reservation`}
+            >
+              <Heading
+                title="RESERVATIONS"
+                subheading={`${editReservation ? "Edit" : "New"} Reservation`}
+              />
 
               <FadeInSection>
-                <MenuItemForm
-                  menuItemDataProp={editMenuItem}
-                  resetData={() => setMenuItem(null)}
+                <ReservationForm
+                  reservationDataProp={editReservation}
+                  resetData={() => setEditReservation(null)}
                 />
               </FadeInSection>
             </Tab>
 
             <Tab
-              isDisabled={editMenuItem !== null}
-              key="viewMenuItem"
-              title="View Menu Item"
+              isDisabled={editReservation !== null}
+              key="viewReservation"
+              title="View Reservation"
             >
-              <Heading title="MENUITEMS" subheading="View Menu Item" />
+              <Heading title="RESERVATIONS" subheading="View Reservation" />
 
-              <MenuItemTable
-                onAddNew={() => handleTabChange("newMenuItem")}
-                onEditMenuItem={(reservation: MenuItem) => {
-                  setMenuItem(reservation);
+              <ViewReservationsTable
+                onAddNew={() => handleTabChange("newReservation")}
+                onEditReservation={(reservation: Reservation) => {
+                  setEditReservation(reservation);
                 }}
               />
             </Tab>
