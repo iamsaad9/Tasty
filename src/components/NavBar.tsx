@@ -438,7 +438,7 @@ export function Nav() {
                     name: session?.user?.name || "Guest",
                     email: session?.user?.email || "",
                     image: session?.user?.image || "",
-                    role: (session?.user as any)?.role || "user",
+                    role: session?.user?.role || "user",
                   }}
                   onCloseMenu={toggleMobileMenu}
                   setShowLogin={(val) => setShowLogin(val)}

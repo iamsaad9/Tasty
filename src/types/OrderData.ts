@@ -3,7 +3,7 @@ import { OrderItem } from "./OrderItem";
 export interface OrderData {
   id: string;
   orderNumber: string;
-  estimatedDeliveryTime: Date;
+  estimatedDeliveryTime?: string | undefined;
   customer: {
     email: string;
     phone: string;

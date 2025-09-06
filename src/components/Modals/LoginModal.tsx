@@ -89,12 +89,13 @@ export default function LoginModal({ open, onClose }: AuthModalProps) {
       });
       setIsLogin(true);
       setFormData({ name: "", email: "", password: "" });
-    } catch (error: any) {
-      setError(error.message || "Signup failed. Please try again.");
+    } catch (error) {
+      const err = error as Error;
+      setError(err.message || "Signup failed. Please try again.");
 
       addToast({
         title: "Failed",
-        description: error.message || "Signup failed. Please try again.",
+        description: err.message || "Signup failed. Please try again.",
         color: "danger",
       });
     }
@@ -127,7 +128,7 @@ export default function LoginModal({ open, onClose }: AuthModalProps) {
           onClose();
         }, 500);
       }
-    } catch (error: any) {
+    } catch (error) {
       addToast({
         title: "Failed",
         description: "Login failed. Please try again!",

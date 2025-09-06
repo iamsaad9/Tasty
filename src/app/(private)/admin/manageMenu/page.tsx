@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import PageBanner from "@/components/PageBanner";
 import { Tabs, Tab } from "@heroui/react";
 import FadeInSection from "@/components/ui/scrollAnimated";
-import ReservationForm from "@/components/Reservation/ReservationForm";
 import ImageGallery from "@/components/ImageGallery";
 import MenuItemTable from "../components/menuItems/MenuItemTable";
 import Heading from "@/components/Heading";
@@ -79,7 +78,7 @@ function ReservationPage() {
     } else {
       setSelectedTab("newMenuItem");
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   return (
     <div>

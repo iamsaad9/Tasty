@@ -110,8 +110,8 @@ export default function ViewReservations({
   const getReservationProperty = (
     reservation: Reservation,
     key: string
-  ): any => {
-    return (reservation as any)[key];
+  ): string | number | Date | undefined => {
+    return reservation[key as keyof Reservation];
   };
 
   // Fixed sorting logic

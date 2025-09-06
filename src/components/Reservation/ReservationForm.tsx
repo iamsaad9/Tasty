@@ -182,7 +182,7 @@ function ReservationForm({
   // Validation functions
   const validateField = (
     name: string,
-    value: string | CalendarDate | Number | null
+    value: string | CalendarDate | number | null
   ) => {
     const newErrors = { ...errors };
 
@@ -277,34 +277,10 @@ function ReservationForm({
 
   const handleInputChange = (
     name: string,
-    value: string | CalendarDate | null | Number
+    value: string | CalendarDate | null | number
   ) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     validateField(name, value);
-  };
-
-  const validateAllFields = () => {
-    const fields = [
-      "name",
-      "email",
-      "phone",
-      "date",
-      "time",
-      "duration",
-      "guests",
-      "occasion",
-    ];
-    let isValid = true;
-
-    fields.forEach((field) => {
-      if (
-        !validateField(field, formData[field as keyof typeof formData] as any)
-      ) {
-        isValid = false;
-      }
-    });
-
-    return isValid;
   };
 
   const handleSubmit = async () => {
@@ -443,8 +419,8 @@ function ReservationForm({
                 </h3>
                 <p className="text-sm text-green-700 mt-1">
                   Your reservation has been successfully{" "}
-                  {reservationDataProp ? "updated" : "submitted"}. We'll send
-                  you a confirmation email shortly.
+                  {reservationDataProp ? "updated" : "submitted"}. We&apos;ll
+                  send you a confirmation email shortly.
                 </p>
               </div>
             </div>

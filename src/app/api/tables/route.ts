@@ -6,7 +6,7 @@ export async function GET() {
   try {
     await connectDB();
 
-    let tables = await Tables.find({}).lean();
+    const tables = await Tables.find({}).lean();
 
     return NextResponse.json(tables);
   } catch (error) {

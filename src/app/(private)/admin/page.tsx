@@ -81,17 +81,8 @@ interface StatCardProps {
   value: string | number;
   change: number;
   period: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
-}
-
-interface Tables {
-  id: string;
-  name: string;
-  capacity: number;
-  location: string;
-  description: string;
-  isAvailable: boolean;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -406,7 +397,7 @@ const AdminDashboard: React.FC = () => {
   ): boolean => {
     const parseTime = (timeStr: string): number => {
       // Handle both "HH:MM" and "HH:MM AM/PM" formats
-      let cleanTime = timeStr.toLowerCase().replace(/\s*(am|pm)\s*$/, "");
+      const cleanTime = timeStr.toLowerCase().replace(/\s*(am|pm)\s*$/, "");
       const [hours, minutes] = cleanTime.split(":").map(Number);
 
       // Convert to 24-hour format if needed
@@ -544,7 +535,8 @@ const AdminDashboard: React.FC = () => {
                 Restaurant Dashboard
               </h1>
               <p className="text-gray-600 mt-1">
-                Welcome back! Here's what's happening at your restaurant today.
+                Welcome back! Here&apos;s what&apos;s happening at your
+                restaurant today.
               </p>
             </div>
             <div className="flex items-center gap-4">

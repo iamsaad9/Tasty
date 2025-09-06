@@ -19,7 +19,6 @@ import { z } from "zod";
 import { Plus, Trash2, Upload, AlertCircle } from "lucide-react";
 import CustomModal from "@/components/Modals/Modal";
 import { useCategories } from "@/app/hooks/useCategories";
-import LoadingScreen from "@/components/Loading";
 import { useDietaries } from "@/app/hooks/useDieties";
 import { useVariations } from "@/app/hooks/useVariations";
 import { useLocations } from "@/app/hooks/useLocation";
@@ -141,10 +140,10 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
     }
   }, [deliveryAreas, deliveryAreasError]);
 
-  const reservations = useMemo(() => {
-    if (!allReservations || !session) return [];
-    return allReservations.filter((i) => i.email === session.user?.email);
-  }, [allReservations, session]);
+  // const reservations = useMemo(() => {
+  //   if (!allReservations || !session) return [];
+  //   return allReservations.filter((i) => i.email === session.user?.email);
+  // }, [allReservations, session]);
 
   const schema = z.object({
     title: z
@@ -682,8 +681,8 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                     {/* Show message when no areas exist */}
                     {deliveryAreas.length === 0 && !deliveryAreasError && (
                       <div className="text-orange-600 text-sm bg-orange-50 p-3 rounded-lg text-center border border-orange-200">
-                        No delivery areas added yet. Click "Add Area" to add
-                        your first delivery area.
+                        No delivery areas added yet. Click &quot;Add Area&quot;
+                        to add your first delivery area.
                       </div>
                     )}
 

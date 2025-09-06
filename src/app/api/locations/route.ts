@@ -6,7 +6,7 @@ export async function GET() {
   try {
     await connectDB();
 
-    let storedLocations = await Locations.find({}).lean();
+    const storedLocations = await Locations.find({}).lean();
 
     return NextResponse.json(storedLocations);
   } catch (error) {

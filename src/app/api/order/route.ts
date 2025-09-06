@@ -66,11 +66,13 @@ export async function POST(request: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error creating order:", error);
 
+    const err = error as Error & { code?: number };
+
     // Handle specific MongoDB errors
-    if (error.code === 11000) {
+    if (err.code === 11000) {
       return NextResponse.json(
         { error: "Order number already exists" },
         { status: 409 }
@@ -141,8 +143,9 @@ export async function PUT(req: Request) {
     console.log("Order updated successfully:", updatedOrder.orderNumber);
 
     return NextResponse.json(updatedOrder, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error updating order:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

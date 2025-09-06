@@ -150,8 +150,7 @@ export default function CartDrawer() {
                             {/* Fixed variations display - handles both formats */}
                             <p className="text-xs text-default-500 line-clamp-2">
                               {formatVariations(
-                                item.itemVariations ||
-                                  (item as any).itemVariation
+                                item.itemVariations || item.itemVariations
                               )}
                             </p>
                           </div>

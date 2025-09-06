@@ -8,10 +8,13 @@ import { determineUserRole } from "@/lib/roles";
 export async function GET() {
   try {
     await connectDB();
-    const users = await User.find().select('-password'); // Don't return passwords
+    const users = await User.find().select("-password"); // Don't return passwords
     return NextResponse.json(users);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch users" },
+      { status: 500 }
+    );
   }
 }
 
@@ -22,13 +25,19 @@ export async function POST(req: Request) {
 
     // Basic validation
     if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Email and password are required" },
+        { status: 400 }
+      );
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return NextResponse.json({ error: "User already exists with this email" }, { status: 400 });
+      return NextResponse.json(
+        { error: "User already exists with this email" },
+        { status: 400 }
+      );
     }
 
     // Hash password
@@ -43,13 +52,17 @@ export async function POST(req: Request) {
       email,
       password: hashedPassword,
       role: userRole, // This will be "admin" for emails in ADMIN_EMAILS, "user" otherwise
-      provider: "credentials"
+      provider: "credentials",
     });
 
     // Return user without password
     const { password: _, ...userWithoutPassword } = newUser.toObject();
     return NextResponse.json(userWithoutPassword);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to create user" }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    return NextResponse.json(
+      { error: err.message || "Failed to create user" },
+      { status: 500 }
+    );
   }
 }

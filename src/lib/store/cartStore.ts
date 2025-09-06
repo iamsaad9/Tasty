@@ -2,15 +2,15 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-// Updated interface to match the new format
+// Cart Item type
 interface CartItem {
-  itemId: number | undefined;
-  itemName: string | undefined;
-  itemImage: string | undefined;
+  itemId: number;
+  itemName: string;
+  itemImage: string;
   itemPrice: number;
   itemBasePrice: number;
   itemQuantity: number;
-  itemVariations: { [key: string]: string }; // New format: object
+  itemVariations: Record<string, string>; // Object format
   itemInstructions: string;
 }
 
@@ -24,63 +24,54 @@ interface CartState {
   toggleCart: (state?: boolean) => void;
 }
 
-// Helper function to compare variations objects
+// Old cart item format (before migration)
+interface OldCartItem {
+  itemId?: number;
+  itemName?: string;
+  itemImage?: string;
+  itemPrice?: number;
+  itemBasePrice?: number;
+  itemQuantity?: number;
+  itemVariation?: { type: string; name: string }[];
+  itemVariations?: Record<string, string>;
+  itemInstructions?: string;
+}
+
+// Migration state type
+interface PersistedCartState {
+  items?: (CartItem | OldCartItem)[];
+  isOpen?: boolean;
+}
+
+// Helper function to compare variations
 const areVariationsEqual = (
-  variations1: { [key: string]: string } | undefined,
-  variations2: { [key: string]: string } | undefined
+  v1: Record<string, string> | undefined,
+  v2: Record<string, string> | undefined
 ): boolean => {
-  // Handle undefined cases
-  if (!variations1 && !variations2) return true;
-  if (!variations1 || !variations2) return false;
+  if (!v1 && !v2) return true;
+  if (!v1 || !v2) return false;
 
-  const keys1 = Object.keys(variations1);
-  const keys2 = Object.keys(variations2);
-
-  // Check if they have the same number of keys
+  const keys1 = Object.keys(v1);
+  const keys2 = Object.keys(v2);
   if (keys1.length !== keys2.length) return false;
 
-  // Check if all keys and values match
-  return keys1.every((key) => variations1[key] === variations2[key]);
+  return keys1.every((key) => v1[key] === v2[key]);
 };
 
-export const useCartStore = create(
-  persist<CartState>(
-    (set) => ({
+// Define what gets persisted
+interface CartData {
+  items: CartItem[];
+  isOpen: boolean;
+}
+
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get): CartState => ({
       items: [],
       isOpen: false,
-      addItem: (item) =>
-        set((state) => {
-          // Find existing item with same ID, variations, and instructions
-          const existingIndex = state.items.findIndex(
-            (existingItem) =>
-              existingItem.itemId === item.itemId &&
-              areVariationsEqual(
-                existingItem.itemVariations,
-                item.itemVariations
-              ) &&
-              existingItem.itemInstructions === item.itemInstructions
-          );
 
-          // If exact match found, increase quantity
-          if (existingIndex !== -1) {
-            const updatedItems = [...state.items];
-            updatedItems[existingIndex] = {
-              ...updatedItems[existingIndex],
-              itemQuantity:
-                (updatedItems[existingIndex].itemQuantity ?? 0) +
-                (item.itemQuantity ?? 0),
-              // Update the price in case base price changed
-              itemPrice:
-                updatedItems[existingIndex].itemBasePrice *
-                ((updatedItems[existingIndex].itemQuantity ?? 0) +
-                  (item.itemQuantity ?? 0)),
-            };
-            return { items: updatedItems };
-          }
-
-          // If no exact match, add as new item
-          return { items: [...state.items, item] };
-        }),
+      // actions
+      addItem: (item) => set((state) => ({ items: [...state.items, item] })),
       removeItem: (index) =>
         set((state) => {
           const newItems = [...state.items];
@@ -89,21 +80,9 @@ export const useCartStore = create(
         }),
       updateItemQuantity: (index, quantity) =>
         set((state) => {
-          // Ensure quantity is at least 1
-          const newQuantity = Math.max(1, quantity);
-
-          const updatedItems = state.items.map((item, i) =>
-            i === index
-              ? {
-                  ...item,
-                  itemQuantity: newQuantity,
-                  // Update total price based on new quantity
-                  itemPrice: item.itemBasePrice * newQuantity,
-                }
-              : item
-          );
-
-          return { items: updatedItems };
+          const newItems = [...state.items];
+          if (newItems[index]) newItems[index].itemQuantity = quantity;
+          return { items: newItems };
         }),
       clearCart: () => set({ items: [] }),
       toggleCart: (state) =>
@@ -111,48 +90,52 @@ export const useCartStore = create(
     }),
     {
       name: "cart-storage",
-      // Migration function to handle old cart data
-      migrate: (persistedState: any, version: number) => {
-        // Clear old cart data that might have incompatible format
-        if (version === 0 || !persistedState) {
+      version: 1,
+      migrate: (persistedState, version): CartData => {
+        const state = persistedState as PersistedCartState | undefined;
+
+        if (version === 0 || !state) {
+          return { items: [], isOpen: false };
+        }
+
+        const migratedItems: CartItem[] = (state.items ?? []).map((item) => {
+          if ("itemVariation" in item && Array.isArray(item.itemVariation)) {
+            const variations: Record<string, string> = {};
+            item.itemVariation.forEach((variation) => {
+              if (variation.type && variation.name) {
+                variations[variation.type] = variation.name;
+              }
+            });
+
+            return {
+              itemId: item.itemId ?? 0,
+              itemName: item.itemName ?? "",
+              itemImage: item.itemImage ?? "",
+              itemPrice: item.itemPrice ?? 0,
+              itemBasePrice: item.itemBasePrice ?? 0,
+              itemQuantity: item.itemQuantity ?? 1,
+              itemVariations: variations,
+              itemInstructions: item.itemInstructions ?? "",
+            };
+          }
+
           return {
-            items: [],
-            isOpen: false,
+            itemId: item.itemId ?? 0,
+            itemName: item.itemName ?? "",
+            itemImage: item.itemImage ?? "",
+            itemPrice: item.itemPrice ?? 0,
+            itemBasePrice: item.itemBasePrice ?? 0,
+            itemQuantity: item.itemQuantity ?? 1,
+            itemVariations: item.itemVariations ?? {},
+            itemInstructions: item.itemInstructions ?? "",
           };
-        }
+        });
 
-        // Handle items that might have old itemVariation format
-        if (persistedState.items) {
-          persistedState.items = persistedState.items.map((item: any) => {
-            // If item has old itemVariation (array), convert to new format or clear
-            if (item.itemVariation && Array.isArray(item.itemVariation)) {
-              // Convert old array format to new object format
-              const variations: { [key: string]: string } = {};
-              item.itemVariation.forEach((variation: any) => {
-                if (variation.type && variation.name) {
-                  variations[variation.type] = variation.name;
-                }
-              });
-
-              return {
-                ...item,
-                itemVariations: variations,
-                itemVariation: undefined, // Remove old property
-              };
-            }
-
-            // Ensure itemVariations exists
-            if (!item.itemVariations) {
-              item.itemVariations = {};
-            }
-
-            return item;
-          });
-        }
-
-        return persistedState;
+        return {
+          items: migratedItems,
+          isOpen: state.isOpen ?? false,
+        };
       },
-      version: 1, // Increment version to trigger migration
     }
   )
 );

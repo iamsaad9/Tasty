@@ -51,7 +51,9 @@ export const authOptions: NextAuthOptions = {
 
         await connectDB();
 
-        const user: IUser | null = await User.findOne({ email: credentials.email });
+        const user: IUser | null = await User.findOne({
+          email: credentials.email,
+        });
         if (!user) {
           throw new Error("No user found with this email");
         }
@@ -94,9 +96,8 @@ export const authOptions: NextAuthOptions = {
         await connectDB();
         const dbUser = await User.findOne({ email: user.email });
 
-        token.role = dbUser?.role || (user as any).role || "user";
-        token.picture =
-          (user as any).image || dbUser?.image || token.picture || null;
+        token.role = dbUser?.role || user.role || "user";
+        token.picture = user.image || dbUser?.image || token.picture || null;
       }
       return token;
     },

@@ -108,7 +108,7 @@ export const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
                     <p className="text-sm text-gray-500">
                       {session.user.email}
                     </p>
-                    {(session.user as any)?.role === "admin" && (
+                    {session.user?.role === "admin" && (
                       <p className="text-sm text-gray-500 capitalize">
                         Administrator
                       </p>

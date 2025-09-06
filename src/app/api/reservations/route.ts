@@ -9,8 +9,9 @@ export async function GET() {
     await connectDB();
     const reservations = await Reservation.find();
     return NextResponse.json(reservations, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
@@ -22,8 +23,9 @@ export async function POST(req: Request) {
     console.log("Incoming body", body);
     const newReservation = await Reservation.create(body);
     return NextResponse.json(newReservation, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
@@ -59,8 +61,9 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json(updatedReservation, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
@@ -90,7 +93,8 @@ export async function DELETE(req: Request) {
       { message: "Reservation deleted successfully" },
       { status: 200 }
     );
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

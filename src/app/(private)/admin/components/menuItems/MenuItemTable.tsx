@@ -16,12 +16,9 @@ import {
   Plus,
   Trash,
   PenIcon,
-  CircleX,
-  Ban,
   Star,
   TrendingUp,
 } from "lucide-react";
-import { set } from "mongoose";
 import LoadingScreen from "@/components/Loading";
 
 interface CategoryType {
@@ -378,13 +375,13 @@ export default function MenuItemTable({
     [menuItems]
   );
 
-  const onSearchChange = React.useCallback((value: string) => {
-    if (value) {
-      setFilterValue(value);
-    } else {
-      setFilterValue("");
-    }
-  }, []);
+  // const onSearchChange = React.useCallback((value: string) => {
+  //   if (value) {
+  //     setFilterValue(value);
+  //   } else {
+  //     setFilterValue("");
+  //   }
+  // }, []);
 
   const topContent = React.useMemo(() => {
     return (

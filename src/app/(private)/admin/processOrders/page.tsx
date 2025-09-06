@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Table,
   TableHeader,
@@ -14,13 +14,11 @@ import {
   DropdownMenu,
   DropdownItem,
   Chip,
-  User,
   Pagination,
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   useDisclosure,
   addToast,
 } from "@heroui/react";
@@ -29,7 +27,6 @@ import {
   FiChevronDown,
   FiMoreVertical,
   FiEye,
-  FiEdit,
   FiCheck,
   FiX,
   FiClock,
@@ -39,15 +36,7 @@ import {
   FiCreditCard,
   FiDollarSign,
 } from "react-icons/fi";
-import {
-  Check,
-  Clock,
-  Eye,
-  ShoppingBag,
-  Truck,
-  X,
-  Calendar,
-} from "lucide-react";
+import { Check, Clock, Truck, X } from "lucide-react";
 import { useOrders, useUpdateOrderStatus } from "@/app/hooks/useOrders";
 import { OrderData } from "@/types";
 import FadeInSection from "@/components/ui/scrollAnimated";
@@ -313,207 +302,227 @@ export default function OrderProcessingAdmin() {
     onOpen();
   };
 
-  const renderCell = React.useCallback((order: any, columnKey: string) => {
-    const cellValue = order[columnKey];
+  const renderCell = React.useCallback(
+    (order: OrderData, columnKey: string) => {
+      const cellValue = order[columnKey as keyof OrderData];
 
-    switch (columnKey) {
-      case "orderNumber":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-sm">{order.orderNumber}</p>
-            <p className="text-bold text-xs text-default-400">
-              {order.orderId}
-            </p>
-          </div>
-        );
-
-      case "customer":
-        return (
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-default-100">
-              <FiUser className="text-default-600" size={14} />
-            </div>
+      switch (columnKey) {
+        case "orderNumber":
+          return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm">{`${order.customer.firstName} ${order.customer.lastName}`}</p>
-              <p className="text-xs text-default-400">{order.customer.email}</p>
+              <p className="text-bold text-sm">{order.orderNumber}</p>
+              <p className="text-bold text-xs text-default-400">{order.id}</p>
             </div>
-          </div>
-        );
+          );
 
-      case "items":
-        const totalItems = order.items.reduce(
-          (sum: number, item: { itemQuantity: number }) =>
-            sum + item.itemQuantity,
-          0
-        );
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-sm">
-              {totalItems} item{totalItems !== 1 ? "s" : ""}
-            </p>
-            <p className="text-xs text-default-400">
-              {order.items[0]?.itemName}
-              {order.items.length > 1 ? ` +${order.items.length - 1} more` : ""}
-            </p>
-          </div>
-        );
+        case "customer":
+          return (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-default-100">
+                <FiUser className="text-default-600" size={14} />
+              </div>
+              <div className="flex flex-col">
+                <p className="text-bold text-sm">{`${order.customer.firstName} ${order.customer.lastName}`}</p>
+                <p className="text-xs text-default-400">
+                  {order.customer.email}
+                </p>
+              </div>
+            </div>
+          );
 
-      case "deliveryMode":
-        return (
-          <div className="flex items-center gap-1">
-            {order.deliveryMode === "delivery" ? (
-              <FiTruck className="text-primary" size={14} />
-            ) : (
-              <FiMapPin className="text-secondary" size={14} />
-            )}
-            <span className="text-sm capitalize">{order.deliveryMode}</span>
-          </div>
-        );
+        case "items":
+          const totalItems = order.items.reduce(
+            (sum: number, item) => sum + (item.itemQuantity || 0),
+            0
+          );
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-sm">
+                {totalItems} item{totalItems !== 1 ? "s" : ""}
+              </p>
+              <p className="text-xs text-default-400">
+                {order.items[0]?.itemName}
+                {order.items.length > 1
+                  ? ` +${order.items.length - 1} more`
+                  : ""}
+              </p>
+            </div>
+          );
 
-      case "orderStatus":
-        return (
-          <Chip
-            className="capitalize"
-            classNames={{
-              base:
-                order.orderStatus === "pending"
-                  ? "bg-gray-200"
-                  : order.orderStatus === "confirmed"
-                  ? "bg-blue-100"
-                  : order.orderStatus === "preparing"
-                  ? "bg-theme"
-                  : order.orderStatus === "ready"
-                  ? "bg-green-100"
-                  : order.orderStatus === "delivered"
-                  ? "bg-green-100"
-                  : "bg-red-200",
-            }}
-            size="sm"
-            variant="flat"
-          >
-            {order.orderStatus}
-          </Chip>
-        );
-
-      case "paymentStatus":
-        return (
-          <div className="flex items-center gap-1">
-            {order.paymentMethod === "Cash" ? (
-              <BsCashCoin className="text-default-400" size={12} />
-            ) : (
-              <FiCreditCard className="text-default-400" size={12} />
-            )}
-            <Chip
-              className="capitalize text-accent"
-              color={
-                paymentColorMap[
-                  order.paymentStatus as keyof typeof paymentColorMap
-                ]
-              }
-              size="sm"
-              variant="dot"
-            >
-              {order.paymentStatus}
-            </Chip>
-          </div>
-        );
-
-      case "total":
-        return (
-          <div className="flex items-center gap-1">
-            <FiDollarSign className="text-success" size={12} />
-            <span className="text-bold text-sm">
-              {order.pricing.total.toFixed(2)}
-            </span>
-          </div>
-        );
-
-      case "actions":
-        return (
-          <div className="relative flex justify-end items-center gap-2">
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              onPress={() => viewOrderDetails(order)}
-            >
-              <FiEye className="text-default-400" />
-            </Button>
-            {order.orderStatus !== "delivered" &&
-              order.orderStatus !== "cancelled" && (
-                <Dropdown>
-                  <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light">
-                      <FiMoreVertical className="text-default-400" />
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu>
-                    <DropdownItem
-                      key="confirm"
-                      startContent={<FiCheck />}
-                      onPress={() => updateOrderStatus(order.id, "confirmed")}
-                      className={`${
-                        order.orderStatus === "pending" ? "" : "hidden"
-                      } text-accent`}
-                    >
-                      Confirm Order
-                    </DropdownItem>
-
-                    <DropdownItem
-                      key="preparing"
-                      startContent={<FiClock />}
-                      onPress={() => updateOrderStatus(order.id, "preparing")}
-                      className={
-                        order.orderStatus === "confirmed"
-                          ? "text-accent"
-                          : "hidden"
-                      }
-                    >
-                      Start Preparing
-                    </DropdownItem>
-                    <DropdownItem
-                      key="ready"
-                      startContent={<FiCheck />}
-                      onPress={() => updateOrderStatus(order.id, "ready")}
-                      className={
-                        order.orderStatus === "preparing"
-                          ? "text-accent"
-                          : "hidden"
-                      }
-                    >
-                      Mark Ready
-                    </DropdownItem>
-                    <DropdownItem
-                      key="delivered"
-                      startContent={<FiTruck />}
-                      onPress={() =>
-                        updateOrderStatus(order.id, "delivered", "completed")
-                      }
-                      className={
-                        order.orderStatus === "ready" ? "text-accent" : "hidden"
-                      }
-                    >
-                      Mark Delivered
-                    </DropdownItem>
-                    <DropdownItem
-                      key="cancel"
-                      startContent={<FiX />}
-                      onPress={() => updateOrderStatus(order.id, "cancelled")}
-                      className="text-danger"
-                      color="danger"
-                    >
-                      Cancel Order
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
+        case "deliveryMode":
+          return (
+            <div className="flex items-center gap-1">
+              {order.deliveryMode === "delivery" ? (
+                <FiTruck className="text-primary" size={14} />
+              ) : (
+                <FiMapPin className="text-secondary" size={14} />
               )}
-          </div>
-        );
+              <span className="text-sm capitalize">{order.deliveryMode}</span>
+            </div>
+          );
 
-      default:
-        return cellValue;
-    }
-  }, []);
+        case "orderStatus":
+          return (
+            <Chip
+              className="capitalize"
+              classNames={{
+                base:
+                  order.orderStatus === "pending"
+                    ? "bg-gray-200"
+                    : order.orderStatus === "confirmed"
+                    ? "bg-blue-100"
+                    : order.orderStatus === "preparing"
+                    ? "bg-theme"
+                    : order.orderStatus === "ready"
+                    ? "bg-green-100"
+                    : order.orderStatus === "delivered"
+                    ? "bg-green-100"
+                    : "bg-red-200",
+              }}
+              size="sm"
+              variant="flat"
+            >
+              {order.orderStatus}
+            </Chip>
+          );
+
+        case "paymentStatus":
+          return (
+            <div className="flex items-center gap-1">
+              {order.paymentMethod === "Cash" ? (
+                <BsCashCoin className="text-default-400" size={12} />
+              ) : (
+                <FiCreditCard className="text-default-400" size={12} />
+              )}
+              <Chip
+                className="capitalize text-accent"
+                color={
+                  paymentColorMap[
+                    order.paymentStatus as keyof typeof paymentColorMap
+                  ]
+                }
+                size="sm"
+                variant="dot"
+              >
+                {order.paymentStatus}
+              </Chip>
+            </div>
+          );
+
+        case "total":
+          return (
+            <div className="flex items-center gap-1">
+              <FiDollarSign className="text-success" size={12} />
+              <span className="text-bold text-sm">
+                {order.pricing.total.toFixed(2)}
+              </span>
+            </div>
+          );
+
+        case "actions":
+          return (
+            <div className="relative flex justify-end items-center gap-2">
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                onPress={() => viewOrderDetails(order)}
+              >
+                <FiEye className="text-default-400" />
+              </Button>
+              {order.orderStatus !== "delivered" &&
+                order.orderStatus !== "cancelled" && (
+                  <Dropdown>
+                    <DropdownTrigger>
+                      <Button isIconOnly size="sm" variant="light">
+                        <FiMoreVertical className="text-default-400" />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu>
+                      <DropdownItem
+                        key="confirm"
+                        startContent={<FiCheck />}
+                        onPress={() => updateOrderStatus(order.id, "confirmed")}
+                        className={`${
+                          order.orderStatus === "pending" ? "" : "hidden"
+                        } text-accent`}
+                      >
+                        Confirm Order
+                      </DropdownItem>
+
+                      <DropdownItem
+                        key="preparing"
+                        startContent={<FiClock />}
+                        onPress={() => updateOrderStatus(order.id, "preparing")}
+                        className={
+                          order.orderStatus === "confirmed"
+                            ? "text-accent"
+                            : "hidden"
+                        }
+                      >
+                        Start Preparing
+                      </DropdownItem>
+                      <DropdownItem
+                        key="ready"
+                        startContent={<FiCheck />}
+                        onPress={() => updateOrderStatus(order.id, "ready")}
+                        className={
+                          order.orderStatus === "preparing"
+                            ? "text-accent"
+                            : "hidden"
+                        }
+                      >
+                        Mark Ready
+                      </DropdownItem>
+                      <DropdownItem
+                        key="delivered"
+                        startContent={<FiTruck />}
+                        onPress={() =>
+                          updateOrderStatus(order.id, "delivered", "completed")
+                        }
+                        className={
+                          order.orderStatus === "ready"
+                            ? "text-accent"
+                            : "hidden"
+                        }
+                      >
+                        Mark Delivered
+                      </DropdownItem>
+                      <DropdownItem
+                        key="cancel"
+                        startContent={<FiX />}
+                        onPress={() => updateOrderStatus(order.id, "cancelled")}
+                        className="text-danger"
+                        color="danger"
+                      >
+                        Cancel Order
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                )}
+            </div>
+          );
+
+        default:
+          // Handle different types of cellValue
+          if (cellValue === null || cellValue === undefined) {
+            return <span>-</span>;
+          }
+
+          if (typeof cellValue === "object") {
+            return <span>{JSON.stringify(cellValue)}</span>;
+          }
+
+          if (Array.isArray(cellValue)) {
+            return <span>{cellValue.length} items</span>;
+          }
+
+          // For primitive types (string, number, boolean)
+          return <span>{String(cellValue)}</span>;
+      }
+    },
+    []
+  );
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -927,9 +936,7 @@ export default function OrderProcessingAdmin() {
                             <div>
                               <p className="font-medium">Delivery Time:</p>
                               <p className="text-default-600">
-                                {new Date(
-                                  selectedOrder.estimatedDeliveryTime
-                                ).toLocaleString()}
+                                {selectedOrder.estimatedDeliveryTime}
                               </p>
                             </div>
                           </div>

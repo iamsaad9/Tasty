@@ -3,15 +3,11 @@
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Card,
   Button,
   Input,
-  Dropdown,
   Select,
   SelectItem,
   Textarea,
-  RadioGroup,
-  Radio,
   addToast,
   Spinner,
   Modal,
@@ -25,7 +21,6 @@ import {
 import { useCartStore } from "@/lib/store/cartStore";
 import { useState } from "react";
 import { useLocationStore } from "@/lib/store/locationStore";
-import { validateAddressWithMaps } from "@/lib/validateAddressWithMaps";
 import PageBanner from "@/components/PageBanner";
 import { useSession } from "next-auth/react";
 import { OrderData } from "@/types";
@@ -36,15 +31,12 @@ import {
   MapPin,
   Phone,
   Mail,
-  Calendar,
   Download,
   Home,
   Package,
   MessageSquare,
   Utensils,
   AlertCircle,
-  Clock,
-  CreditCardIcon,
   User,
 } from "lucide-react";
 import { useCreateOrder } from "@/app/hooks/useOrders";
@@ -304,7 +296,7 @@ const StripePaymentModal = ({
 interface OrderConfirmationData {
   isOpen: boolean;
   onClose: () => void;
-  orderData: any;
+  orderData: OrderData | undefined;
 }
 
 // Order Details Modal Component
@@ -642,7 +634,7 @@ const OrderConfirmationModal = ({
             {/* Confirmation Message */}
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-800 text-center">
-                You'll receive a confirmation SMS and email shortly.
+                You&apos;ll receive a confirmation SMS and email shortly.
                 {orderData?.paymentMethod === "Cash" && (
                   <span className="block mt-2 font-medium">
                     Please keep the exact amount ready for delivery.
@@ -929,7 +921,7 @@ export default function CheckoutPage() {
       // Store order data with backend response
       setOrderConfirmationData({
         ...orderData,
-        orderId: orderResponse.orderId,
+        id: orderResponse.orderId,
         orderNumber: orderResponse.orderNumber,
         estimatedDeliveryTime: orderResponse.estimatedDeliveryTime,
         orderStatus: orderResponse.orderStatus,
@@ -942,13 +934,17 @@ export default function CheckoutPage() {
       });
 
       onConfirmationOpen();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to place order:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+          ? error
+          : "Something went wrong while placing your order. Please try again.";
       addToast({
         title: "Order Failed",
-        description:
-          error.message ||
-          "Something went wrong while placing your order. Please try again.",
+        description: errorMessage,
         color: "danger",
       });
     }
@@ -1107,7 +1103,7 @@ export default function CheckoutPage() {
                       </span>
                     </div>
                     <p className="text-xs text-blue-600 mt-1">
-                      We'll verify your address belongs to this area
+                      We&apos;ll verify your address belongs to this area
                     </p>
                   </div>
 
