@@ -12,7 +12,7 @@ function CartIcon() {
   }, [items]);
 
   return (
-    <div className="fixed right-5 md:right-10 bottom-10 lg:bottom-20 z-50 bg-theme rounded-full shadow-md">
+    <div className="fixed right-5 md:right-10 bottom-20 z-50 bg-theme rounded-full shadow-md">
       <Badge
         color="danger"
         content={itemsInCart}

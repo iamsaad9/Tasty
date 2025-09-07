@@ -247,7 +247,7 @@ function MenuItemModal() {
                   </div>
 
                   {/* Variations - Multiple Groups */}
-                  <div className="mt-4 space-y-4 overflow-y-auto flex-1 max-h-[40vh]">
+                  <div className="mt-4 space-y-4 flex-1">
                     {variationGroups.map((group) => (
                       <div key={group.type}>
                         <h3 className="text-base font-semibold mb-2 capitalize">
@@ -256,7 +256,7 @@ function MenuItemModal() {
                         <RadioGroup
                           className=""
                           classNames={{
-                            wrapper: "grid grid-cols-3 sm:grid-cols-2 gap-1",
+                            wrapper: "grid grid-cols-1 sm:grid-cols-3 gap-1",
                           }}
                           value={(
                             selectedVariations[group.type] ?? 0
@@ -311,10 +311,10 @@ function MenuItemModal() {
 
                   {/* Footer */}
                   <div className="flex items-center justify-between mt-4 border-t pt-3">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="border rounded-full p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
+                        className="border rounded-full p-1 sm:p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
                       >
                         <Minus size={18} />
                       </button>

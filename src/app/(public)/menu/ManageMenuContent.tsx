@@ -61,8 +61,6 @@ function MenuPage() {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [itemToCard, setItemToCart] = useState<number | null>();
-  const [showItemModal, setShowItemModal] = useState(false);
-  const [menuItemClicked, setMenuItemClicker] = useState<number>();
   const openModal = useMenuItemModalStore((state) => state.openModal);
   const searchParams = useSearchParams();
   const { data: Categories } = useCategories();
@@ -85,6 +83,13 @@ function MenuPage() {
       setMenuItems(filteredMenuItems);
     }
   }, [isPending, MenuItems]);
+
+  useEffect(() => {
+    if (MenuItems) {
+      const filteredMenuItems = filterMenuItems(MenuItems);
+      setMenuItems(filteredMenuItems);
+    }
+  }, [selectedLocation, deliveryMode, MenuItems]);
 
   useEffect(() => {
     const itemId = searchParams.get("item");
@@ -177,7 +182,7 @@ function MenuPage() {
 
       <div className="w-full flex flex-col items-center justify-center  gap-5 p-2 md:p-5">
         <div className="lg:w-[90%] w-full sm:px-2 py-5">
-          <FadeInSection className="w-full flex md:flex-row justify-center flex-col gap-3 sm:gap-5 xl:gap-10 p-2 ">
+          <FadeInSection className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5 xl:gap-10 p-2 ">
             {Categories?.map((item) => (
               <Card
                 key={item.id}

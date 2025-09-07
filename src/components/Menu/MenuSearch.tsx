@@ -132,23 +132,6 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 py-5 gap-5">
                 {/* Category Filter */}
                 <div>
-                  {/* <Autocomplete
-                    classNames={{
-                      listboxWrapper: "text-accent",
-                    }}
-                    label="Dietary Preferences"
-                    placeholder="Select Diet"
-                    onSelectionChange={(val) => {
-                      setSelectedDiet(val as string);
-                    }}
-                  >
-                    {dietaryPreferences.map((item) => (
-                      <AutocompleteItem key={item.value}>
-                        {item.label}
-                      </AutocompleteItem>
-                    ))}
-                  </Autocomplete> */}
-
                   <Select
                     classNames={{ listboxWrapper: "text-accent" }}
                     label="Dietary Preferences"

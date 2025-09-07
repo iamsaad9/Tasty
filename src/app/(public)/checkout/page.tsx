@@ -342,6 +342,7 @@ const OrderDetailsModal = ({
       size="2xl"
       isDismissable={!isProcessing}
       scrollBehavior="inside"
+      placement="center"
       className="text-accent"
     >
       <ModalContent>
@@ -358,7 +359,7 @@ const OrderDetailsModal = ({
                 Customer Information
               </h3>
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium">Name:</span>
                     <p>
@@ -517,7 +518,7 @@ const OrderDetailsModal = ({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="light" onPress={onClose} isDisabled={isProcessing}>
+          <Button variant="solid" onPress={onClose} isDisabled={isProcessing}>
             Back to Edit
           </Button>
 
@@ -556,6 +557,8 @@ const OrderConfirmationModal = ({
       onClose={onClose}
       size="2xl"
       isDismissable={false}
+      scrollBehavior="inside"
+      placement="center"
       className="text-accent"
     >
       <ModalContent>
@@ -573,7 +576,7 @@ const OrderConfirmationModal = ({
           <div className="space-y-6">
             {/* Order Details */}
             <div className="bg-gray-50 p-4 rounded-lg text-accent">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Package className="w-4 h-4" />
                   <span className="font-medium">Order ID:</span>
@@ -620,7 +623,7 @@ const OrderConfirmationModal = ({
             )}
 
             {/* Contact Info */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4" />
                 <span>{orderData?.customer?.phone}</span>
@@ -648,12 +651,14 @@ const OrderConfirmationModal = ({
           <div className="flex flex-wrap gap-2 justify-center">
             <Button
               variant="light"
+              className="border-1 border-accent"
               startContent={<Package className="w-4 h-4" />}
             >
               Track Order
             </Button>
             <Button
               variant="light"
+              className="border-1 border-accent"
               startContent={<Download className="w-4 h-4" />}
             >
               Download Invoice
@@ -911,11 +916,10 @@ export default function CheckoutPage() {
       pricing: { subTotal, tax, delivery, tip, total },
       deliveryMode,
       paymentMethod,
-      selectedLocation,
+      selectedLocation: selectedLocation || "Not specified",
     };
 
     try {
-      // Use React Query mutation to create order
       const orderResponse = await createOrderMutation.mutateAsync(orderData);
 
       // Store order data with backend response
@@ -1002,7 +1006,7 @@ export default function CheckoutPage() {
         title="Checkout"
         image="/images/PageBanners/reservationPage.jpg"
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-12 text-accent mt-5">
+      <div className="grid grid-cols-1 md:grid-cols-2  gap-8 p-6 md:p-12 text-accent mt-5">
         {/* Contact + Shipping */}
         <div className="space-y-8">
           <div>
@@ -1190,19 +1194,24 @@ export default function CheckoutPage() {
 
           <div className="border border-default-200 rounded-md divide-y">
             {items.map((item, idx) => (
-              <div key={idx} className="flex justify-between items-start p-4">
-                <div className="flex items-start gap-4">
+              <div
+                key={idx}
+                className="flex justify-between items-start p-2 md:p-4"
+              >
+                <div className="flex items-start gap-2 md:gap-4">
                   <img
                     src={item.itemImage}
                     alt={item.itemName || "Item image"}
                     className="w-16 h-16 rounded-md object-cover"
                   />
                   <div>
-                    <h3 className="font-medium">{item.itemName}</h3>
+                    <h3 className="text-sm sm:text-base font-medium">
+                      {item.itemName}
+                    </h3>
                     {/* Updated variations display */}
                     {item.itemVariations &&
                       Object.keys(item.itemVariations).length > 0 && (
-                        <p className="text-sm text-default-500">
+                        <p className="text-xs sm:text-sm text-default-500">
                           {formatVariations(item.itemVariations)}
                         </p>
                       )}
@@ -1233,7 +1242,7 @@ export default function CheckoutPage() {
                   size="sm"
                   variant={tip === (subTotal * p) / 100 ? "solid" : "bordered"}
                   onPress={() => setTip((subTotal * p) / 100)}
-                  className="text-accent text-base"
+                  className="text-accent text-sm"
                 >
                   {p}%
                 </Button>
@@ -1256,7 +1265,7 @@ export default function CheckoutPage() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-default-500">Shipping</span>
-              <span>{delivery ? `${delivery.toFixed(2)}` : "Free"}</span>
+              <span>${delivery ? `${delivery.toFixed(2)}` : "Free"}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-default-500">Tax</span>

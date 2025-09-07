@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import { useMenuItems } from "@/app/hooks/useMenuItems";
 import { MenuItem, Categories } from "@/types";
+import { set } from "mongoose";
 
 interface MenuItemProps {
   showLoading: (val: boolean) => void;
@@ -52,6 +53,7 @@ function MenuItems({ showLoading }: MenuItemProps) {
   const filterMenuItems = (data: MenuItem[]) => {
     if (deliveryMode !== "delivery") return data;
 
+    if (!data) return [];
     return data.filter((item) => {
       return (
         item.delivery.isDeliverable === true &&
@@ -60,18 +62,15 @@ function MenuItems({ showLoading }: MenuItemProps) {
     });
   };
 
-  // useEffect(() => {
-  //   const fetchMenuItems = async () => {
-  //     showLoading(true);
-  //     const res = await fetch("/Data/menu.json");
-  //     const data = await res.json();
-  //     const filteredMenuItems = filterMenuItems(data);
-  //     setMenuItems(filteredMenuItems);
-
-  //     showLoading(false);
-  //   };
-  //   fetchMenuItems();
-  // }, [selectedLocation, deliveryMode]);
+  useEffect(() => {
+    console.log("Selected Location:", selectedLocation);
+    console.log("Delivery Mode:", deliveryMode);
+    console.log("MenuItems:", MenuItems);
+    if (MenuItems) {
+      const filteredMenuItems = filterMenuItems(MenuItems);
+      setMenuItems(filteredMenuItems);
+    }
+  }, [selectedLocation, deliveryMode]);
 
   const handleMenuClick = (id: number) => {
     setActiveMenu(filteredCategories[id - 1].id);
@@ -150,7 +149,7 @@ function MenuItems({ showLoading }: MenuItemProps) {
       <FadeInSection>
         <Link
           href="/menu"
-          className="bg-transparent border-2 rounded-none border-secondary text-secondary px-2 md:px-10 py-3 text-sm md:text-xl cursor-pointer hover:bg-secondary hover:text-foreground transition-colors duration-300"
+          className="bg-transparent border-2 rounded-none border-secondary text-secondary px-2 md:px-10 py-2 text-sm md:text-xl cursor-pointer hover:bg-secondary active:bg-secondary hover:text-foreground active:text-foreground transition-colors duration-300"
         >
           SEE MORE
         </Link>

@@ -263,27 +263,34 @@ export function Nav() {
                   </div>
 
                   <div className="flex lg:hidden gap-2 items-center">
-                    {deliveryMode === "delivery" && (
-                      <Button
-                        className="border-1 border-white bg-transparent"
-                        onPress={() => setShowLocationModal(true)}
-                      >
-                        <MdLocationPin size={20} color="white" />
-                        <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                          {selectedLocation || "Select"}
-                        </span>
-                      </Button>
-                    )}
                     <div className="flex items-center gap-2">
                       <div
-                        onClick={() => handleDeliveryToggle("delivery")}
-                        className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                        onClick={() => {
+                          if (deliveryMode === "pickup") {
+                            // Switch to delivery mode
+                            handleDeliveryToggle("delivery");
+                          } else {
+                            // Already in delivery mode, open location modal
+                            setShowLocationModal(true);
+                          }
+                        }}
+                        className={`flex items-center gap-2 px-3 py-2 max-w-30 rounded-md cursor-pointer border transition-all ${
                           deliveryMode === "delivery"
-                            ? "bg-theme text-white border-theme"
-                            : "bg-transparent text-white border-gray-300"
+                            ? " text-white border-theme"
+                            : "bg-transparent text-white border-gray-300 hover:border-theme"
                         }`}
                       >
-                        <Truck className="w-4 h-4" />
+                        {deliveryMode === "pickup" && (
+                          <Truck className="w-4 h-4" />
+                        )}
+                        {deliveryMode === "delivery" && (
+                          <>
+                            <MdLocationPin size={16} />
+                            <span className="text-sm line-clamp-1 lg:text-base 2xl:text-lg font-medium">
+                              {selectedLocation || "Select"}
+                            </span>
+                          </>
+                        )}
                       </div>
                       <div
                         onClick={() => handleDeliveryToggle("pickup")}
@@ -324,7 +331,7 @@ export function Nav() {
             <div className="flex justify-between py-2 items-center ">
               <Link
                 href="/"
-                className="text-base md:text-xl text-[--color-foreground] px-4 py-1 mr-2 border-2 border-white"
+                className="text-base md:text-xl text-[--color-foreground] px-2 sm:px-4 py-1 mr-2 border-2 border-white"
               >
                 Tasty
               </Link>
@@ -373,27 +380,32 @@ export function Nav() {
 
               {/* Mobile Hamburger */}
               <div className="flex lg:hidden gap-2 items-center">
-                {deliveryMode === "delivery" && (
-                  <Button
-                    className="border-1 border-white bg-transparent"
-                    onPress={() => setShowLocationModal(true)}
-                  >
-                    <MdLocationPin size={20} color="white" />
-                    <span className="lg:text-base 2xl:text-lg font-medium text-white">
-                      {selectedLocation || "Select"}
-                    </span>
-                  </Button>
-                )}
                 <div className="flex items-center gap-2">
                   <div
-                    onClick={() => handleDeliveryToggle("delivery")}
-                    className={`w-9 h-9 flex items-center justify-center rounded-md cursor-pointer border ${
+                    onClick={() => {
+                      if (deliveryMode === "pickup") {
+                        // Switch to delivery mode
+                        handleDeliveryToggle("delivery");
+                      } else {
+                        // Already in delivery mode, open location modal
+                        setShowLocationModal(true);
+                      }
+                    }}
+                    className={`flex items-center gap-2 px-3 py-2 max-w-30 rounded-md cursor-pointer border transition-all ${
                       deliveryMode === "delivery"
-                        ? "bg-theme text-white border-theme"
-                        : "bg-transparent text-white border-gray-300"
+                        ? " text-white border-theme"
+                        : "bg-transparent text-white border-gray-300 hover:border-theme"
                     }`}
                   >
-                    <Truck className="w-4 h-4" />
+                    {deliveryMode === "pickup" && <Truck className="w-4 h-4" />}
+                    {deliveryMode === "delivery" && (
+                      <>
+                        <MdLocationPin size={16} />
+                        <span className="text-sm line-clamp-1 lg:text-base 2xl:text-lg font-medium">
+                          {selectedLocation || "Select"}
+                        </span>
+                      </>
+                    )}
                   </div>
                   <div
                     onClick={() => handleDeliveryToggle("pickup")}

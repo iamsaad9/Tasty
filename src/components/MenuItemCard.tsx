@@ -100,7 +100,7 @@ export function MenuItemCard({
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </div>
-          <div className="flex-1 p-2 md:p-4 flex flex-col justify-between  gap-2 ">
+          <div className="flex-1 p-2 md:p-4 flex flex-col justify-between  gap-1 ">
             <h3 className="text-md md:text-lg text-center font-semibold text-accent">
               {itemName}
             </h3>
@@ -113,7 +113,7 @@ export function MenuItemCard({
               </span>
               <div className="flex gap-2 items-center">
                 <Button
-                  className="bg-theme text-white text-sm px-3 py-1 rounded-full hover:bg-theme-dark transition"
+                  className="bg-theme text-white text-xs sm:text-sm px-3 rounded-2xl hover:bg-theme-dark transition"
                   onPress={handleClick}
                 >
                   Add to Cart
@@ -184,9 +184,9 @@ export function DashboardMenuItemCard({
         ease: "easeInOut",
       }}
       whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 1 }}
+      whileTap={{ scale: 0.9 }}
     >
-      <Card className="bg-foreground p-4 rounded-sm hover:bg-theme cursor-pointer transition-shadow duration-300">
+      <Card className="p-4 rounded-sm hover:bg-theme cursor-pointer transition-shadow duration-300">
         {showLoginModal && (
           <LoginModal
             open={showLoginModal}
@@ -199,7 +199,7 @@ export function DashboardMenuItemCard({
         >
           <div className="flex items-center sm:items-center gap-4 flex-1">
             <div
-              className="min-w-[70px] min-h-[70px] w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-red-500 flex items-center justify-center text-white font-bold"
+              className="min-w-[60px] min-h-[60px] w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-red-500 flex items-center justify-center text-white font-bold"
               style={{
                 backgroundImage: `url(${itemImage})`,
                 backgroundSize: "cover",
@@ -211,7 +211,7 @@ export function DashboardMenuItemCard({
               <h2 className="text-base sm:text-lg font-semibold text-accent line-clamp-1">
                 {itemName}
               </h2>
-              <p className="text-xs md:text-sm text-accent/60 mt-1 sm:mt-2 line-clamp-3">
+              <p className="text-xs md:text-sm text-accent/60 mt-1 sm:mt-2 line-clamp-2">
                 {itemDescription}
               </p>
             </div>

@@ -128,64 +128,82 @@ export default function CartDrawer() {
               <DrawerBody className="pt-4 px-4 pb-0 space-y-6">
                 {/* Cart Items */}
                 {items.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {items.map((item, index) => (
                       <Card
                         key={`${item.itemId}-${index}`}
-                        className="flex flex-row gap-2 items-center p-2 text-accent"
+                        className="flex flex-col sm:flex-row gap-3 sm:gap-2 items-start sm:items-center p-3 sm:p-2 text-accent justify-between"
                       >
-                        <img
-                          src={item.itemImage}
-                          alt="Dish"
-                          className="w-16 h-16 rounded-md object-cover"
-                        />
-                        <div className="flex flex-row justify-between items-center w-full ">
-                          <div>
-                            <h3 className="font-medium text-base line-clamp-1">
+                        {/* Image and content wrapper for mobile */}
+                        <div className="flex flex-row gap-3 items-start w-full sm:w-auto">
+                          <img
+                            src={item.itemImage}
+                            alt="Dish"
+                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-md object-cover flex-shrink-0"
+                          />
+
+                          {/* Item details */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-sm sm:text-base line-clamp-1">
                               {item.itemName}
                             </h3>
-                            <p className="text-xs text-default-500 line-clamp-2">
+                            <p className="text-xs text-default-500 line-clamp-2 mb-1">
                               {item.itemInstructions}
                             </p>
-                            {/* Fixed variations display - handles both formats */}
-                            <p className="text-xs text-default-500 line-clamp-2">
+                            {/* Variations */}
+                            <p className="text-xs text-default-500 line-clamp-1 sm:line-clamp-2">
                               {formatVariations(
                                 item.itemVariations || item.itemVariations
                               )}
                             </p>
                           </div>
-                          <div className="flex items-center justify-between gap-5 ">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleDecreaseQuantity(index)}
-                                className="border rounded-full p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
-                              >
-                                <Minus size={10} />
-                              </button>
+                        </div>
 
-                              <span className="font-medium text-base">
-                                {item.itemQuantity}
-                              </span>
+                        {/* Controls section - stacked on mobile, inline on desktop */}
+                        <div className="flex flex-row sm:flex-row justify-between sm:justify-end items-center w-full sm:w-auto gap-2 sm:gap-2 md:gap-5">
+                          {/* Quantity controls */}
+                          <div className="flex items-center">
+                            <button
+                              onClick={() => handleDecreaseQuantity(index)}
+                              className="border rounded-full p-1.5 sm:p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
+                            >
+                              <Minus
+                                size={8}
+                                className="sm:w-[10px] sm:h-[10px]"
+                              />
+                            </button>
 
-                              <button
-                                onClick={() => handleIncreaseQuantity(index)}
-                                className="border rounded-full p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
-                              >
-                                <Plus size={10} />
-                              </button>
-                            </div>
-                            <span className="min-w-14 text-sm font-semibold">
+                            <span className="font-medium text-sm sm:text-base min-w-[20px] text-center">
+                              {item.itemQuantity}
+                            </span>
+
+                            <button
+                              onClick={() => handleIncreaseQuantity(index)}
+                              className="border rounded-full p-1.5 sm:p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
+                            >
+                              <Plus
+                                size={8}
+                                className="sm:w-[10px] sm:h-[10px]"
+                              />
+                            </button>
+                          </div>
+
+                          <div className="flex gap-2 items-center justify-end">
+                            {/* Price */}
+                            <span className="text-large font-semibold min-w-[60px] text-right">
                               ${" "}
                               {(
                                 (item.itemBasePrice || 0) *
                                 (item.itemQuantity || 1)
                               ).toFixed(2)}
                             </span>
+
+                            {/* Remove button */}
                             <Button
                               isIconOnly
                               size="sm"
                               variant="light"
-                              className="hover:!bg-red-200"
+                              className="bg-red-200 flex-shrink-0 min-w-[32px]"
                               onPress={() => {
                                 setShowModal({
                                   open: true,
@@ -203,7 +221,8 @@ export default function CartDrawer() {
                         </div>
                       </Card>
                     ))}
-                    <div className="flex w-full justify-end mt-5">
+
+                    <div className="flex w-full justify-center sm:justify-end mt-4 sm:mt-5">
                       <AddItemButton />
                     </div>
                   </div>

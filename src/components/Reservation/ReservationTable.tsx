@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Table,
   TableHeader,
@@ -285,7 +285,7 @@ export default function ViewReservations({
               })
             : "N/A";
           return (
-            <div className="flex justify-center items-center gap-2">
+            <div className="flex justify-center items-center gap-2 min-w-20">
               <MdOutlineAccessTimeFilled size={20} />
               <p className="text-bold">{formattedTime}</p>
             </div>
@@ -293,7 +293,7 @@ export default function ViewReservations({
 
         case "duration":
           return (
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 min-w-20">
               <MdAvTimer size={20} />
               <p className="text-bold">
                 {item.duration} {item.duration === 1 ? "Hours" : "Hours"}
@@ -303,7 +303,7 @@ export default function ViewReservations({
 
         case "guests":
           return (
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 min-w-20">
               <FaUserFriends size={20} />
               <p className="text-bold">
                 {item.guests} {item.guests === 1 ? "Guest" : "Guests"}
@@ -338,7 +338,7 @@ export default function ViewReservations({
 
         case "requests":
           return (
-            <div className="flex flex-col w-40 whitespace-normal break-words">
+            <div className="flex flex-col w-40 whitespace-normal break-words ">
               <p className="text-bold" title={item.requests || ""}>
                 {item.requests ? item.requests : "N/A"}
               </p>
@@ -357,7 +357,7 @@ export default function ViewReservations({
                   "bg-orange-100 border-orange-500 text-orange-700":
                     item.status === "pending",
                 },
-                "flex justify-center items-center rounded-full px-2 py-1 border-1 text-xs font-semibold"
+                "flex justify-center items-center rounded-full px-2 py-1 border-1 text-xs font-semibold min-w-20"
               )}
             >
               <p className="capitalize">{item.status}</p>
@@ -366,7 +366,7 @@ export default function ViewReservations({
 
         case "table":
           return (
-            <div className="flex items-center gap-2 justify-center border-1 border-accent rounded-sm p-1 min-w-16">
+            <div className="flex items-center gap-2 justify-center border-1 border-accent rounded-sm p-1 min-w-20">
               <MdTableRestaurant size={20} />
               <p className="font-medium">
                 {item.tableId ? item.tableId : "N/A"}

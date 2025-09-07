@@ -544,6 +544,7 @@ const AdminDashboard: React.FC = () => {
                 <DropdownTrigger>
                   <Button
                     variant="bordered"
+                    color="secondary"
                     endContent={<ChevronDown size={16} />}
                   >
                     {timeRange === "today" && "Today"}

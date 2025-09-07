@@ -97,6 +97,7 @@ export function useCreateOrder() {
   return useMutation({
     mutationFn: async (orderData: CreateOrderData) => {
       console.log("Creating order:", orderData);
+
       const res = await fetch("/api/order", {
         method: "POST",
         headers: {
@@ -105,12 +106,27 @@ export function useCreateOrder() {
         body: JSON.stringify(orderData),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to create order");
+      // Read response as text first
+      const text = await res.text();
+      console.log("Server response text:", text);
+
+      // Try parsing JSON safely
+      let data: any = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (err) {
+        console.error("Failed to parse JSON:", err);
       }
 
-      return res.json();
+      // Handle errors
+      if (!res.ok) {
+        const errorMsg =
+          data?.error || `Failed to create order (status ${res.status})`;
+        alert(errorMsg);
+        throw new Error(errorMsg);
+      }
+
+      return data;
     },
     onSuccess: () => {
       // Invalidate and refetch orders
@@ -118,7 +134,6 @@ export function useCreateOrder() {
     },
   });
 }
-
 // Hook to update order status
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();

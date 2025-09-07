@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import {
   Calendar,
   Clock,
@@ -114,24 +114,36 @@ function ReservationForm({
     });
   };
 
-  // Check reservation limits for general errors (only max reservations)
+  const todayString = useMemo(() => today(getLocalTimeZone()).toString(), []);
+
   const validateReservationLimits = useMemo(() => {
     const limitErrors: string[] = [];
     const onGoingReservations = userReservations.filter(
-      (i) => i.date >= today(getLocalTimeZone()).toString()
+      (i) => i.date >= todayString
     );
-    // Check if user has more than 5 pending/confirmed reservations
+
     if (!reservationDataProp && onGoingReservations.length >= 5) {
       limitErrors.push(
         "You cannot have more than 5 ongoing reservations at a time."
       );
     }
-    return limitErrors;
-  }, [userReservations, reservationDataProp]);
 
-  // Update reservation limit errors when validation changes
+    return limitErrors;
+  }, [userReservations, reservationDataProp, todayString, session]);
+
+  // Use a ref to track previous errors and only update if they actually changed
+  const prevErrorsRef = useRef<string[]>([]);
   useEffect(() => {
-    setReservationLimitErrors(validateReservationLimits);
+    const errorsChanged =
+      validateReservationLimits.length !== prevErrorsRef.current.length ||
+      validateReservationLimits.some(
+        (error, index) => error !== prevErrorsRef.current[index]
+      );
+
+    if (errorsChanged) {
+      setReservationLimitErrors(validateReservationLimits);
+      prevErrorsRef.current = validateReservationLimits;
+    }
   }, [validateReservationLimits]);
 
   // Check if form should be disabled (only for max reservations, not date conflict)
@@ -140,12 +152,6 @@ function ReservationForm({
   // Get today's date
   const minDate = today(getLocalTimeZone()).add({ days: 1 });
   const maxDate = today(getLocalTimeZone()).add({ days: 30 });
-
-  useEffect(() => {
-    if (reservationDataProp) {
-      console.log("reservationDataProp", reservationDataProp);
-    }
-  }, []);
 
   useEffect(() => {
     if (session?.user?.email) {

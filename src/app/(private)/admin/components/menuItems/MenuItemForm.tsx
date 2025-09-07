@@ -385,16 +385,16 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-4">
+    <div className="flex flex-col items-center min-h-screen ">
       <div className="w-full max-w-6xl bg-white shadow-lg rounded-lg overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-theme/70 to-theme p-6">
+        <div className="bg-gradient-to-r from-theme/70 to-theme p-5">
           <h1 className="text-2xl font-bold text-white">
             {menuItemDataProp ? "Edit Menu Item" : "Add New Menu Item"}
           </h1>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-3 space-y-6">
           {/* Basic Information */}
           <Card>
             <CardBody className="space-y-4">

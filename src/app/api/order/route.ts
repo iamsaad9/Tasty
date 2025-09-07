@@ -79,10 +79,7 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json(
-      { error: "Failed to create order" },
-      { status: 500 }
-    );
+    return NextResponse.json(alert(error), { status: 500 });
   }
 }
 
