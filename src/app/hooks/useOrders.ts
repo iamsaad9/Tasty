@@ -61,6 +61,29 @@ export interface CreateOrderData {
   selectedLocation: string;
 }
 
+// Additional interfaces for API responses
+interface CreateOrderResponse {
+  id: string;
+  orderNumber: string;
+  message?: string;
+  estimatedDeliveryTime?: string;
+  success?: boolean;
+  orderStatus?: string | undefined;
+}
+
+interface UpdateOrderResponse {
+  id: string;
+  orderStatus?: string;
+  paymentStatus?: string;
+  message?: string;
+  success?: boolean;
+}
+
+interface ApiErrorResponse {
+  error: string;
+  message?: string;
+}
+
 // Hook to fetch all orders
 export function useOrders() {
   return useQuery({
@@ -95,7 +118,9 @@ export function useCreateOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (orderData: CreateOrderData) => {
+    mutationFn: async (
+      orderData: CreateOrderData
+    ): Promise<CreateOrderResponse> => {
       console.log("Creating order:", orderData);
 
       const res = await fetch("/api/order", {
@@ -111,22 +136,24 @@ export function useCreateOrder() {
       console.log("Server response text:", text);
 
       // Try parsing JSON safely
-      let data: any = {};
+      let data: CreateOrderResponse | ApiErrorResponse;
       try {
-        data = text ? JSON.parse(text) : {};
+        data = text ? JSON.parse(text) : { error: "Empty response" };
       } catch (err) {
         console.error("Failed to parse JSON:", err);
+        throw new Error("Invalid JSON response from server");
       }
 
       // Handle errors
       if (!res.ok) {
+        const errorData = data as ApiErrorResponse;
         const errorMsg =
-          data?.error || `Failed to create order (status ${res.status})`;
+          errorData?.error || `Failed to create order (status ${res.status})`;
         alert(errorMsg);
         throw new Error(errorMsg);
       }
 
-      return data;
+      return data as CreateOrderResponse;
     },
     onSuccess: () => {
       // Invalidate and refetch orders
@@ -134,6 +161,7 @@ export function useCreateOrder() {
     },
   });
 }
+
 // Hook to update order status
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
@@ -147,15 +175,14 @@ export function useUpdateOrderStatus() {
       orderId: string;
       orderStatus?: string;
       paymentStatus?: string;
-    }) => {
+    }): Promise<UpdateOrderResponse> => {
       console.log("Updating order status:", orderId, {
         orderStatus,
         paymentStatus,
       });
 
       const res = await fetch(`/api/order`, {
-        // Changed to /api/orders
-        method: "PUT", // Changed to PUT
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -167,11 +194,11 @@ export function useUpdateOrderStatus() {
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
+        const errorData: ApiErrorResponse = await res.json();
         throw new Error(errorData.error || "Failed to update order");
       }
 
-      return res.json();
+      return res.json() as Promise<UpdateOrderResponse>;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });

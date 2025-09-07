@@ -785,34 +785,12 @@ export default function CheckoutPage() {
 
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone number is required";
-    } else if (!/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone)) {
+    } else if (
+      !/^\+?[\d\s\-\(\)]*$/.test(formData.phone) ||
+      formData.phone.replace(/\D/g, "").length !== 11
+    ) {
       newErrors.phone = "Please enter a valid phone number";
     }
-
-    // if (deliveryMode === "delivery") {
-    //   if (!formData.address.trim()) {
-    //     newErrors.address = "Address is required for delivery";
-    //   } else {
-    //     // Validate address with Google Maps
-    //     setIsValidatingAddress(true);
-    //     try {
-    //       const locationValidation = await validateAddressWithMaps(
-    //         formData.address,
-    //         selectedLocation
-    //       );
-
-    //       if (!locationValidation.isValid) {
-    //         newErrors.address =
-    //           locationValidation.message ?? "Invalid address.";
-    //       }
-    //     } catch (error) {
-    //       console.error("Address validation failed:", error);
-    //       // Don't block submission if validation fails
-    //     } finally {
-    //       setIsValidatingAddress(false);
-    //     }
-    //   }
-    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -925,10 +903,18 @@ export default function CheckoutPage() {
       // Store order data with backend response
       setOrderConfirmationData({
         ...orderData,
-        id: orderResponse.orderId,
+        id: orderResponse.id,
         orderNumber: orderResponse.orderNumber,
-        estimatedDeliveryTime: orderResponse.estimatedDeliveryTime,
-        orderStatus: orderResponse.orderStatus,
+        estimatedDeliveryTime:
+          orderResponse.estimatedDeliveryTime || "30-45 minutes",
+        orderStatus:
+          (orderResponse.orderStatus as
+            | "pending"
+            | "confirmed"
+            | "preparing"
+            | "ready"
+            | "delivered"
+            | "cancelled") ?? "pending",
       });
 
       addToast({

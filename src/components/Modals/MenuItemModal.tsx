@@ -321,7 +321,7 @@ function MenuItemModal() {
                       <span className="font-medium">{quantity}</span>
                       <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="border rounded-full p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
+                        className="border rounded-full p-1 sm:p-2 cursor-pointer bg-theme hover:scale-105 active:scale-100 transition-all duration-200"
                       >
                         <Plus size={18} />
                       </button>
