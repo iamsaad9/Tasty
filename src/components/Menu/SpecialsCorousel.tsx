@@ -6,7 +6,6 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { Button } from "@heroui/react";
 import Heading from "../Heading";
 import { MenuItemCard } from "../MenuItemCard";
 import { MenuItem } from "@/types";

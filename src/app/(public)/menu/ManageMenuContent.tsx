@@ -162,7 +162,7 @@ function MenuPage() {
         description="Please select your location"
         onClose={() => setShowAddressModal(false)}
       />
-      <LoadingScreen showLoading={loading} />
+      {isPending && <LoadingScreen showLoading={true} />}
       {/* Background Section */}
       <PageBanner
         title="Discover Our Exclusive Menu"

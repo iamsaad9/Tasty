@@ -6,16 +6,9 @@ import Heading from "../Heading";
 import { DashboardMenuItemCard } from "../MenuItemCard";
 import { useLocationStore } from "@/lib/store/locationStore";
 import { useCategories } from "@/app/hooks/useCategories";
-import {
-  FaDrumstickBite,
-  FaIceCream,
-  FaWineGlassAlt,
-  FaPizzaSlice,
-  FaBreadSlice,
-} from "react-icons/fa";
+import { FaDrumstickBite, FaIceCream, FaPizzaSlice } from "react-icons/fa";
 import { useMenuItems } from "@/app/hooks/useMenuItems";
 import { MenuItem, Categories } from "@/types";
-import { set } from "mongoose";
 import LoadingScreen from "../Loading";
 
 function MenuItems() {
@@ -48,15 +41,12 @@ function MenuItems() {
   const filterMenuItems = (data: MenuItem[]) => {
     if (!data) return [];
 
-    // If not in delivery mode → show all items
     if (deliveryMode !== "delivery") return data;
 
-    // If no location selected → show all deliverable items
     if (!selectedLocation || selectedLocation.trim() === "") {
       return data.filter((item) => item.delivery.isDeliverable === true);
     }
 
-    // If location is selected → show deliverable items for that location
     return data.filter((item) => {
       return (
         item.delivery.isDeliverable === true &&
@@ -98,10 +88,12 @@ function MenuItems() {
     ),
   };
 
+  isPending && <LoadingScreen showLoading={true} />;
+
   return (
     <div className=" w-full lg:w-[90vw] xl:w-[80vw] flex flex-col gap-10 py-10 justify-center items-center px-5 lg:px-0">
       <Heading title="OUR MENU" subheading="Discover Our Exclusive Menu" />
-      <LoadingScreen showLoading={loading} />
+
       <div className="w-full sm:px-0 ">
         <FadeInSection
           delay={0.2}
