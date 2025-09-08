@@ -1,6 +1,5 @@
 import { Card } from "@heroui/react";
 import React, { useState, useEffect, JSX } from "react";
-import { motion } from "framer-motion";
 import FadeInSection from "../ui/scrollAnimated";
 import { Link } from "@heroui/react";
 import Heading from "../Heading";
@@ -47,9 +46,17 @@ function MenuItems() {
   }, [Categories]);
 
   const filterMenuItems = (data: MenuItem[]) => {
+    if (!data) return [];
+
+    // If not in delivery mode → show all items
     if (deliveryMode !== "delivery") return data;
 
-    if (!data) return [];
+    // If no location selected → show all deliverable items
+    if (!selectedLocation || selectedLocation.trim() === "") {
+      return data.filter((item) => item.delivery.isDeliverable === true);
+    }
+
+    // If location is selected → show deliverable items for that location
     return data.filter((item) => {
       return (
         item.delivery.isDeliverable === true &&
@@ -68,6 +75,7 @@ function MenuItems() {
   }, [selectedLocation, deliveryMode]);
 
   const handleMenuClick = (id: number) => {
+    console.log("Active Category:", id);
     setActiveMenu(filteredCategories[id - 1].id);
   };
 
@@ -125,6 +133,12 @@ function MenuItems() {
       <div className="w-full grid gap-5 md:grid-cols-2">
         {menuItems
           .filter((item) => item.category === activeMenu)
+          .slice(
+            0,
+            selectedLocation === null || selectedLocation === ""
+              ? 8 // show 8 items per category if no location
+              : 8 // show 8 items for selected location
+          )
           .map((item) => (
             <FadeInSection className="w-full" key={item.id}>
               <DashboardMenuItemCard

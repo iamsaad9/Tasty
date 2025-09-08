@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
 import FadeInSection from "@/components/ui/scrollAnimated";
-import { Card, CardContent } from "@/components/ui/card";
-import { useSession } from "next-auth/react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@heroui/react";
@@ -21,15 +17,11 @@ interface SpecialsCorouselProps {
   addItemToCart: (itemId: number) => void;
 }
 
-function SpecialsCorousel({
-  showLogin,
-  addItemToCart,
-  menuItems,
-}: SpecialsCorouselProps) {
+function SpecialsCorousel({ menuItems }: SpecialsCorouselProps) {
   const [specialItems, setSpecialItems] = useState<MenuItem[]>([]);
 
   const filterSpecialMenuItems = (data: MenuItem[]) => {
-    return data.filter((item) => item.special === true).slice(0, 4);
+    return data.filter((item) => item.special === true);
   };
 
   useEffect(() => {

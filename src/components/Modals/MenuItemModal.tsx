@@ -250,7 +250,7 @@ function MenuItemModal() {
                         <RadioGroup
                           className=""
                           classNames={{
-                            wrapper: "grid grid-cols-1 sm:grid-cols-3 gap-1",
+                            wrapper: "grid grid-cols-1 sm:grid-cols-2 gap-1",
                           }}
                           value={(
                             selectedVariations[group.type] ?? 0
