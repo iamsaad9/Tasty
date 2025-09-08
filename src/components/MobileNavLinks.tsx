@@ -5,10 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { User as UserIconLucide, LogOut } from "lucide-react";
-import { useState } from "react";
 import { Avatar, Button } from "@heroui/react";
 import type { User as NextAuthUser } from "next-auth";
-import AuthModal from "./Modals/LoginModal";
+import { User, ShoppingCart, ClipboardList } from "lucide-react";
 
 // --- Sub-component: MobileNavMenu ---
 interface MobileNavMenuProps {
@@ -23,6 +22,19 @@ interface ProcessedMobileNavItem {
   title: string;
   icon: React.ReactNode;
 }
+
+const profileLinks = [
+  {
+    title: "Edit Profile",
+    href: "/profile/edit",
+    icon: <User className="w-4 h-4" />,
+  },
+  {
+    title: "My Orders",
+    href: "/orders",
+    icon: <ClipboardList className="w-4 h-4" />,
+  },
+];
 
 export const MobileNavLinks: React.FC<MobileNavMenuProps> = ({
   navLinks,
@@ -65,6 +77,23 @@ export const MobileNavLinks: React.FC<MobileNavMenuProps> = ({
           </div>
         ) : (
           <div className="flex flex-col w-full">
+            {profileLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center px-3 gap-2 py-3 rounded-lg mx-2 text-white
+            ${
+              pathname === link.href ||
+              (link.href !== "/" && pathname.startsWith(link.href))
+                ? "bg-background/50 text-primary dark:bg-primary/20  text-md"
+                : "text-muted-foreground hover:bg-background/30 hover:text-foreground text-sm"
+            }`}
+                onClick={onCloseMenu}
+              >
+                {link.icon}
+                {link.title}
+              </Link>
+            ))}
             <div className="flex items-center px-3 py-2 mb-2">
               <Avatar
                 src={session.user.image || undefined}
@@ -88,6 +117,7 @@ export const MobileNavLinks: React.FC<MobileNavMenuProps> = ({
                 </div>
               </div>
             </div>
+
             <button
               onClick={() => {
                 onCloseMenu();

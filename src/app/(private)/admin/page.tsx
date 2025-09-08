@@ -244,7 +244,6 @@ const AdminDashboard: React.FC = () => {
       return;
     }
 
-    console.log("Updating reservation with _id:", reservation.id);
     try {
       const res = await fetch("/api/reservations", {
         method: "PUT",
@@ -260,7 +259,6 @@ const AdminDashboard: React.FC = () => {
         throw new Error("Failed to update reservation");
       }
 
-      console.log("Reservation status updated successfully");
       queryClient.invalidateQueries({ queryKey: ["Reservations"] });
     } catch (error) {
       console.error("Error updating reservation:", error);
@@ -299,7 +297,6 @@ const AdminDashboard: React.FC = () => {
       return;
     }
 
-    console.log("Confirming reservation with table:", reservation._id);
     try {
       const res = await fetch("/api/reservations", {
         method: "PUT",
@@ -417,17 +414,6 @@ const AdminDashboard: React.FC = () => {
       const start2 = parseTime(startTime2);
       const end2 = start2 + duration2 * 60;
 
-      // Debug logging
-      console.log("Time overlap check:", {
-        time1: `${startTime1} (${duration1}h)`,
-        time2: `${startTime2} (${duration2}h)`,
-        start1Minutes: start1,
-        end1Minutes: end1,
-        start2Minutes: start2,
-        end2Minutes: end2,
-        overlap: start1 < end2 && start2 < end1,
-      });
-
       // Check if ranges overlap
       return start1 < end2 && start2 < end1;
     } catch (error) {
@@ -466,21 +452,6 @@ const AdminDashboard: React.FC = () => {
           return false;
         }
 
-        // Debug logging
-        console.log(`Checking conflict for table ${table.name}:`, {
-          existingReservation: {
-            name: reservation.name,
-            time: reservation.time,
-            duration: reservation.duration,
-            tableId: reservation.tableId,
-          },
-          newReservation: {
-            name: currentReservation.name,
-            time: currentReservation.time,
-            duration: currentReservation.duration,
-          },
-        });
-
         // Check time overlap
         const overlap = checkTimeOverlap(
           reservation.time,
@@ -488,10 +459,6 @@ const AdminDashboard: React.FC = () => {
           currentReservation.time,
           currentReservation.duration
         );
-
-        if (overlap) {
-          console.log(`Time conflict detected for table ${table.name}`);
-        }
 
         return overlap;
       });
@@ -755,34 +722,6 @@ const AdminDashboard: React.FC = () => {
                         mockTables
                       )
                     : [];
-
-                  // Debug logging
-                  console.log(
-                    "Reservation:",
-                    reservation.name,
-                    "Date:",
-                    reservation.date,
-                    "Time:",
-                    reservation.time
-                  );
-                  console.log(
-                    "Available tables for this reservation:",
-                    availableTablesForReservation.map((t) => ({
-                      name: t.name,
-                      isAvailable: t.isAvailable,
-                      unavailableReason: t.unavailableReason,
-                    }))
-                  );
-                  console.log(
-                    "All reservations being checked:",
-                    sortedReservations?.map((r) => ({
-                      name: r.name,
-                      status: r.status,
-                      tableId: r.tableId,
-                      date: r.date,
-                      time: r.time,
-                    }))
-                  );
 
                   return (
                     <div

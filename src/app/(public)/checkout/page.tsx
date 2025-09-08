@@ -751,8 +751,6 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (items.length === 0) {
       router.push("/");
-    } else {
-      console.log("checkout items", items);
     }
   }, [items, router]);
 
@@ -958,9 +956,6 @@ export default function CheckoutPage() {
 
   const handleConfirmOrder = async () => {
     onOrderDetailsClose();
-
-    console.log("Form Data:", formData);
-    console.log("Item Data:", items);
 
     if (paymentMethod === "Card") {
       onPaymentOpen();

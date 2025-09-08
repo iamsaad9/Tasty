@@ -20,7 +20,6 @@ export function useReservations() {
   return useQuery({
     queryKey: ["Reservations"],
     queryFn: async () => {
-      console.log("Fetching Reservations using API");
       const res = await fetch("/api/reservations");
       if (!res.ok) throw new Error("Failed to fetch Reservations");
       return res.json() as Promise<Reservation[]>;

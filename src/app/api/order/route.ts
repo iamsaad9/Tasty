@@ -52,7 +52,6 @@ export async function POST(request: Request) {
 
     // Save to database
     const savedOrder = await Order.create(newOrder);
-    console.log("Order created successfully:", savedOrder.orderNumber);
 
     // Return success response
     return NextResponse.json(
@@ -90,8 +89,6 @@ export async function GET() {
     // Fetch all orders, sorted by creation date (newest first)
     const orders = await Order.find({}).sort({ createdAt: -1 }).lean();
 
-    console.log(`Fetched ${orders.length} orders from DB`);
-
     return NextResponse.json(orders, { status: 200 });
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -118,8 +115,6 @@ export async function PUT(req: Request) {
 
     const { id, ...updateData } = body;
 
-    console.log("Updating order with ID:", id, "Data:", updateData);
-
     // Find by your custom 'id' field, not MongoDB's '_id'
     const updatedOrder = await Order.findOneAndUpdate(
       { id: id }, // Using your custom id field from nanoid
@@ -136,8 +131,6 @@ export async function PUT(req: Request) {
     if (!updatedOrder) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
-
-    console.log("Order updated successfully:", updatedOrder.orderNumber);
 
     return NextResponse.json(updatedOrder, { status: 200 });
   } catch (error) {

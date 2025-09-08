@@ -199,7 +199,7 @@ export function DashboardMenuItemCard({
         >
           <div className="flex items-center sm:items-center gap-4 flex-1">
             <div
-              className="min-w-[60px] min-h-[60px] w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-red-500 flex items-center justify-center text-white font-bold"
+              className="min-w-[60px] min-h-[60px] w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white font-bold"
               style={{
                 backgroundImage: `url(${itemImage})`,
                 backgroundSize: "cover",

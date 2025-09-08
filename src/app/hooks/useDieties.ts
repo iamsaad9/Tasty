@@ -10,7 +10,6 @@ export function useDietaries() {
   return useQuery({
     queryKey: ["Dietaries"],
     queryFn: async () => {
-      console.log("Fetching Dietaries using API");
       const res = await fetch("/api/dietaryPreference");
       if (!res.ok) throw new Error("Failed to fetch Dietaries");
       return res.json() as Promise<DietaryOption[]>;

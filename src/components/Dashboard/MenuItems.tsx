@@ -17,15 +17,12 @@ import {
 import { useMenuItems } from "@/app/hooks/useMenuItems";
 import { MenuItem, Categories } from "@/types";
 import { set } from "mongoose";
+import LoadingScreen from "../Loading";
 
-interface MenuItemProps {
-  showLoading: (val: boolean) => void;
-}
-
-function MenuItems({ showLoading }: MenuItemProps) {
+function MenuItems() {
   const [activeMenu, setActiveMenu] = useState<string>("1");
   const { selectedLocation, deliveryMode } = useLocationStore();
-
+  const [loading, setLoading] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Categories[]>(
     []
   );
@@ -41,13 +38,12 @@ function MenuItems({ showLoading }: MenuItemProps) {
   };
 
   useEffect(() => {
+    setLoading(true);
     if (!isLoading && Categories) {
       const filteredCategories = filterCategories(Categories);
-      console.log("Categories:", filteredCategories);
       setFilteredCategories(filteredCategories);
-    } else {
-      console.log("No Category found");
     }
+    setLoading(false);
   }, [Categories]);
 
   const filterMenuItems = (data: MenuItem[]) => {
@@ -63,13 +59,12 @@ function MenuItems({ showLoading }: MenuItemProps) {
   };
 
   useEffect(() => {
-    console.log("Selected Location:", selectedLocation);
-    console.log("Delivery Mode:", deliveryMode);
-    console.log("MenuItems:", MenuItems);
+    setLoading(true);
     if (MenuItems) {
       const filteredMenuItems = filterMenuItems(MenuItems);
       setMenuItems(filteredMenuItems);
     }
+    setLoading(false);
   }, [selectedLocation, deliveryMode]);
 
   const handleMenuClick = (id: number) => {
@@ -98,7 +93,7 @@ function MenuItems({ showLoading }: MenuItemProps) {
   return (
     <div className=" w-full lg:w-[90vw] xl:w-[80vw] flex flex-col gap-10 py-10 justify-center items-center px-5 lg:px-0">
       <Heading title="OUR MENU" subheading="Discover Our Exclusive Menu" />
-
+      <LoadingScreen showLoading={loading} />
       <div className="w-full sm:px-0 ">
         <FadeInSection
           delay={0.2}

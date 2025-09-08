@@ -34,7 +34,6 @@ function SpecialsCorousel({
 
   useEffect(() => {
     if (!menuItems) return;
-    console.log("MenuItems", menuItems);
     const filteredMenuItems = filterSpecialMenuItems(menuItems);
     setSpecialItems(filteredMenuItems);
   }, [menuItems]);

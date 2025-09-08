@@ -78,7 +78,6 @@ function MenuPage() {
 
   useEffect(() => {
     if (!isPending && MenuItems) {
-      console.log("MenuItems", MenuItems);
       const filteredMenuItems = filterMenuItems(MenuItems);
       setMenuItems(filteredMenuItems);
     }

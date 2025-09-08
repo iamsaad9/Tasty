@@ -23,7 +23,6 @@ import { Truck, Store } from "lucide-react";
 import { addToast } from "@heroui/react";
 import { useCartStore } from "@/lib/store/cartStore";
 import CustomModal from "./Modals/Modal";
-import MenuLink from "@/../models/menuLinks";
 import { DesktopNavLinks } from "./DesktopNavLinks";
 import { MobileNavLinks } from "./MobileNavLinks";
 import LoadingScreen from "./Loading";

@@ -10,7 +10,6 @@ export function useVariations() {
   return useQuery({
     queryKey: ["Variations"],
     queryFn: async () => {
-      console.log("Fetching Variations using API");
       const res = await fetch("/api/variationType");
       if (!res.ok) throw new Error("Failed to fetch Variations");
       return res.json() as Promise<VariationType[]>;

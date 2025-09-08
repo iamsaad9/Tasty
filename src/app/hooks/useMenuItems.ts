@@ -42,7 +42,6 @@ export function useMenuItems() {
   return useQuery({
     queryKey: ["MenuItems"],
     queryFn: async () => {
-      console.log("Fetching MenuItems using API");
       const res = await fetch("/api/menuItems");
       if (!res.ok) throw new Error("Failed to fetch MenuItems");
       return res.json() as Promise<MenuItem[]>;

@@ -4,9 +4,6 @@ import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Radio,
   RadioGroup,
   addToast,
@@ -15,10 +12,8 @@ import {
 import { useMenuItemModalStore } from "@/lib/store/menuItemModalStore";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, X, Share2 } from "lucide-react";
-import Image from "next/image";
 import { useCartStore } from "@/lib/store/cartStore";
 import { useLocationStore } from "@/lib/store/locationStore";
-import LocationModal from "./LocationModal";
 import { useSession } from "next-auth/react";
 import ItemNotAvailable from "../ItemNotAvailable";
 
@@ -173,7 +168,6 @@ function MenuItemModal() {
       itemVariations: getSelectedVariationNames(),
       itemInstructions: instructions,
     };
-    console.log("cartItem", cartItem);
 
     addItem(cartItem);
     closeModal();

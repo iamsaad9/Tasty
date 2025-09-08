@@ -6,7 +6,6 @@ export function useTables() {
   return useQuery({
     queryKey: ["Tables"],
     queryFn: async () => {
-      console.log("Fetching Tables using API");
       const res = await fetch("/api/tables");
       if (!res.ok) throw new Error("Failed to fetch Tables");
       return res.json() as Promise<Tables[]>;

@@ -21,7 +21,6 @@ function Speacials() {
 
   useEffect(() => {
     if (!isPending && MenuItems) {
-      console.log("MenuItems", MenuItems);
       const filteredMenuItems = filterSpecialMenuItems(MenuItems);
       setSpecialItems(filteredMenuItems);
     }

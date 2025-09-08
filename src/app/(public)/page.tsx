@@ -25,7 +25,7 @@ function Home() {
       </div>
 
       <div className="w-full flex justify-center z-10">
-        <MenuItems showLoading={(val) => setLoading(val)} />
+        <MenuItems />
       </div>
 
       <div className="w-full flex items-center justify-center">

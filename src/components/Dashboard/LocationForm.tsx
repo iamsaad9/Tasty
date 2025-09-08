@@ -24,10 +24,6 @@ function LocationForm() {
     }
   }, [hasHydrated, selectedLocation]);
 
-  useEffect(() => {
-    console.log("locations", locations);
-  }, [locations]);
-
   return (
     <div className="w-full bg-foreground">
       <Card className="bg-theme mx-auto  xl:w-[70vw] 2xl:w-[60vw] p-5 2xl:p-10 rounded-none">

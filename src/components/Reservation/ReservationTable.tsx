@@ -101,7 +101,6 @@ export default function ViewReservations({
   }, [occasionType]);
 
   const handleEditReservation = (reservation: Reservation) => {
-    console.log("Reservation Data", reservation);
     onEditReservation(reservation);
     onAddNew();
   };
@@ -223,7 +222,6 @@ export default function ViewReservations({
 
   const handleCancelReservation = useCallback((reservationId: string) => {
     // Add your cancel logic here
-    console.log("Cancelling reservation:", reservationId);
     addToast({
       title: "Success!",
       description: "Reservation cancelled successfully",

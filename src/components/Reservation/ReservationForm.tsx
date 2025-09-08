@@ -290,8 +290,6 @@ function ReservationForm({
   };
 
   const handleSubmit = async () => {
-    console.log("Submit clicked");
-
     setIsSubmitting(true);
 
     const reservation: Reservation = {
@@ -308,9 +306,7 @@ function ReservationForm({
       status: "pending",
       tableId: "",
     };
-    console.log("reservation", reservation);
     const isEditing = !!reservationDataProp;
-    console.log("isEditing", isEditing);
 
     try {
       setIsSubmitting(true);

@@ -12,13 +12,7 @@ import {
   Chip,
   Image,
 } from "@heroui/react";
-import {
-  Plus,
-  Trash,
-  PenIcon,
-  Star,
-  TrendingUp,
-} from "lucide-react";
+import { Plus, Trash, PenIcon, Star, TrendingUp } from "lucide-react";
 import LoadingScreen from "@/components/Loading";
 
 interface CategoryType {
@@ -178,7 +172,6 @@ export default function MenuItemTable({
   }, []);
 
   const handleEditMenuItem = (menuItem: MenuItem) => {
-    console.log("Menu Item Data", menuItem);
     onEditMenuItem(menuItem);
     onAddNew();
   };

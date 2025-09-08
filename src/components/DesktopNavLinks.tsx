@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, Button } from "@heroui/react";
 import { MdLogout } from "react-icons/md";
 import AuthModal from "./Modals/LoginModal";
@@ -14,6 +13,8 @@ import {
   DropdownTrigger,
 } from "@heroui/react";
 import { FaUserEdit } from "react-icons/fa";
+import { ClipboardList } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Updated interfaces to work with flat menu structure
 interface ProcessedMenuLink {
@@ -38,6 +39,7 @@ export const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
 }) => {
   const [showLogin, setShowLogin] = useState(false);
   const { data: session } = useSession();
+  const router = useRouter();
 
   // Check if a menu item is active
   const isLinkActive = (href: string) =>
@@ -122,6 +124,16 @@ export const DesktopNavLinks: React.FC<DesktopNavLinksProps> = ({
               <div className="text-accent flex flex-row gap-2 justify-start items-center font-medium">
                 <FaUserEdit size={20} />
                 <span>Edit Profile</span>
+              </div>
+            </DropdownItem>
+
+            <DropdownItem
+              key="view-orders"
+              onClick={() => router.push("/orders")}
+            >
+              <div className="text-accent flex flex-row gap-2 justify-start items-center font-medium">
+                <ClipboardList size={20} />
+                <span>My Orders</span>
               </div>
             </DropdownItem>
 

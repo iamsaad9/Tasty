@@ -89,7 +89,6 @@ export function useOrders() {
   return useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
-      console.log("Fetching orders using API");
       const res = await fetch("/api/order");
       if (!res.ok) throw new Error("Failed to fetch orders");
       return res.json() as Promise<Order[]>;
@@ -103,7 +102,6 @@ export function useOrder(orderId: string) {
   return useQuery({
     queryKey: ["order", orderId],
     queryFn: async () => {
-      console.log("Fetching order:", orderId);
       const res = await fetch(`/api/order/${orderId}`);
       if (!res.ok) throw new Error("Failed to fetch order");
       return res.json() as Promise<Order>;
@@ -121,8 +119,6 @@ export function useCreateOrder() {
     mutationFn: async (
       orderData: CreateOrderData
     ): Promise<CreateOrderResponse> => {
-      console.log("Creating order:", orderData);
-
       const res = await fetch("/api/order", {
         method: "POST",
         headers: {
@@ -133,7 +129,6 @@ export function useCreateOrder() {
 
       // Read response as text first
       const text = await res.text();
-      console.log("Server response text:", text);
 
       // Try parsing JSON safely
       let data: CreateOrderResponse | ApiErrorResponse;
@@ -176,11 +171,6 @@ export function useUpdateOrderStatus() {
       orderStatus?: string;
       paymentStatus?: string;
     }): Promise<UpdateOrderResponse> => {
-      console.log("Updating order status:", orderId, {
-        orderStatus,
-        paymentStatus,
-      });
-
       const res = await fetch(`/api/order`, {
         method: "PUT",
         headers: {

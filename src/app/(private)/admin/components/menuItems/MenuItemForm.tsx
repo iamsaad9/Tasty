@@ -719,7 +719,6 @@ function MenuItemForm({ menuItemDataProp, resetData }: MenuItemFormProps) {
                                     }
                                   : item
                               );
-                              console.log("Updated delivery areas:", updated);
                               return updated;
                             });
                           }}

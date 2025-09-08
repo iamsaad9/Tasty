@@ -20,7 +20,6 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
-    console.log("Incoming body", body);
     const newReservation = await Reservation.create(body);
     return NextResponse.json(newReservation, { status: 201 });
   } catch (error) {

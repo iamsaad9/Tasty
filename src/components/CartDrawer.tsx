@@ -27,10 +27,6 @@ export default function CartDrawer() {
     itemIndex: -1,
   });
 
-  useEffect(() => {
-    console.log("items", items);
-  }, []);
-
   // Helper function to format variations display - handles both old and new formats
   const formatVariations = (
     variations: { [key: string]: string } | ItemVariation[] | undefined

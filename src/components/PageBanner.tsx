@@ -26,7 +26,7 @@ function PageBanner({ title, image }: PageBannerProps) {
   return (
     <div className="w-full">
       <div
-        className="bg-cover bg-center h-72 md:h-[30rem] flex items-center justify-center relative"
+        className="bg-cover bg-center h-72 md:h-[22rem] lg:h-[26rem] xl:h-[30rem] flex items-center justify-center relative"
         style={{ backgroundImage: `url(${image})` }}
       >
         {/* Overlay */}
@@ -35,7 +35,7 @@ function PageBanner({ title, image }: PageBannerProps) {
         {/* Title */}
         <FadeInSection className="absolute flex flex-col items-center justify-center text-center px-4">
           <h2
-            className={`${indie.className} text-white text-4xl md:text-7xl mt-10 mb-4`}
+            className={`${indie.className} text-white text-4xl md:text-6xl lg:text-7xl mt-10 mb-4`}
           >
             {title}
           </h2>

@@ -144,7 +144,6 @@ const MenuSearch: React.FC<MenuSearchProps> = ({
                         .filter((item) => item !== "all"); // Remove "all"
 
                       setSelectedDiet(selected);
-                      console.log("Selected Diet:", selected);
                     }}
                   >
                     {dietaryPreferences.map((item) => (

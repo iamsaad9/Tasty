@@ -287,11 +287,9 @@ export default function OrderProcessingAdmin() {
       {
         onSuccess: (data) => {
           console.log("Order status updated successfully:", data);
-          // Optionally show a success toast/notification
         },
         onError: (error) => {
           console.error("Failed to update order status:", error);
-          // Optionally show an error toast/notification
         },
       }
     );
