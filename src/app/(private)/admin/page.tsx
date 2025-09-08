@@ -302,7 +302,7 @@ const AdminDashboard: React.FC = () => {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: reservation._id,
+          _id: reservation._id,
           status: "confirmed",
           tableId: selectedTable.id,
         }),

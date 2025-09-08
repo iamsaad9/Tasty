@@ -100,6 +100,10 @@ function ReservationForm({
     );
   }, [allReservations, session]);
 
+  useEffect(() => {
+    console.log("Reservation Props: ", reservationDataProp);
+  }, [reservationDataProp]);
+
   // Helper function to check if user has reservation on a specific date
   const checkReservationOnDate = (dateToCheck: CalendarDate | null) => {
     if (!dateToCheck) return false;
@@ -307,7 +311,6 @@ function ReservationForm({
       tableId: "",
     };
     const isEditing = !!reservationDataProp;
-
     try {
       setIsSubmitting(true);
       const res = await fetch("/api/reservations", {

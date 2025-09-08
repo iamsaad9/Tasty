@@ -33,18 +33,18 @@ export async function PUT(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
-
-    if (!body.id) {
+    console.log("Body:", body);
+    if (!body._id) {
       return NextResponse.json(
         { error: "Missing id for update" },
         { status: 400 }
       );
     }
 
-    const { id, ...updateData } = body; // take id out, keep rest dynamic
+    const { _id, ...updateData } = body; // take id out, keep rest dynamic
 
     const updatedReservation = await Reservation.findByIdAndUpdate(
-      id,
+      _id,
       updateData,
       {
         new: true,
