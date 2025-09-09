@@ -9,6 +9,9 @@ const RalewaySans = Raleway({
 });
 export const metadata: Metadata = {
   title: "Tasty",
+  icons: {
+    icon: "/images/favIcon.png",
+  },
 };
 
 export default function Layout({
